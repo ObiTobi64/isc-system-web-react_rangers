@@ -217,10 +217,24 @@ const ProfessorPage = () => {
               row: "bg-white dark:bg-gray-800",
               columnHeaderTitle: "!font-bold text-center",
             }}
+            pageSizeOptions={[5, 10]}
             checkboxSelection={false}
-            rowSelectionModel={[]}
             disableRowSelectionOnClick
-            sx={{'& *':{userSelect:'none',pointerEvents:'none'}}}
+            sx={{
+              
+              "& .MuiDataGrid-cell": {
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                MozUserSelect: "none",
+                msUserSelect: "none",
+              },
+              "& .MuiDataGrid-cell:focus": {
+                outline: "none !important",
+              },
+              "& .MuiDataGrid-cell:focus-within": {
+                outline: "none !important",
+              },
+            }}
           />
           <Dialog
             open={open}
