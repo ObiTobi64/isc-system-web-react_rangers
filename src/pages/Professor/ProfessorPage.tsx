@@ -217,10 +217,10 @@ const ProfessorPage = () => {
               row: "bg-white dark:bg-gray-800",
               columnHeaderTitle: "!font-bold text-center",
             }}
-            pageSizeOptions={[5, 10]}
             checkboxSelection={false}
+            rowSelectionModel={[]}
             disableRowSelectionOnClick
-
+            sx={{'& *':{userSelect:'none',pointerEvents:'none'}}}
           />
           <Dialog
             open={open}
