@@ -218,6 +218,9 @@ const ProfessorPage = () => {
               columnHeaderTitle: "!font-bold text-center",
             }}
             pageSizeOptions={[5, 10]}
+            checkboxSelection={false}
+            disableRowSelectionOnClick
+
           />
           <Dialog
             open={open}
