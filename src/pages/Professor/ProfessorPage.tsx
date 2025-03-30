@@ -31,6 +31,18 @@ const ProfessorPage = () => {
   const [deleteProfessorPermission, setDeleteProfessorPermission] = useState<Permission>();
   const [editProfessorPermission, setEditProfessorPermission] = useState<Permission>();
 
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    code: true, 
+    degree: true,
+    name: true,
+    lastName: true,
+    phone: true,
+    tutorias: true,
+    revisiones: true,
+    actions: true,
+  });
+  
+
   useEffect(() => {
     const fetchPermissions = async () => {
       const addProfessorResponse = await getPermissionById(7);
@@ -177,6 +189,23 @@ const hasDeletePermission = HasPermission(deleteProfessorPermission?.name || "")
       },
     },
   ];
+
+
+  interface VisibilityChangeModel {
+    [key: string]: boolean;
+  }
+
+  const handleColumnVisibilityChange = (newModel: VisibilityChangeModel): void => {
+    const visibleColumns = Object.entries(newModel).filter(([, isVisible]) => isVisible);
+    
+    if (visibleColumns.length === 0) {
+      const firstColumn = Object.keys(columnVisibilityModel)[0]; 
+      newModel[firstColumn] = true; 
+    }
+  
+    setColumnVisibilityModel((prevModel) => ({ ...prevModel, ...newModel }));
+  };
+  
   
   const handleCreateTeacher = () => {
     navigate("/create-professor");
@@ -244,6 +273,9 @@ const hasDeletePermission = HasPermission(deleteProfessorPermission?.name || "")
             rows={professors}
             columns={columns}
             localeText={dataGridLocaleText}
+            columnVisibilityModel={columnVisibilityModel}
+            onColumnVisibilityModelChange={handleColumnVisibilityChange}
+        
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
