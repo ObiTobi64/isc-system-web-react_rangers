@@ -190,7 +190,7 @@ const hasDeletePermission = HasPermission(deleteProfessorPermission?.name || "")
     },
   ];
 
-
+//
   interface VisibilityChangeModel {
     [key: string]: boolean;
   }
