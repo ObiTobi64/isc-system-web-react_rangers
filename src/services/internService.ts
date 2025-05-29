@@ -87,7 +87,7 @@ export const getInternInformation = async (user_id: number) => {
   }
 };
 
-export const getAllCompleteInternService = async (userId: number) => {
+export const getAllCompleteInternService = async () => {
   try {
     const response = await apiClient.get(`/interns/full-info`);
     if (response.status === 200) {

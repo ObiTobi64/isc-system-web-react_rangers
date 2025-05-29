@@ -230,6 +230,7 @@ const GraduationProcessPage = () => {
             slotProps={{
               columnsManagement: {
                 autoFocusSearchField: false,
+                //@ts-ignore
                 searchInputProps: {
                   sx: {
                     "& .MuiOutlinedInput-root": {
