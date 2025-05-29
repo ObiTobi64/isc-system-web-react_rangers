@@ -339,6 +339,7 @@ const StudentPage = () => {
           slotProps={{
                 columnsManagement: {
                   autoFocusSearchField: false,
+                  //@ts-ignore
                   searchInputProps: {
                     sx: {
                       "& .MuiOutlinedInput-root": {
