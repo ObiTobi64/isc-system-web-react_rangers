@@ -37,32 +37,33 @@ const Checklist = () => {
   } = process as Seminar;
 
   const renderStatusIcon = (stage: number) => {
-    switch (stage) {
-      case 0:
+  switch (stage) {
+    case 0:
+      return <FaCheck className="text-green-500 ml-auto" />;
+
+    case 1:
+      if (tutorApproval) {
         return <FaCheck className="text-green-500 ml-auto" />;
+      }
+      if (stageId === 1) {
+        return <FaClock className="text-yellow-500 ml-auto" />;
+      }
+      return <FaMinus className="text-gray-400 ml-auto" />;
 
-      case 1:
-        if (tutorApproval) {
-          return <FaCheck className="text-green-500 ml-auto" />;
-        }
-        if (stageId === 1) {
-          return <FaClock className="text-yellow-500 ml-auto" />;
-        }
-        return <FaMinus className="text-gray-400 ml-auto" />;
+    case 2:
+      if (reviewerApproval) {
+        return <FaCheck className="text-green-500 ml-auto" />;
+      }
+      return stageId >= 2 ? (
+        <FaClock className="text-yellow-500 ml-auto" />
+      ) : (
+        <FaMinus className="text-gray-400 ml-auto" />
+      );
 
-      case 2:
-        if (reviewerApproval) {
-          return <FaCheck className="text-green-500 ml-auto" />;
-        }
-        if (stageId === 2) {
-          return <FaClock className="text-yellow-500 ml-auto" />;
-        }
-        return <FaMinus className="text-gray-400 ml-auto" />;
-
-      default:
-        return <FaMinus className="text-gray-400 ml-auto" />;
-    }
-  };
+    default:
+      return <FaMinus className="text-gray-400 ml-auto" />;
+  }
+};
   const [telegramLink, setTelegramLink] = useState<string>("");
 
   const fetchUserData = async () => {

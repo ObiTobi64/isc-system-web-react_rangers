@@ -1,5 +1,8 @@
 name: Deploy Frontend to Vercel on Develop Push (if E2E passed)
 
+permissions:
+  contents: write
+
 on:
   workflow_run:
     workflows: ["CI - Pruebas E2E Frontend"]

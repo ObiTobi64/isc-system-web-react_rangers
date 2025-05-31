@@ -75,7 +75,7 @@ const ProgressTracker: FC<ProgressTrackerProps> = ({ currentStepIndex }) => {
         {steps.map((label, index) => (
           <Step
             key={index}
-            completed={index < (process?.stage_id || 1)}
+            completed={index <= (process?.stage_id || 1)}
             onClick={handleStep(index)}
           >
             <StepLabel>{label}</StepLabel>
