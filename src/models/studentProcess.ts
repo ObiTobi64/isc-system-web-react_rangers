@@ -26,10 +26,10 @@ export interface Seminar {
   reviewer_fullname: string;
   reviewer_degree: string;
   stage_id: number;
-  date_tutor_assignament: Dayjs | null;
-  date_reviewer_assignament: Dayjs | null;
-  tutor_approval_date: Dayjs | null;
-  reviewer_approval_date: Dayjs | null;
+  date_tutor_assignament: string;
+  date_reviewer_assignament: string;
+  tutor_approval_date: string;
+  reviewer_approval_date: string;
 }
 
 export interface GraduationProcess {

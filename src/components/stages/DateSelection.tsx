@@ -22,7 +22,7 @@ const DateSelection: FC<DateSelectionProps> = ({ disabled, formik, renderFieldEr
         <DatePicker
           disabled={disabled}
           label="Fecha de Asignación"
-          value={formik.values.date_tutor_assignament}
+          value={formik.values.date_tutor_assignament ? dayjs(formik.values.date_tutor_assignament):null}
           onChange={(value) => formik.setFieldValue("date_tutor_assignament", value)}
           format="DD/MM/YYYY"
           minDate={currentDate}

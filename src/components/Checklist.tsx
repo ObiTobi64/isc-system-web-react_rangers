@@ -16,12 +16,12 @@ import { getUserById } from "../services/studentService";
 const Checklist = () => {
   const process = useProcessStore((state) => state.process);
 
-  const formattedTutorDate = process?.tutor_approval_date
-    ? dayjs(process.tutor_approval_date).format("DD/MM/YYYY")
+  const formattedTutorDate = process?.date_tutor_assignament
+    ? dayjs(process.date_tutor_assignament).format("DD/MM/YYYY")
     : "";
 
-  const formattedReviewerDate = process?.reviewer_approval_date
-    ? dayjs(process.reviewer_approval_date).format("DD/MM/YYYY")
+  const formattedReviewerAssignDate = process?.date_reviewer_assignament
+    ? dayjs(process.date_reviewer_assignament).format("DD/MM/YYYY")
     : "";
 
   const {
@@ -142,13 +142,11 @@ const Checklist = () => {
                 {"Revisor: "}
                 {reviewerDegree} {reviewerFullname}
               </h4>
-              {reviewerApproval ? (
+              {formattedReviewerAssignDate && (
                 <p className="text-sm text-gray-500">
-                  {"Aprobación del Revisor el "}
-                  {formattedReviewerDate}
+                  {"Asignación del Revisor el "}
+                  {formattedReviewerAssignDate}
                 </p>
-              ) : (
-                <p className="text-sm text-gray-500">{"Fase de Revisor no Aprobada"}</p>
               )}
             </div>
             {renderStatusIcon(2)}

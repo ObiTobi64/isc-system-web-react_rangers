@@ -54,11 +54,11 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
       tutor_approval: formik.values.tutorApprovalLetterSubmitted,
       tutor_id: Number(mentor),
       tutor_name: mentorName,
-      date_tutor_assignament: date_tutor_assignament ? dayjs(date_tutor_assignament) : null,
+      date_tutor_assignament: date_tutor_assignament ? dayjs(date_tutor_assignament).toISOString() :'',
       ...(canApproveStage && {
         stage_id: 2,
         tutor_approval: true,
-        tutor_approval_date: dayjs(),
+        tutor_approval_date: dayjs().toISOString(),
       }),
     };
     try {

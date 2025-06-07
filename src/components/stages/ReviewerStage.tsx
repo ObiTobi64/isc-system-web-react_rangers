@@ -1,6 +1,4 @@
-import { FC, useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import { FC, useState, useCallback } from "react";
 import { Box, Button, Checkbox, Grid, Paper, Typography } from "@mui/material";
 import ConfirmModal from "../common/ConfirmModal";
 import { steps } from "../../data/steps";
@@ -16,23 +14,17 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DownloadButton from "../common/DownloadButton";
 import { letters } from "../../constants/letters";
 import { useCarrerStore } from "../../store/carrerStore";
+import useReviewerFormik from "../../hooks/useReviewerFormik";
 const { TUTOR_APPROBAL, REVIEWER_ASSIGNMENT } = letters;
 
-const validationSchema = Yup.object({
-  reviewer: Yup.string().required("* El revisor es obligatorio"),
-  reviewerDesignationLetterSubmitted: Yup.boolean(),
-  reviewerApprovalLetterSubmitted: Yup.boolean(),
-  date_reviewer_assignament: Yup.mixed().required("Debe seleccionar una fecha"),
-});
+const program = "Ingeniería de Sistemas Computacionales";
+const headOfDepartment = "Alexis Marechal Marin PhD";
+const CURRENT_STAGE = 2;
 
 interface ReviewerStageProps {
   onPrevious: () => void;
   onNext: () => void;
 }
-
-const program = "Ingeniería de Sistemas Computacionales";
-const headOfDepartment = "Alexis Marechal Marin PhD";
-const CURRENT_STAGE = 2;
 
 export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
   const process = useProcessStore((state) => state.process);
@@ -42,45 +34,54 @@ export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) =>
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<boolean>(CURRENT_STAGE < (process?.stage_id || 0));
 
-  const formik = useFormik({
-    initialValues: {
-      reviewerDesignationLetterSubmitted: process?.reviewer_letter || false,
-      date_reviewer_assignament: process?.date_reviewer_assignament
-        ? dayjs(process.date_reviewer_assignament)
-        : dayjs(),
-      reviewer: process?.reviewer_id || "",
-      reviewerApprovalLetterSubmitted: process?.reviewer_approval || false,
-    },
-    validationSchema,
-    onSubmit: () => {
+  const { formik, canApproveStage } = useReviewerFormik(process, () => {
+    if (canApproveStage()) {
       setShowModal(true);
-    },
+    } else {
+      saveStage(false);
+    }
   });
 
-  const saveStage = async () => {
-    if (process) {
-      const { reviewer, reviewerDesignationLetterSubmitted, reviewerApprovalLetterSubmitted } = formik.values;
-      process.reviewer_approval = reviewerApprovalLetterSubmitted;
-      process.reviewer_letter = reviewerDesignationLetterSubmitted;
-      process.reviewer_id = Number(reviewer);
-      process.stage_id = 3;
-      process.reviewer_approval_date = dayjs();
-      setProcess(process);
-      try {
-        await updateProcess(process);
-        if (isApproveButton) {
-          onNext();
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
+  const saveStage = useCallback(
+    async (approve: boolean) => {
+      if (process) {
+        const {
+          reviewer,
+          reviewerDesignationLetterSubmitted,
+          reviewerApprovalLetterSubmitted,
+          date_reviewer_assignament,
+        } = formik.values;
 
-  const handleModalAction = () => {
-    saveStage();
+        process.reviewer_approval = reviewerApprovalLetterSubmitted;
+        process.reviewer_letter = reviewerDesignationLetterSubmitted;
+        process.reviewer_id = Number(reviewer);
+        process.date_reviewer_assignament = date_reviewer_assignament
+          ? dayjs(date_reviewer_assignament).toISOString()
+          : "";
+        
+        if (approve) {
+          process.stage_id = 3;
+          process.reviewer_approval_date = dayjs().toISOString();
+        }
+
+        setProcess({ ...process });
+        try {
+          await updateProcess(process);
+          if (approve) {
+            onNext();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    [process, formik.values, setProcess, onNext]
+  );
+
+  const handleModalAction = useCallback(() => {
+    saveStage(true);
     setShowModal(false);
-  };
+  }, [saveStage]);
 
   const handleMentorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("reviewer", value?.id || "");
@@ -91,15 +92,6 @@ export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) =>
 
   const handleDateChange = (value: Dayjs | null) => {
     formik.setFieldValue("date_reviewer_assignament", value);
-  };
-
-  const canApproveStage = () => {
-    return Boolean(
-      formik.values.reviewer &&
-      formik.values.reviewerDesignationLetterSubmitted &&
-      formik.values.reviewerApprovalLetterSubmitted &&
-      formik.values.date_reviewer_assignament
-    );
   };
 
   const isApproveButton = canApproveStage();
@@ -133,7 +125,11 @@ export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) =>
               <DatePicker
                 disabled={editMode}
                 label="Fecha de Asignación"
-                value={formik.values.date_reviewer_assignament}
+                value={
+                  formik.values.date_reviewer_assignament
+                    ? dayjs(formik.values.date_reviewer_assignament)
+                    : null
+                }
                 onChange={handleDateChange}
                 format="DD/MM/YYYY"
               />
@@ -233,7 +229,10 @@ export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) =>
           <Button type="button" variant="contained" color="secondary" onClick={onPrevious}>
             Anterior
           </Button>
-          <Button type="submit" variant="contained" color="primary"
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
             disabled={
               !formik.values.reviewerDesignationLetterSubmitted ||
               !formik.values.reviewerApprovalLetterSubmitted
