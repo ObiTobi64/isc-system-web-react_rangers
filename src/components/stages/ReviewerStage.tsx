@@ -52,19 +52,22 @@ export const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) =>
           date_reviewer_assignament,
         } = formik.values;
 
-        process.reviewer_approval = reviewerApprovalLetterSubmitted;
-        process.reviewer_letter = reviewerDesignationLetterSubmitted;
-        process.reviewer_id = Number(reviewer);
-        process.date_reviewer_assignament = date_reviewer_assignament
+        const updatedProcess = {
+        ...process,
+        reviewer_approval: reviewerApprovalLetterSubmitted,
+        reviewer_letter: reviewerDesignationLetterSubmitted,
+        reviewer_id: Number(reviewer),
+        date_reviewer_assignament: date_reviewer_assignament
           ? dayjs(date_reviewer_assignament).toISOString()
-          : "";
+          : "",
+        };
         
         if (approve) {
-          process.stage_id = 3;
-          process.reviewer_approval_date = dayjs().toISOString();
+          updatedProcess.stage_id = 3;
+          updatedProcess.reviewer_approval_date = dayjs().toISOString();
         }
 
-        setProcess({ ...process });
+        setProcess({ ...process, ...updatedProcess});
         try {
           await updateProcess(process);
           if (approve) {
