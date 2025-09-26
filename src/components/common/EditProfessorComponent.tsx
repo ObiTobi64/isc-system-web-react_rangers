@@ -15,6 +15,12 @@ import { useEffect, useState } from "react";
 import { getUserById } from "../../services/studentService";
 import LoadingOverlay from "../../components/common/Loading";
 import { updateProfessor } from "../../services/mentorsService";
+import {
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
+  CODE_REGEX,
+} from "../../constants/validation";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("El nombre completo es obligatorio"),
@@ -26,7 +32,17 @@ const validationSchema = Yup.object({
   phone: Yup.string()
     .matches(/^[0-9]{8}$/, "Ingrese un número de teléfono válido")
     .optional(),
-  code: Yup.number().optional(),
+  code: Yup.string()
+    .test('code-validation', CODE_ERROR_MESSAGE, function(value) {
+      if (!value || value.trim() === '') {
+        return true; // Allow empty values
+      }
+      
+      const isValidRegex = CODE_REGEX.test(value);
+      const isValidLength = value.length >= CODE_MIN_DIGITS && value.length <= CODE_DIGITS;
+      
+      return isValidRegex && isValidLength;
+    }),
 });
 
 const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({ id, onClose }) => {
@@ -50,6 +66,9 @@ const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({
       setProfessor(response);
     } catch (error) {
       console.error("Error al obtener docente:", error);
+      setMessage("No se pudo cargar la información del docente.");
+      setSeverity("error");
+      setOpen(true);
     }
   };
   useEffect(() => {
@@ -72,9 +91,38 @@ const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({
     },
     validationSchema,
     onSubmit: async (values) => {
+     
+      const errors = await formik.validateForm();
+      
+  
+      if (values.code && values.code.trim() !== '') {
+        if (!CODE_REGEX.test(values.code)) {
+          formik.setFieldError('code', CODE_ERROR_MESSAGE);
+          formik.setFieldTouched('code', true);
+          setMessage("El código debe tener entre 5 y 8 dígitos");
+          setSeverity("error");
+          setOpen(true);
+          return;
+        }
+        if (values.code.length < CODE_MIN_DIGITS || values.code.length > CODE_DIGITS) {
+          formik.setFieldError('code', CODE_ERROR_MESSAGE);
+          formik.setFieldTouched('code', true);
+          setMessage("El código debe tener entre 5 y 8 dígitos");
+          setSeverity("error");
+          setOpen(true);
+          return;
+        }
+      }
+
+      if (Object.keys(errors).length > 0) {
+        setMessage("Por favor corrija los errores antes de continuar");
+        setSeverity("error");
+        setOpen(true);
+        return;
+      }
+      
       try {
-        // @ts-expect-error: Código de docente se está pasando como string y no como numero
-        await updateProfessor(values);
+        await updateProfessor({ ...values, id: Number(id) });
         setMessage("Docente actualizado con éxito");
         setSeverity("success");
         setTimeout(() => {
@@ -104,8 +152,17 @@ const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({
 
   const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+    
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("code", value);
+      formik.setFieldTouched("code", true); 
+      
+     
+      if (value.trim() !== '' && !CODE_REGEX.test(value)) {
+        formik.setFieldError("code", CODE_ERROR_MESSAGE);
+      } else if (value.trim() === '' || CODE_REGEX.test(value)) {
+        formik.setFieldError("code", undefined);
+      }
     }
   };
 
@@ -185,7 +242,10 @@ const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ maxLength: 10 }}
+                      inputProps={{ 
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -250,7 +310,12 @@ const EditProfessorComponent: React.FC<{ id: number; onClose: () => void }> = ({
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="flex-end">
               <Grid item>
-                <Button variant="contained" color="primary" type="submit">
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  type="submit"
+                  disabled={!formik.isValid}
+                >
                   GUARDAR
                 </Button>
               </Grid>

@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
@@ -10,10 +11,14 @@ export default defineConfig({
     CAREER_MANAGER_PASSWORD: '123456',
     SUPERVISOR_EMAIL: 'supervisor@gmail.com',
     SUPERVISOR_PASSWORD: '123456',
+    HEAD_OF_DEPARTMENT_EMAIL: 'alexismarechal@upb.edu',
+    HEAD_OF_DEPARTMENT_PASSWORD: '123456'
   },
   e2e: {
-    setupNodeEvents(on, config) {
+    /*setupNodeEvents(on, config) {
       // implement node event listeners here
-    },
+    },*/
+    baseUrl: "http://localhost:5173",
+    supportFile: "cypress/support/commands.ts",
   },
 });

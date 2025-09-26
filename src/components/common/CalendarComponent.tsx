@@ -5,6 +5,15 @@ import moment from "moment";
 import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
+const calendarStyles = `
+  .rbc-toolbar {
+    flex-wrap: nowrap !important;
+  }
+  .rbc-toolbar .rbc-btn-group {
+    flex-wrap: nowrap !important;
+  }
+`;
+
 moment.locale("es");
 const localizer = momentLocalizer(moment);
 
@@ -65,6 +74,7 @@ const CalendarCard = ({ events }) => {
         >
           Calendario de Eventos
         </Typography>
+        <style>{calendarStyles}</style>
         <div style={{ height: 400 }}>
           <Calendar
             localizer={localizer}

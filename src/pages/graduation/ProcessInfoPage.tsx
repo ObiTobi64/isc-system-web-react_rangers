@@ -1,10 +1,10 @@
 import { useLoaderData } from "react-router-dom";
+import { useEffect } from "react";
+import { Grid } from "@mui/material";
 import Checklist from "../../components/Checklist";
 import ProgressTracker from "../../components/ProgressTracker";
 import { Seminar } from "../../models/studentProcess";
 import { useProcessStore } from "../../store/store";
-import { Grid } from "@mui/material";
-import { useEffect } from "react";
 import { steps } from "../../data/steps";
 
 const ProcessInfoPage = () => {
@@ -17,7 +17,7 @@ const ProcessInfoPage = () => {
     updateProcess(data);
   }, [data, updateProcess]);
 
-  const stageProcess = data.stage_id;
+  const stageProcess = data.stage_id || 0;
 
   return (
     <Grid container spacing={2}>

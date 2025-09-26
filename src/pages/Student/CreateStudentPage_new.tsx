@@ -24,13 +24,13 @@ import {
   PHONE_ERROR_MESSAGE,
   CODE_ERROR_MESSAGE,
   CODE_DIGITS,
+  CODE_MIN_DIGITS,
   PHONE_DIGITS,
   LETTERS_REGEX,
   EMAIL_REGEX,
   PHONE_REGEX,
   CODE_REGEX,
 } from "../../constants/validation";
-
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -80,7 +80,7 @@ const CreateStudentPage = () => {
       try {
         const response = await getStudents();
         const students = response.data || [];
-        const codes = new Set<string>(students.map((s: { code: number | string }) => s.code.toString()));
+        const codes = new Set<string>(students.map((s: any) => s.code.toString()));
         setStudentCodes(codes);
       } catch (error) {
         setStudentCodes(new Set());
@@ -108,14 +108,14 @@ const CreateStudentPage = () => {
       mothername: "",
       email: "",
       phone: "",
-      code: "00000",
+      code: "",
       isIntern: false,
       total_hours: 0,
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        const codeStr = values.code;
+        const codeStr = values.code.toString();
 
         if (studentCodes.has(codeStr)) {
           setMessage("El código de estudiante ya está en uso");
@@ -181,6 +181,14 @@ const CreateStudentPage = () => {
       return;
     }
     setOpen(false);
+  };
+
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    formik.handleChange(event);
+  };
+
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    formik.handleChange(event);
   };
 
   return (
@@ -267,7 +275,7 @@ const CreateStudentPage = () => {
                         variant="outlined"
                         fullWidth
                         value={formik.values.code}
-                        onChange={formik.handleChange}
+                        onChange={handleCodeChange}
                         onBlur={formik.handleBlur}
                         error={formik.touched.code && Boolean(formik.errors.code)}
                         helperText={formik.touched.code && formik.errors.code}
@@ -308,7 +316,7 @@ const CreateStudentPage = () => {
                     variant="outlined"
                     fullWidth
                     value={formik.values.phone}
-                    onChange={formik.handleChange}
+                    onChange={handlePhoneChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.phone && Boolean(formik.errors.phone)}
                     helperText={formik.touched.phone && formik.errors.phone}

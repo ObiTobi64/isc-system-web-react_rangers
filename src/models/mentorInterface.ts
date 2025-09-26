@@ -4,4 +4,5 @@ export interface Mentor {
   lastName: string;
   motherName: string;
   fullname: string;
+  degree: string
 }

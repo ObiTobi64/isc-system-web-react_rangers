@@ -50,5 +50,5 @@ export async function modifyPdf(
   });
 
   const pdfBytes = await pdfDoc.save();
-  return pdfBytes;
+  return new Uint8Array(pdfBytes).buffer;
 }

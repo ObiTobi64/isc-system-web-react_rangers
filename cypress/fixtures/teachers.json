@@ -1,0 +1,44 @@
+{
+  "validTeacher": {
+    "name": "Juan",
+    "lastname": "Pérez",
+    "mothername": "García",
+    "degree": "Ing.",
+    "code": "77162",
+    "email": "juan.perez@upb.edu",
+    "phone": "76543210"
+  },
+  "updatedTeacher": {
+    "name": "Carlos",
+    "lastname": "Navarro",
+    "mothername": "Zapata",
+    "degree": "M.Sc.",
+    "code": "34282",
+    "email": "carlos.navarro@example.com",
+    "phone": "71234567"
+  },
+  "invalidTeacher": {
+    "invalidName": "J0uan123",
+    "invalidPaternalSurname": "P3rez",
+    "invalidMaternalSurname": "G0m3z",
+    "invalidCode": "ABC123",
+    "invalidEmail": "correo-invalido",
+    "invalidPhone": "1234"
+  },
+  "validationMessages": {
+    "requiredName": "El nombre completo es obligatorio",
+    "requiredPaternalSurname": "El apellido es obligatorio",
+    "requiredMaternalSurname": "El apellido materno es obligatorio",
+    "requiredCode": "El código de docente es obligatorio",
+    "requiredTitle": "El título académico es obligatorio",
+    "requiredEmail": "El correo electrónico es obligatorio",
+    "requiredPhone": "El número de teléfono es requerido",
+    "obligatoryPhone": "El número de teléfono es obligatorio",
+    "onlyLettersName": "El nombre solo debe contener letras",
+    "onlyLettersPaternal": "El apellido paterno solo debe contener letras",
+    "onlyLettersMaternal": "El apellido materno solo debe contener letras",
+    "onlyNumbersCode": "El código solo debe contener números",
+    "invalidEmailFormat": "Ingrese un correo electrónico válido",
+    "invalidPhoneLength": "Ingrese un número de teléfono válido"
+  }
+}

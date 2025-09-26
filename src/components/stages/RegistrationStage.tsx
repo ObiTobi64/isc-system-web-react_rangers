@@ -47,7 +47,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
   const studentProcess = useProcessStore((state) => state.process);
   const setProcess = useProcessStore((state) => state.setProcess);
   const [modes, setModes] = useState<Modes[]>([]);
-  const [readOnly, setReadOnly] = useState<boolean>(true);
+  const readOnly = true;
   const [isVisible, setIsVisible] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [, setError] = useState<any | null>(null);
@@ -96,10 +96,6 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
     },
   });
 
-  const editForm = () => {
-    setReadOnly(false);
-  };
-
   const handleOnChange = (event: any) => {
     setEdited(true)
     formik.handleChange(event);
@@ -108,7 +104,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
   return (
     <>
       <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold' }}>
-        Etapa 1: Seminario de Grado <ModeEditIcon onClick={editForm} style={{ cursor: "pointer" }} />
+        Etapa 1: Seminario de Grado<ModeEditIcon style={{ cursor: "not-allowed", opacity: 0.5 }}/>
       </Typography>
   
       <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">

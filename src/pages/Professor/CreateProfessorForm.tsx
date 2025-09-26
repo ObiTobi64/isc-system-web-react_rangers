@@ -8,9 +8,13 @@ import ErrorDialog from "../../components/common/ErrorDialog";
 import SuccessDialog from "../../components/common/SucessDialog";
 import {
   PHONE_ERROR_MESSAGE,
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
   PHONE_DIGITS,
   LETTERS_REGEX,
   PHONE_REGEX,
+  CODE_REGEX,
 } from "../../constants/validation";
 
 
@@ -31,8 +35,8 @@ const validationSchema = Yup.object({
     .matches(PHONE_REGEX, PHONE_ERROR_MESSAGE)
     .required("El número de teléfono es requerido"),
   degree: Yup.string().required("El título académico es obligatorio"),
-  code: Yup.number()
-    .typeError("El código debe ser numérico")
+  code: Yup.string()
+    .matches(CODE_REGEX, CODE_ERROR_MESSAGE)
     .required("El código de docente es obligatorio"),
 
 });
@@ -65,7 +69,12 @@ const CreateProfessorForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        await createProfessor(values);
+      
+        const professorData = {
+          ...values,
+          code: values.code,
+        };
+        await createProfessor(professorData as any);
         setMessage("Profesor creado con éxito");
         setSuccessDialog(true);
       } catch (error) {
@@ -168,7 +177,10 @@ const CreateProfessorForm = () => {
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ maxLength: 10 }}
+                      inputProps={{ 
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS
+                      }}
                     />
                   </Grid>
                 </Grid>

@@ -1,8 +1,9 @@
 import { FC, useCallback, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-import { Box, Button, Typography, Grid } from "@mui/material";
+import { Box, Button, Typography, Grid, Alert, AlertTitle } from "@mui/material";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import WarningIcon from "@mui/icons-material/Warning";
 
 import MentorSelection from "./MentorSelection";
 import DateSelection from "./DateSelection";
@@ -31,6 +32,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<boolean>(CURRENT_STAGE < (process?.stage_id || 0));
+  const isBlocked = process?.stage_id !== 2;
 
   const { formik, canApproveStage } = useMentorFormik(process, () => {
     if (canApproveStage) {
@@ -95,9 +97,18 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
 
   return (
     <>
-      <Typography variant="h6"  gutterBottom style={{ fontWeight: 'bold' }}>
-        Etapa 2: Seleccionar Tutor <ModeEditIcon onClick={editForm} style={{ cursor: "pointer" }} />
+      <Typography variant="h6" gutterBottom style={{ fontWeight: "bold" }}>
+        Etapa 2: Seleccionar Tutor
+        {!isBlocked && <ModeEditIcon onClick={editForm} style={{ cursor: "pointer" }} />}
       </Typography>
+
+      {isBlocked && (
+        <Alert severity="warning" sx={{ mb: 2 }} icon={<WarningIcon />}>
+          <AlertTitle>{"Fase de Tutor Registrada"}</AlertTitle>
+          {"Esta fase ya ha sido completada y aprobada. No se puede editar el tutor porque \r"}
+          {"la fase ya ha sido registrada. Si necesita hacer cambios, contacte al administrador.\r"}
+        </Alert>
+      )}
 
       <form onSubmit={formik.handleSubmit} className="mx-16">
         <Grid container spacing={3}>

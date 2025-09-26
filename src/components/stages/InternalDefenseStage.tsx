@@ -89,15 +89,28 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const downloadEditedPDF = async (values: any) => {
     try {
-      const [year, month, day] = values.date.format("YYYY-MM-DD").split("-");
+      const [year, month, day, hour, minute] = values.date.format("YYYY-MM-DD HH:mm").split(/[- :]/);
       const response = await getProfessorById(parseInt(values.president));
       const fullName = response.fullname;
+      const student = process?.student_fullname || "";
+      const tutor = `${process?.tutor_degree || ""} ${process?.tutor_fullname}`;
+      const reviewer = `${process?.reviewer_degree || ""} ${process?.reviewer_fullname}`;
+      const projectName = process?.project_name;
+
       const data: PDFInsertData[] = [
         { x: 195, y: 204.1, size: 10, text: `${day}` },
         { x: 222, y: 204.1, size: 10, text: `${month}` },
         { x: 245, y: 204.1, size: 10, text: `${year}` },
+        { x: 195, y: 228, size: 10, text: hour },
+        { x: 222, y: 228, size: 10, text: minute },
+        { x: 222, y: 250, size: 10, text: student },
         { x: 222, y: 293, size: 10, text: fullName },
+        { x: 222, y: 317, size: 10, text: tutor },
+        { x: 222, y: 340, size: 10, text: reviewer },
+        { x: 305, y: 369, size: 10, text: projectName },
+
       ];
+      
 
       const pdfArrayBuffer = await fetch(pdfFile).then((res) => res.arrayBuffer());
       const modifiedPdf = await modifyPdf(pdfArrayBuffer, data);

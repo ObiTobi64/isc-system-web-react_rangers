@@ -18,7 +18,9 @@ import SuccessDialog from "../../components/common/SucessDialog";
 import ErrorDialog from "../../components/common/ErrorDialog";
 import {
   PHONE_ERROR_MESSAGE,
+  CODE_ERROR_MESSAGE,
   CODE_DIGITS,
+  CODE_MIN_DIGITS,
   PHONE_DIGITS,
   LETTERS_REGEX,
   EMAIL_REGEX,
@@ -52,7 +54,7 @@ const validationSchema = Yup.object({
     .required("El número de teléfono es obligatorio"),
 
   code: Yup.string()
-    .matches(CODE_REGEX, `El código debe tener hasta ${CODE_DIGITS} dígitos`)
+    .matches(CODE_REGEX, CODE_ERROR_MESSAGE)
     .required("El código de estudiante es obligatorio"),
 
   isIntern: Yup.boolean(),
@@ -105,9 +107,13 @@ const CreateStudentForm = ({ onSuccess }: { onSuccess: () => void }) => {
             total_hours,
             completed_hours: 0,
             pending_hours: 0,
-          });
+          } as any);
         } else {
-          await createStudent(studentData);
+          await createStudent({
+            ...studentData,
+            // Mantener como string
+            code: rest.code,
+          });
         }
         setSuccessDialog(true);
         setTimeout(() => {
@@ -210,7 +216,10 @@ const CreateStudentForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       margin="normal"
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
-                      inputProps={{ maxLength: CODE_DIGITS }}
+                      inputProps={{ 
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS
+                      }}
                     />
                   </Grid>
                 </Grid>

@@ -1,0 +1,30 @@
+{
+  "student": {
+    "name": "Diego",
+    "lastname": "Ramírez",
+    "mothername": "Lagos",
+    "code": "30152"
+  },
+  "student2": {
+    "name": "Claudia",
+    "lastname": "Navarro",
+    "mothername": "Paredes",
+    "code": "77420"
+  },
+  "process": {
+    "modality": "Proyecto de Grado",
+    "title": "PROYECTONUEVO",
+    "period": "Primero-2025",
+    "existingTitle": "PROYECTO"
+  },
+  "invalidData": {
+    "invalidCodes": ["ABC123", "123ABC", "!@#456"],
+    "shortTitle": "A",
+    "invalidTitle": "Título Inválido!@#",
+    "requiredFieldError": "Campo requerido",
+    "selectModalityError": "Seleccionar Modalidad",
+    "numericCodeError": "El código del estudiante debe ser un número",
+    "titleLengthError": "El título debe tener al menos 5 caracteres",
+    "titleFormatError": "El título solo debe contener letras y números"
+  }
+}

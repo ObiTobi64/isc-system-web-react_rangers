@@ -33,7 +33,7 @@ const RoleGuard: React.FC<RoleGuardProps> = ({ allowedRoles, children }) => {
       </div>
     );
   }
-
+  
   const userRoles = user.roles ?? [];
 
   const hasRole = allowedRoles.some((role) => userRoles.includes(role));

@@ -23,15 +23,16 @@ const AdministratorPage = () => {
   });
 
   const extractRoles = (rolesData: RolePermissions) => {
-    const rolesPermissions: RolePermissions = rolesData;
     const rolesFetched: Role[] = [];
-    Object.keys(rolesPermissions).forEach((roleName: string) => {
-      const rolePermissions = rolesPermissions[roleName];
+    Object.keys(rolesData).forEach((roleName: string) => {
+      const rolePermissions = rolesData[roleName];
       rolesFetched.push({
         id: rolePermissions.id,
         name: roleName,
         disabled: rolePermissions.disabled,
-        permissions: rolePermissions.permissions,
+        permissions: Array.isArray(rolePermissions.permissions)
+          ? rolePermissions.permissions
+          : [],
       });
     });
     return rolesFetched;

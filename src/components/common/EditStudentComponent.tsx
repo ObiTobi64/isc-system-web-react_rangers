@@ -4,6 +4,12 @@ import { FormContainer } from "../../pages/CreateGraduation/components/FormConta
 import { Button, Divider, Grid, TextField, Typography, Snackbar, Alert } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getUserById, updateStudent } from "../../services/studentService";
+import {
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
+  CODE_REGEX,
+} from "../../constants/validation";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("El nombre completo es obligatorio"),
@@ -15,7 +21,14 @@ const validationSchema = Yup.object({
   phone: Yup.string()
     .matches(/^[0-9]{8}$/, "Ingrese un número de teléfono válido")
     .optional(),
-  code: Yup.number().optional(),
+  code: Yup.string()
+    .optional()
+    .test('code-validation', CODE_ERROR_MESSAGE, function(value) {
+      if (value === undefined || value === null || value === '') {
+        return true; 
+      }
+      return CODE_REGEX.test(value);
+    }),
 });
 
 const EditStudentComponent: React.FC<{ id: number; onClose: () => void }> = ({ id, onClose }) => {
@@ -81,6 +94,7 @@ const EditStudentComponent: React.FC<{ id: number; onClose: () => void }> = ({ i
     const value = event.target.value;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("code", value);
+      formik.setFieldTouched("code", true);
     }
   };
 
@@ -159,7 +173,10 @@ const EditStudentComponent: React.FC<{ id: number; onClose: () => void }> = ({ i
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ maxLength: 10 }}
+                      inputProps={{ 
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS
+                      }}
                     />
                   </Grid>
                 </Grid>

@@ -35,7 +35,10 @@ const createProfessor = async (professor: ProfessorInterface) => {
 type ProfessorWithId = UserRequest & { id: number };
 
 export const updateProfessor = async (professor: ProfessorWithId) => {
-  const response = await putUser(professor.id, professor);
+  
+  const { id, ...professorData } = professor;
+  
+  const response = await putUser(id, professorData);
   return response;
 };
 

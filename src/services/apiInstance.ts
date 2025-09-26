@@ -1,4 +1,6 @@
+/* eslint-disable no-param-reassign */
 import axios from 'axios';
+
 if (import.meta.env.DEV) {
   console.log(import.meta.env.VITE_API_URL);
 }
@@ -14,5 +16,21 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Interceptor para manejar respuestas 401
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem('token');
+      // Si no estamos ya en la página de login, redirigir
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;
