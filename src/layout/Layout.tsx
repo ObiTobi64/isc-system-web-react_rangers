@@ -71,6 +71,8 @@ const Layout = () => {
       title: "Logout",
       onClick: () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("sessionActive");
+
         clearUser();
         navigate("/login", { replace: true });
       },
