@@ -1,6 +1,8 @@
-import { Permission } from './permissionInterface';
+import Permission from './permissionInterface';
 
-export interface Section {
+interface Section {
   name: string;
   permissions: Permission[];
 }
+
+export default Section;

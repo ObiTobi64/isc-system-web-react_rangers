@@ -1,4 +1,4 @@
-export interface ProfessorInterface {
+interface ProfessorInterface {
   name: string;
   lastName: string;
   motherName: string;
@@ -6,3 +6,5 @@ export interface ProfessorInterface {
   fullName: string;
   id: number;
 }
+
+export default ProfessorInterface;
