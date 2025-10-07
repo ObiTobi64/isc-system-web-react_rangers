@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { saveAs } from 'file-saver';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
@@ -11,7 +12,9 @@ export const downloadFile = async (file: Blob, fileName: string) => {
 
 export const loadFile = async (url: string) => {
   try {
-    if (import.meta.env.DEV) console.log('Loading file:', url);
+    if (import.meta.env.DEV) {
+      console.log('Loading file:', url);
+    }
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok ${response.statusText}`);
@@ -40,7 +43,9 @@ export const generateDocument = async (
   try {
     doc.render();
   } catch (error) {
-    if (import.meta.env.DEV) console.log(JSON.stringify({ error }));
+    if (import.meta.env.DEV) {
+      console.log(JSON.stringify({ error }));
+    }
     throw error;
   }
 

@@ -1,4 +1,4 @@
-import { roles } from '../constants/roles';
+import roles from '../constants/roles';
 
 const { ADMIN, PROFESSOR, STUDENT, INTERN, PROGRAM_DIRECTOR, SUPERVISOR } = roles;
 const getDefaultHomeRoute = (userRoles: string[]): string => {
