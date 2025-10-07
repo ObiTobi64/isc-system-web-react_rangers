@@ -285,7 +285,7 @@ const UsersPage = () => {
         )
       }
       children={
-        <div style={{ height: 400, width: "100%" }}>
+        <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
           <Grid container spacing={1} style={{ paddingBottom: 20 }}>
             <Grid item xs={9} md={8}>
               <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between m-5 mb-8 overflow-hidden">
