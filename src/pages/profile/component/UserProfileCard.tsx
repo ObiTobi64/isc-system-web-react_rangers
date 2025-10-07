@@ -3,9 +3,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { IconButton } from "@mui/material";
 import { HasPermission } from "../../../helper/permissions";
-import { useState, useEffect } from "react";
+import { FC, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Permission } from "../../../models/permissionInterface";
+import Permission from "../../../models/permissionInterface";
 import { getPermissionById } from "../../../services/permissionsService";
 import { UserResponse } from "../../../services/models/LoginResponse";
 
@@ -13,7 +13,7 @@ interface UserProfileCardProps {
   user: UserResponse;
 }
 
-const UserProfileCard: React.FC<UserProfileCardProps> = ({ user }) => {
+const UserProfileCard: FC<UserProfileCardProps> = ({ user }) => {
   const [scheduleAppointmentPermissionStudent, setScheduleAppointmentPermissionStudent] =
     useState<Permission | null>(null);
   const [scheduleAppointmentPermissionProffesor, setScheduleAppointmentPermissionProfessor] =

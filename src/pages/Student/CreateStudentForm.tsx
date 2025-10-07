@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable camelcase */
+import { useState, useCallback, ChangeEvent } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -11,9 +12,9 @@ import {
   FormControlLabel,
   Container,
 } from "@mui/material";
+import axios from "axios";
 import { createStudent } from "../../services/studentService";
 import { createIntern } from "../../services/internService";
-import axios from "axios";
 import SuccessDialog from "../../components/common/SucessDialog";
 import ErrorDialog from "../../components/common/ErrorDialog";
 import {
@@ -45,7 +46,7 @@ const validationSchema = Yup.object({
     .required("El apellido materno es obligatorio"),
 
   email: Yup.string()
-    .matches(EMAIL_REGEX,"Ingrese un correo electrónico válido")
+    .matches(EMAIL_REGEX, "Ingrese un correo electrónico válido")
     .max(50, "Máximo 50 caracteres")
     .required("El correo electrónico es obligatorio"),
 
@@ -61,7 +62,7 @@ const validationSchema = Yup.object({
 
   total_hours: Yup.number()
     .min(0, "Las horas no pueden ser negativas.")
-    .when("isIntern",{
+    .when("isIntern", {
       is: true,
       then: (schema) => schema.required("Las horas becarias son obligatorias."),
       otherwise: (schema) => schema.nullable(),
@@ -90,16 +91,16 @@ const CreateStudentForm = ({ onSuccess }: { onSuccess: () => void }) => {
         const { isIntern, total_hours, ...rest } = values;
         const studentData = isIntern
           ? {
-              ...rest,
-              is_scholarship: true,
-              total_hours,
-              completed_hours: 0,
-              pending_hours: total_hours,
-            }
+            ...rest,
+            is_scholarship: true,
+            total_hours,
+            completed_hours: 0,
+            pending_hours: total_hours,
+          }
           : {
-              ...rest,
-              is_scholarship: false,
-            };
+            ...rest,
+            is_scholarship: false,
+          };
 
         if (isIntern) {
           await createIntern({
@@ -132,177 +133,198 @@ const CreateStudentForm = ({ onSuccess }: { onSuccess: () => void }) => {
     },
   });
 
-  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (/^[0-9]*$/.test(value)) {
-      formik.setFieldValue("phone", value);
-    }
-  };
+  const handlePhoneChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      if (/^[0-9]*$/.test(value)) {
+        formik.setFieldValue("phone", value);
+      }
+    },
+    [formik]
+  );
 
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (/^[0-9]*$/.test(value)) {
-      formik.setFieldValue("code", value);
-    }
-  };
+  const handleCodeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      if (/^[0-9]*$/.test(value)) {
+        formik.setFieldValue("code", value);
+      }
+    },
+    [formik]
+  );
+
+  const handleSwitchChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      formik.setFieldValue("isIntern", event.target.checked);
+    },
+    [formik]
+  );
+
+  const handleSuccessDialogClose = useCallback(() => {
+    setSuccessDialog(false);
+  }, []);
+
+  const handleErrorDialogClose = useCallback(() => {
+    setErrorDialog(false);
+  }, []);
 
   return (
     <Container>
-      <form onSubmit={formik.handleSubmit} style={{ marginLeft: -20}}>
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <Typography variant="h4">Crear Nuevo Estudiante</Typography>
-            <Typography variant="body2" sx={{ fontSize: 14, color: "gray" }}>
-              Ingrese los datos del estudiante a continuación.
+      <form onSubmit = {formik.handleSubmit} style = {{ marginLeft: -20 }}>
+        <Grid container spacing = {1}>
+          <Grid item xs = {12}>
+            <Typography variant = "h4">{"Crear Nuevo Estudiante"}</Typography>
+            <Typography variant = "body2" sx = {{ fontSize: 14, color: "gray" }}>
+              {"Ingrese los datos del estudiante a continuación.\r"}
             </Typography>
-            <Divider flexItem sx={{ mt: 2, mb: 2 }} />
+            <Divider flexItem sx = {{ mt: 2, mb: 2 }} />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Typography variant="body2">Información del Estudiante</Typography>
+          <Grid item xs = {12}>
+            <Grid container spacing = {2}>
+              <Grid item xs = {3}>
+                <Typography variant = "body2">{"Información del Estudiante"}</Typography>
               </Grid>
-              <Grid item xs={9}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
+              <Grid item xs = {9}>
+                <Grid container spacing = {2}>
+                  <Grid item xs = {6}>
                     <TextField
-                      name="name"
-                      label="Nombres"
+                      name = "name"
+                      label = "Nombres"
                       fullWidth
-                      inputProps={{ maxLength: 20 }}
-                      value={formik.values.name}
-                      onChange={formik.handleChange}
-                      error={formik.touched.name && Boolean(formik.errors.name)}
-                      helperText={formik.touched.name && formik.errors.name}
-                      margin="normal"
+                      inputProps = {{ maxLength: 20 }}
+                      value = {formik.values.name}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.name && Boolean(formik.errors.name)}
+                      helperText = {formik.touched.name && formik.errors.name}
+                      margin = "normal"
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs = {6}>
                     <TextField
-                      name="lastname"
-                      label="Apellido Paterno"
+                      name = "lastname"
+                      label = "Apellido Paterno"
                       fullWidth
-                      inputProps={{ maxLength: 20 }}
-                      value={formik.values.lastname}
-                      onChange={formik.handleChange}
-                      error={formik.touched.lastname && Boolean(formik.errors.lastname)}
-                      helperText={formik.touched.lastname && formik.errors.lastname}
-                      margin="normal"
+                      inputProps = {{ maxLength: 20 }}
+                      value = {formik.values.lastname}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.lastname && Boolean(formik.errors.lastname)}
+                      helperText = {formik.touched.lastname && formik.errors.lastname}
+                      margin = "normal"
                     />
                   </Grid>
                 </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                <Grid container spacing = {2}>
+                  <Grid item xs = {6}>
                     <TextField
-                      name="mothername"
-                      label="Apellido Materno"
+                      name = "mothername"
+                      label = "Apellido Materno"
                       fullWidth
-                      inputProps={{ maxLength: 20 }}
-                      value={formik.values.mothername}
-                      onChange={formik.handleChange}
-                      error={formik.touched.mothername && Boolean(formik.errors.mothername)}
-                      helperText={formik.touched.mothername && formik.errors.mothername}
-                      margin="normal"
+                      inputProps = {{ maxLength: 20 }}
+                      value = {formik.values.mothername}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.mothername && Boolean(formik.errors.mothername)}
+                      helperText = {formik.touched.mothername && formik.errors.mothername}
+                      margin = "normal"
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                  <TextField
-                      name="code"
-                      label="Código de Estudiante"
+                  <Grid item xs = {6}>
+                    <TextField
+                      name = "code"
+                      label = "Código de Estudiante"
                       fullWidth
-                      value={formik.values.code}
-                      onChange={handleCodeChange}
-                      margin="normal"
-                      error={formik.touched.code && Boolean(formik.errors.code)}
-                      helperText={formik.touched.code && formik.errors.code}
-                      inputProps={{ 
+                      value = {formik.values.code}
+                      onChange = {handleCodeChange}
+                      margin = "normal"
+                      error = {formik.touched.code && Boolean(formik.errors.code)}
+                      helperText = {formik.touched.code && formik.errors.code}
+                      inputProps = {{
                         maxLength: CODE_DIGITS,
-                        minLength: CODE_MIN_DIGITS
+                        minLength: CODE_MIN_DIGITS,
                       }}
                     />
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
-            <Divider flexItem sx={{ mt: 2, mb: 2 }} />
+            <Divider flexItem sx = {{ mt: 2, mb: 2 }} />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Typography variant="body2">Información Adicional</Typography>
+          <Grid item xs = {12}>
+            <Grid container spacing = {2}>
+              <Grid item xs = {3}>
+                <Typography variant = "body2">{"Información Adicional"}</Typography>
               </Grid>
-              <Grid item xs={9}>
+              <Grid item xs = {9}>
                 <TextField
-                  name="email"
-                  label="Correo Electrónico"
+                  name = "email"
+                  label = "Correo Electrónico"
                   fullWidth
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  inputProps={{ maxLength: 50 }}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
-                  margin="normal"
+                  value = {formik.values.email}
+                  onChange = {formik.handleChange}
+                  inputProps = {{ maxLength: 50 }}
+                  error = {formik.touched.email && Boolean(formik.errors.email)}
+                  helperText = {formik.touched.email && formik.errors.email}
+                  margin = "normal"
                 />
                 <TextField
-                  name="phone"
-                  label="Número de Teléfono"
+                  name = "phone"
+                  label = "Número de Teléfono"
                   fullWidth
-                  value={formik.values.phone}
-                  onChange={handlePhoneChange}
-                  error={formik.touched.phone && Boolean(formik.errors.phone)}
-                  helperText={formik.touched.phone && formik.errors.phone}
-                  margin="normal"
-                  inputProps={{ maxLength: PHONE_DIGITS }}
+                  value = {formik.values.phone}
+                  onChange = {handlePhoneChange}
+                  error = {formik.touched.phone && Boolean(formik.errors.phone)}
+                  helperText = {formik.touched.phone && formik.errors.phone}
+                  margin = "normal"
+                  inputProps = {{ maxLength: PHONE_DIGITS }}
                 />
               </Grid>
             </Grid>
-            <Divider flexItem sx={{ mt: 2, mb: 2 }} />
+            <Divider flexItem sx = {{ mt: 2, mb: 2 }} />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid container spacing={2} sx={{ padding: 0 }}>
-              <Grid item xs={3}>
+          <Grid item xs = {12}>
+            <Grid container spacing = {2} sx = {{ padding: 0 }}>
+              <Grid item xs = {3}>
                 <FormControlLabel
-                  control={
+                  control = {
                     <Switch
-                      checked={formik.values.isIntern}
-                      onChange={(e) => formik.setFieldValue("isIntern", e.target.checked)}
-                      name="isIntern"
+                      checked = {formik.values.isIntern}
+                      onChange = {handleSwitchChange}
+                      name = "isIntern"
                     />
                   }
-                  label=<Typography variant="body2">¿Es Becario?</Typography>
+                  label = {<Typography variant = "body2">{"¿Es Becario?"}</Typography>}
                 />
               </Grid>
             </Grid>
           </Grid>
 
           {formik.values.isIntern && (
-            <Grid item xs={12}>
-              <Grid container spacing={2} sx={{ padding: 0 }}>
-                <Grid item xs={6}>
+            <Grid item xs = {12}>
+              <Grid container spacing = {2} sx = {{ padding: 0 }}>
+                <Grid item xs = {6}>
                   <TextField
-                    name="total_hours"
-                    label="Horas Becario"
-                    type="number"
+                    name = "total_hours"
+                    label = "Horas Becario"
+                    type = "number"
                     fullWidth
-                    value={formik.values.total_hours}
-                    onChange={formik.handleChange}
-                    error={formik.touched.total_hours && Boolean(formik.errors.total_hours)}
-                    helperText={formik.touched.total_hours && formik.errors.total_hours}
-                    margin="normal"
+                    value = {formik.values.total_hours}
+                    onChange = {formik.handleChange}
+                    error = {formik.touched.total_hours && Boolean(formik.errors.total_hours)}
+                    helperText = {formik.touched.total_hours && formik.errors.total_hours}
+                    margin = "normal"
                   />
                 </Grid>
               </Grid>
             </Grid>
           )}
 
-          <Grid item xs={12}>
-            <Grid container spacing={2} justifyContent="flex-end">
+          <Grid item xs = {12}>
+            <Grid container spacing = {2} justifyContent = "flex-end">
               <Grid item>
-                <Button variant="contained" color="primary" type="submit">
-                  GUARDAR
+                <Button variant = "contained" color = "primary" type = "submit">
+                  {"GUARDAR\r"}
                 </Button>
               </Grid>
             </Grid>
@@ -311,16 +333,16 @@ const CreateStudentForm = ({ onSuccess }: { onSuccess: () => void }) => {
       </form>
 
       <SuccessDialog
-        open={successDialog}
-        onClose={() => setSuccessDialog(false)}
-        title="¡Estudiante Creado!"
-        subtitle="El estudiante ha sido creado con éxito."
+        open = {successDialog}
+        onClose = {handleSuccessDialogClose}
+        title = "¡Estudiante Creado!"
+        subtitle = "El estudiante ha sido creado con éxito."
       />
       <ErrorDialog
-        open={errorDialog}
-        onClose={() => setErrorDialog(false)}
-        title="¡Vaya!"
-        subtitle={message}
+        open = {errorDialog}
+        onClose = {handleErrorDialogClose}
+        title = "¡Vaya!"
+        subtitle = {message}
       />
     </Container>
   );

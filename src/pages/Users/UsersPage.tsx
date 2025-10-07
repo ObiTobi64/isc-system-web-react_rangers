@@ -76,7 +76,7 @@ const UsersPage = () => {
   };
 
   const handleEdit = (id: number) => {
-    const editUser = users.find((user) => user.id == id) || null;
+    const editUser = users.find((user) => user.id === id) || null;
     setUser(editUser);
     setOpenCreate(true);
   };
@@ -140,9 +140,7 @@ const UsersPage = () => {
     }
 
     if (filterRoles) {
-      filteredData = filteredData.filter((user: User) => {
-        return user.roles.includes(Number(filterRoles));
-      });
+      filteredData = filteredData.filter((user: User) => user.roles.includes(Number(filterRoles)));
     }
 
     setFilteredUsers(filteredData);
@@ -190,7 +188,7 @@ const UsersPage = () => {
       width: 200,
       renderCell: ({ row }) =>
         row.roles.map((rol: string) => (
-          <Chip key={rol} label={rol} style={{ color: "#ffffff", backgroundColor: "#337DD0" }} />
+          <Chip key = {rol} label = {rol} style = {{ color: "#ffffff", backgroundColor: "#337DD0" }} />
         )),
     },
     {
@@ -203,24 +201,24 @@ const UsersPage = () => {
       renderCell: (params) => (
         <div>
           {HasPermission(viewUserReport?.name || "") && (
-            <IconButton color="primary" aria-label="ver" onClick={() => handleView(params.row.id)}>
+            <IconButton color = "primary" aria-label = "ver" onClick = {() => handleView(params.row.id)}>
               <VisibilityIcon />
             </IconButton>
           )}
           {HasPermission(editUserPermission?.name || "") && (
             <IconButton
-              color="primary"
-              aria-label="editar"
-              onClick={() => handleEdit(params.row.id)}
+              color = "primary"
+              aria-label = "editar"
+              onClick = {() => handleEdit(params.row.id)}
             >
               <EditIcon />
             </IconButton>
           )}
           {HasPermission(deleteUserPermission?.name || "") && (
             <IconButton
-              color="secondary"
-              aria-label="eliminar"
-              onClick={() => handleClickDelete(params.row.id)}
+              color = "secondary"
+              aria-label = "eliminar"
+              onClick = {() => handleClickDelete(params.row.id)}
             >
               <DeleteIcon />
             </IconButton>
@@ -236,8 +234,9 @@ const UsersPage = () => {
     for (const user of usersResponse) {
       user.fullName = `${user.name} ${user.lastname} ${user.mothername}`;
       user.roles = [];
-      for (const key in user.rolesAndPermissions)
+      for (const key in user.rolesAndPermissions) {
         user.roles.push(user.rolesAndPermissions[key].role_name);
+      }
     }
     setUsers(usersResponse);
     setFilteredUsers(usersResponse);
@@ -264,123 +263,127 @@ const UsersPage = () => {
     fetchRoles();
   }, []);
 
-  const countStudentsWithRole = (role: string) => {
-    return users.filter((user) => user.roles.includes(Number(role))).length;
-  };
+  const countStudentsWithRole = (role: string) =>
+    users.filter((user) => user.roles.includes(Number(role))).length;
 
   return (
     <ContainerPage
-      title={`Usuarios (${users.length})`}
-      subtitle={"Lista de usuarios"}
-      actions={
+      title = {`Usuarios (${users.length})`}
+      subtitle = "Lista de usuarios"
+      actions = {
         HasPermission(addUserPermission?.name || "Agregar usuario") && (
           <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleCreateUser}
-            startIcon={<AddIcon />}
+            variant = "contained"
+            color = "secondary"
+            onClick = {handleCreateUser}
+            startIcon = {<AddIcon />}
           >
-            Agregar Usuario
+            {"Agregar Usuario\r"}
           </Button>
         )
       }
-      children={
-        <div style={{ height: 400, width: "100%" }}>
-          <Grid container spacing={1} style={{ paddingBottom: 20 }}>
-            <Grid item xs={9} md={8}>
-              <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between m-5 mb-8 overflow-hidden">
-                <label htmlFor="table-search" className="sr-only">
-                  Search
+      children = {
+        <div style = {{ height: 400, width: "100%" }}>
+          <Grid container spacing = {1} style = {{ paddingBottom: 20 }}>
+            <Grid item xs = {9} md = {8}>
+              <div className = "flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between m-5 mb-8 overflow-hidden">
+                <label htmlFor = "table-search" className = "sr-only">
+                  {"Search\r"}
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
-                    <FaSearch className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <div className = "relative">
+                  <div className = "absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                    <FaSearch className = "w-5 h-5 text-gray-500 dark:text-gray-400" />
                   </div>
                   <input
-                    type="text"
-                    id="table-search"
-                    className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Buscar por código y nombre de estudiante"
-                    value={search}
-                    onChange={handleSearchChange}
+                    type = "text"
+                    id = "table-search"
+                    className = "block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder = "Buscar por código y nombre de estudiante"
+                    value = {search}
+                    onChange = {handleSearchChange}
                   />
                 </div>
               </div>
             </Grid>
-            <Grid item xs={7} md={4}>
-              <FormControl fullWidth style={{ paddingTop: 20 }}>
-                <InputLabel style={{ paddingTop: 13 }}>Rol</InputLabel>
+            <Grid item xs = {7} md = {4}>
+              <FormControl fullWidth style = {{ paddingTop: 20 }}>
+                <InputLabel style = {{ paddingTop: 13 }}>{"Rol"}</InputLabel>
                 <Select
                   fullWidth
-                  label="Rol"
-                  style={{ height: 40 }}
-                  onChange={handleSelectRoleChange}
-                  value={filterRoles}
+                  label = "Rol"
+                  style = {{ height: 40 }}
+                  onChange = {handleSelectRoleChange}
+                  value = {filterRoles}
                 >
-                  <MenuItem value="reset">Borrar búsqueda</MenuItem>
+                  <MenuItem value = "reset">{"Borrar búsqueda"}</MenuItem>
                   {roles.map((rol: Role) => (
-                    <MenuItem value={rol.name}>
-                      {rol.name} ({countStudentsWithRole(rol.name)})
+                    <MenuItem value = {rol.name}>
+                      {rol.name}
+                      {" ("}
+                      {countStudentsWithRole(rol.name)}
+                      {")\r"}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
           </Grid>
-          <Box sx={{ width: "100%" }}>
+          <Box sx = {{ width: "100%" }}>
             <DataGrid
-              rows={filteredUsers}
-              columns={columns}
-              localeText={dataGridLocaleText}
-              initialState={{
+              rows = {filteredUsers}
+              columns = {columns}
+              localeText = {dataGridLocaleText}
+              initialState = {{
                 pagination: {
                   paginationModel: { page: 0, pageSize: 5 },
                 },
               }}
-              classes={{
+              classes = {{
                 root: "bg-white dark:bg-gray-800",
                 columnHeader: "bg-gray-200 dark:bg-gray-800 ",
                 cell: "bg-white dark:bg-gray-800",
                 row: "bg-white dark:bg-gray-800",
                 columnHeaderTitle: "!font-bold text-center",
               }}
-              pageSizeOptions={[5, 10]}
+              pageSizeOptions = {[5, 10]}
             />
           </Box>
 
           <Dialog
-            open={isOpenDelete}
-            onClose={handleCloseDelete}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            open = {isOpenDelete}
+            onClose = {handleCloseDelete}
+            aria-labelledby = "alert-dialog-title"
+            aria-describedby = "alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">Confirmar eliminación</DialogTitle>
+            <DialogTitle id = "alert-dialog-title">{"Confirmar eliminación"}</DialogTitle>
 
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.
+              <DialogContentText id = "alert-dialog-description">
+                {
+                  "¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.\r"
+                }
               </DialogContentText>
             </DialogContent>
 
             <DialogActions>
-              <Button onClick={handleCloseDelete} color="primary">
-                Cancelar
+              <Button onClick = {handleCloseDelete} color = "primary">
+                {"Cancelar\r"}
               </Button>
 
-              <Button onClick={handleDelete} color="secondary" autoFocus>
-                Eliminar
+              <Button onClick = {handleDelete} color = "secondary" autoFocus>
+                {"Eliminar\r"}
               </Button>
             </DialogActions>
           </Dialog>
 
           {isOpenCreate && (
             <CreateUserPage
-              openCreate={isOpenCreate}
-              handleClose={() => {
+              openCreate = {isOpenCreate}
+              handleClose = {() => {
                 fetchUsers();
                 setOpenCreate(false);
               }}
-              user={user}
+              user = {user}
             />
           )}
         </div>
