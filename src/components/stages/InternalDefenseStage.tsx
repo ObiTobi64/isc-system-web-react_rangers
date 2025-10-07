@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, ChangeEvent, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { Box, Grid, Button, Typography } from "@mui/material";
 
@@ -10,16 +10,16 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import pdfFile from "../../assets/Acta_Defensa_Interna_de_Seminario_de_Grado_V1.1.pdf";
 import { modifyPdf, PDFInsertData } from "../../utils/pdfEditor";
 import { downloadFile } from "../../utils/files";
 import { useProcessStore } from "../../store/store";
 import { postDefenseDetail } from "../../services/defenseDetail";
 import { updateProcess } from "../../services/processServicer";
-import { useDefenseInternalDetail } from "../../hooks/useDefenseInternalDetail";
+import useDefenseInternalDetail from "../../hooks/useDefenseInternalDetail";
 import ProfessorAutocomplete from "../selects/ProfessorAutoComplete";
-import { Mentor } from "../../models/mentorInterface";
+import Mentor from "../../models/mentorInterface";
 import EmailSender from "../common/EmailArea";
 import { getProfessorById } from "../../services/mentorsService";
 
@@ -149,15 +149,15 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
     }
   };
 
-  const handlePresidentChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handlePresidentChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("president", value?.id || "");
   };
 
-  const handleFirstJurorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleFirstJurorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("firstJuror", value?.id || "");
   };
 
-  const handleSecondJurorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleSecondJurorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("secondJuror", value?.id || "");
   };
 
@@ -195,7 +195,9 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
       </Typography>
       {subStage === 0 && (
         <>
-          <EmailSender />
+          <EmailSender id={0} onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
           <Box display="flex" justifyContent="space-between" pt={1} pb={0}>
             <Button type="button" onClick={prevSubStage} variant="contained" color="secondary">
               {"Anterior"}

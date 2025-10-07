@@ -10,12 +10,12 @@ import DateSelection from "./DateSelection";
 import DocumentCheckbox from "./DocumentCheckbox";
 import LoadingBackdrop from "../common/LoadingBackdrop";
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
 import { useCarrerStore } from "../../store/carrerStore";
 import useMentorFormik from "../../hooks/useMentorFormik";
-import { STAGE } from "../../constants/stages";
+import STAGE from "../../constants/stages";
 
 const CURRENT_STAGE = STAGE.MENTOR;
 
@@ -81,19 +81,26 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
     setShowModal(false);
   }, [saveStage]);
 
-  const renderFieldError = (fieldName: string) => {
-    const touched = formik.touched[fieldName as keyof typeof formik.touched];
-    const error = formik.errors[fieldName as keyof typeof formik.errors];
-    return touched && error ? (
-      <Typography color="error" variant="caption">
-        {String(error)}
-      </Typography>
-    ) : null;
-  };
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+  }, []);
 
-  const editForm = () => {
+  const renderFieldError = useCallback(
+    (fieldName: string) => {
+      const touched = formik.touched[fieldName as keyof typeof formik.touched];
+      const error = formik.errors[fieldName as keyof typeof formik.errors];
+      return touched && error ? (
+        <Typography color="error" variant="caption">
+          {String(error)}
+        </Typography>
+      ) : null;
+    },
+    [formik.touched, formik.errors]
+  );
+
+  const editForm = useCallback(() => {
     setEditMode(false);
-  };
+  }, []);
 
   return (
     <>
@@ -135,7 +142,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
           step={steps[1]}
           nextStep={steps[2]}
           isApproveButton={canApproveStage}
-          setShowModal={setShowModal}
+          setShowModal={handleCloseModal}
           onNext={handleModalAction}
         />
       )}

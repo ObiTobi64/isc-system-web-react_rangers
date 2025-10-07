@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, ChangeEvent } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -21,13 +21,13 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import WarningIcon from "@mui/icons-material/Warning";
 import ErrorIcon from "@mui/icons-material/Error";
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
-import { Mentor } from "../../models/mentorInterface";
+import Mentor from "../../models/mentorInterface";
 import ProfessorAutocomplete from "../selects/ProfessorAutoComplete";
 import DownloadButton from "../common/DownloadButton";
-import { letters } from "../../constants/letters";
+import letters from "../../constants/letters";
 import { useCarrerStore } from "../../store/carrerStore";
 
 const { TUTOR_APPROBAL, REVIEWER_ASSIGNMENT } = letters;
@@ -217,7 +217,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
     }
   };
 
-  const handleMentorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleMentorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     const selectedId = value?.id?.toString() || "";
 
     if (selectedId && process?.tutor_id && selectedId === process.tutor_id.toString()) {
@@ -254,11 +254,11 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
 
   return (
     <>
-      <div className = "txt1 pb-3">
+      <div className="txt1 pb-3">
         {"Etapa 3: Seleccionar Revisor "}
         <ModeEditIcon
-          onClick = {editForm}
-          style = {{
+          onClick={editForm}
+          style={{
             cursor: wasReviewerApproved() ? "not-allowed" : "pointer",
             color: wasReviewerApproved() ? "#ccc" : "inherit",
           }}
@@ -266,7 +266,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
       </div>
 
       {wasReviewerApproved() && (
-        <Alert severity = "warning" sx = {{ mb: 2 }} icon = {<WarningIcon />}>
+        <Alert severity="warning" sx={{ mb: 2 }} icon={<WarningIcon />}>
           <AlertTitle>{"Fase de Revisor Registrada"}</AlertTitle>
           {"Esta fase ya ha sido completada y aprobada. No se puede editar el revisor porque \r"}
           {"la fase ya ha sido registrada. Si necesita hacer cambios, contacte al administrador.\r"}
@@ -276,17 +276,17 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
       {!wasReviewerApproved() &&
         process?.reviewer_approval &&
         process?.stage_id > CURRENT_STAGE && (
-        <Alert severity = "info" sx = {{ mb: 2 }}>
-          <AlertTitle>{"Edición de Revisor Aprobado"}</AlertTitle>
-          {
-            "El revisor actual ya fue aprobado. Cualquier cambio requerirá una nueva aprobación \r"
-          }
-          {"y el proceso regresará a la etapa de revisión.\r"}
-        </Alert>
-      )}
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <AlertTitle>{"Edición de Revisor Aprobado"}</AlertTitle>
+            {
+              "El revisor actual ya fue aprobado. Cualquier cambio requerirá una nueva aprobación \r"
+            }
+            {"y el proceso regresará a la etapa de revisión.\r"}
+          </Alert>
+        )}
 
       {isDuplicateSelection(formik.values.reviewer) && (
-        <Alert severity = "error" sx = {{ mb: 2 }} icon = {<ErrorIcon />}>
+        <Alert severity="error" sx={{ mb: 2 }} icon={<ErrorIcon />}>
           <AlertTitle>{"Docente Duplicado"}</AlertTitle>
           {"El docente seleccionado ya está asignado como tutor. Por favor, seleccione un \r"}
           {"docente diferente para el rol de revisor.\r"}
@@ -294,7 +294,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
       )}
 
       {process?.tutor_fullname && (
-        <Alert severity = "info" sx = {{ mb: 2 }}>
+        <Alert severity="info" sx={{ mb: 2 }}>
           <AlertTitle>{"Tutor Asignado"}</AlertTitle>
           {"Tutor actual: "}
           <strong>
@@ -305,9 +305,9 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         </Alert>
       )}
 
-      <form onSubmit = {formik.handleSubmit} className = "mt-5 mx-16">
-        <Grid container spacing = {3}>
-          <Grid item xs = {6}>
+      <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">
+        <Grid container spacing={3}>
+          <Grid item xs={6}>
             <ProfessorAutocomplete
               disabled={editMode}
               value={formik.values.reviewer}
@@ -316,25 +316,25 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
               label="Seleccionar Revisor"
             />
             {formik.touched.reviewer && formik.errors.reviewer ? (
-              <div className = "text-red-1 text-xs mt-1">{formik.errors.reviewer}</div>
+              <div className="text-red-1 text-xs mt-1">{formik.errors.reviewer}</div>
             ) : null}
           </Grid>
-          <Grid item xs = {6}>
-            <LocalizationProvider dateAdapter = {AdapterDayjs}>
+          <Grid item xs={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                disabled = {editMode}
-                label = "Fecha de Asignación"
-                value = {formik.values.date_reviewer_assignament}
-                onChange = {handleDateChange}
-                format = "DD/MM/YYYY"
+                disabled={editMode}
+                label="Fecha de Asignación"
+                value={formik.values.date_reviewer_assignament}
+                onChange={handleDateChange}
+                format="DD/MM/YYYY"
               />
             </LocalizationProvider>
           </Grid>
         </Grid>
 
         <Paper
-          elevation = {0}
-          sx = {{
+          elevation={0}
+          sx={{
             display: "flex",
             alignItems: "center",
             backgroundColor: "#e6f4ff",
@@ -344,23 +344,23 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           }}
         >
           <Checkbox
-            name = "reviewerDesignationLetterSubmitted"
-            color = "primary"
-            checked = {formik.values.reviewerDesignationLetterSubmitted}
-            onChange = {formik.handleChange}
-            disabled = {editMode}
+            name="reviewerDesignationLetterSubmitted"
+            color="primary"
+            checked={formik.values.reviewerDesignationLetterSubmitted}
+            onChange={formik.handleChange}
+            disabled={editMode}
           />
-          <Typography variant = "body2" sx = {{ flexGrow: 1 }}>
+          <Typography variant="body2" sx={{ flexGrow: 1 }}>
             {"Carta de Designación de Revisor Presentada\r"}
           </Typography>
           <Tooltip
-            title = {!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
+            title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
           >
             <span>
               <DownloadButton
-                disabled = {!hasReviewer}
-                url = {REVIEWER_ASSIGNMENT.path}
-                data = {{
+                disabled={!hasReviewer}
+                url={REVIEWER_ASSIGNMENT.path}
+                data={{
                   student: process?.student_fullname || "",
                   number: 1,
                   reviewer: process?.reviewer_fullname || "",
@@ -373,7 +373,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                   month: dayjs().format("MMMM"),
                   year: dayjs().format("YYYY"),
                 }}
-                filename = {`${REVIEWER_ASSIGNMENT.filename}_${
+                filename={`${REVIEWER_ASSIGNMENT.filename}_${
                   process?.reviewer_fullname || ""
                 }.${REVIEWER_ASSIGNMENT.extention}`}
               />
@@ -382,8 +382,8 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         </Paper>
 
         <Paper
-          elevation = {0}
-          sx = {{
+          elevation={0}
+          sx={{
             display: "flex",
             alignItems: "center",
             backgroundColor: "#e6f4ff",
@@ -393,23 +393,23 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           }}
         >
           <Checkbox
-            name = "reviewerApprovalLetterSubmitted"
-            color = "primary"
-            checked = {formik.values.reviewerApprovalLetterSubmitted}
-            onChange = {formik.handleChange}
-            disabled = {editMode}
+            name="reviewerApprovalLetterSubmitted"
+            color="primary"
+            checked={formik.values.reviewerApprovalLetterSubmitted}
+            onChange={formik.handleChange}
+            disabled={editMode}
           />
-          <Typography variant = "body2" sx = {{ flexGrow: 1 }}>
+          <Typography variant="body2" sx={{ flexGrow: 1 }}>
             {"Carta de Aprobación de Revisor Presentada\r"}
           </Typography>
           <Tooltip
-            title = {!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
+            title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
           >
             <span>
               <DownloadButton
-                disabled = {!hasReviewer}
-                url = {TUTOR_APPROBAL.path}
-                data = {{
+                disabled={!hasReviewer}
+                url={TUTOR_APPROBAL.path}
+                data={{
                   student: process?.student_fullname || "",
                   tutor: process?.reviewer_fullname || "",
                   jefe_carrera: carrer?.headOfDepartment || "",
@@ -424,22 +424,20 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                   isProject: process?.modality_id.toString() === "1" ? "  X" : "",
                   isJob: process?.modality_id.toString() === "2" ? "  X" : "",
                 }}
-                filename = {`${TUTOR_APPROBAL.filename}_${process?.reviewer_fullname || formik.values.reviewer}.${TUTOR_APPROBAL.extention}`}
+                filename={`${TUTOR_APPROBAL.filename}_${process?.reviewer_fullname || formik.values.reviewer}.${TUTOR_APPROBAL.extention}`}
               />
             </span>
           </Tooltip>
         </Paper>
 
-        <Box display = "flex" justifyContent = "space-between" mt = {4}>
-          <Button
-            type = "button" variant = "contained" color = "secondary"
-            onClick = {onPrevious}>
+        <Box display="flex" justifyContent="space-between" mt={4}>
+          <Button type="button" variant="contained" color="secondary" onClick={onPrevious}>
             {"Anterior\r"}
           </Button>
           <Button
-            type = "submit"
-            variant = "contained"
-            color = "primary"
+            type="submit"
+            variant="contained"
+            color="primary"
             disabled={
               editMode ||
               !formik.values.reviewerDesignationLetterSubmitted ||
@@ -454,33 +452,33 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
 
       {showModal && (
         <ConfirmModal
-          step = {steps[2]}
-          nextStep = {steps[3]}
-          setShowModal = {setShowModal}
-          isApproveButton = {isApproveButton}
-          onNext = {handleModalAction}
+          step={steps[2]}
+          nextStep={steps[3]}
+          setShowModal={setShowModal}
+          isApproveButton={isApproveButton}
+          onNext={handleModalAction}
         />
       )}
 
       <Snackbar
-        open = {showWarningSnackbar}
-        autoHideDuration = {6000}
-        onClose = {handleWarningSnackbarClose}
-        anchorOrigin = {{ vertical: "top", horizontal: "center" }}
+        open={showWarningSnackbar}
+        autoHideDuration={6000}
+        onClose={handleWarningSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose = {handleWarningSnackbarClose} severity = "warning" sx = {{ width: "100%" }}>
+        <Alert onClose={handleWarningSnackbarClose} severity="warning" sx={{ width: "100%" }}>
           {"No se puede editar el revisor porque la fase ya ha sido registrada o aprobada.\r"}
           {"Cualquier cambio requerirá reiniciar el proceso de aprobación.\r"}
         </Alert>
       </Snackbar>
 
       <Snackbar
-        open = {showDuplicateWarning}
-        autoHideDuration = {8000}
-        onClose = {handleDuplicateWarningClose}
-        anchorOrigin = {{ vertical: "top", horizontal: "center" }}
+        open={showDuplicateWarning}
+        autoHideDuration={8000}
+        onClose={handleDuplicateWarningClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose = {handleDuplicateWarningClose} severity = "error" sx = {{ width: "100%" }}>
+        <Alert onClose={handleDuplicateWarningClose} severity="error" sx={{ width: "100%" }}>
           <AlertTitle>{"Docente Duplicado"}</AlertTitle>
           {"No se puede asignar el mismo docente como tutor y revisor. \r"}
           {"Por favor, seleccione un docente diferente.\r"}

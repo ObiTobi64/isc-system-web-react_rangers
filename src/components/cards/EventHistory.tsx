@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import Typography from "@mui/material/Typography";
@@ -45,7 +45,7 @@ const groupEventsByMonth = (events: EventInternsType[]): Record<string, EventInt
 
 const SplitButton = ({ options }: { options: { label: string; onClick: () => void }[] }) => {
   const [open, setOpen] = useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const [selectedIndex, setSelectedIndex] = useState(1);
 

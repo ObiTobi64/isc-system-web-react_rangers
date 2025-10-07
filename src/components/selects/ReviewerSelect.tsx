@@ -4,15 +4,14 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   FormHelperText,
 } from "@mui/material";
-import { useReviewers } from "../../hooks/useReviewers";
-import { Mentor } from "../../models/mentorInterface";
+import useReviewers from "../../hooks/useReviewers";
+import Mentor from "../../models/mentorInterface";
 
 interface ReviewerSelectProps {
   value: string;
-  onChange: (event: SelectChangeEvent) => void;
+  onChange: () => void;
   error?: boolean;
   helperText?: string | boolean;
   label?: string;
@@ -30,21 +29,23 @@ const ReviewerSelect: FC<ReviewerSelectProps> = ({
   const { reviewers } = useReviewers();
 
   return (
-    <FormControl fullWidth variant="outlined" margin="normal" error={error}>
-      <InputLabel id={`${name}-label`}>{label || "Seleccione docente"}</InputLabel>
+    <FormControl
+      fullWidth variant = "outlined" margin = "normal"
+      error = {error}>
+      <InputLabel id = {`${name}-label`}>{label || "Seleccione docente"}</InputLabel>
       <Select
-        labelId={`${name}-label`}
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        label={label || "Seleccione docente"}
+        labelId = {`${name}-label`}
+        id = {name}
+        name = {name}
+        value = {value}
+        onChange = {onChange}
+        label = {label || "Seleccione docente"}
       >
-        <MenuItem value="">
-          <em>Seleccione un Docente</em>
+        <MenuItem value = "">
+          <em>{"Seleccione un Docente"}</em>
         </MenuItem>
         {reviewers.map((option: Mentor) => (
-          <MenuItem key={option.id} value={option.id}>
+          <MenuItem key = {option.id} value = {option.id}>
             {option.name}
           </MenuItem>
         ))}
