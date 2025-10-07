@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { UserRequest } from '../models/userInterface';
 import apiClient from './apiInstance';
 import { ProfessorInterface } from './models/Professor';
@@ -18,7 +19,7 @@ const getProfessorById = async (professorId: number) => {
     const response = await apiClient.get(`professor/${professorId}`);
     return response.data.data;
   } catch (error) {
-    console.error('Error al obtener el docente:',professorId, error);
+    console.error('Error al obtener el docente:', professorId, error);
     throw error;
   }
 };
@@ -35,9 +36,8 @@ const createProfessor = async (professor: ProfessorInterface) => {
 type ProfessorWithId = UserRequest & { id: number };
 
 export const updateProfessor = async (professor: ProfessorWithId) => {
-  
   const { id, ...professorData } = professor;
-  
+
   const response = await putUser(id, professorData);
   return response;
 };
