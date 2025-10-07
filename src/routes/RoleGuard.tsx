@@ -1,23 +1,40 @@
-import React, { useEffect } from "react";
+import { FC, ReactNode, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/store";
 
 interface RoleGuardProps {
   allowedRoles: string[];
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const RoleGuard: React.FC<RoleGuardProps> = ({ allowedRoles, children }) => {
+const RoleGuard: FC<RoleGuardProps> = ({ allowedRoles, children }) => {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
+
+  const handleLoginRedirect = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
+
+  const userRoles = user?.roles ?? [];
+
+  const hasRole = allowedRoles.some((role) => userRoles.includes(role));
+
+  useEffect(() => {
+    if (!hasRole) {
+      navigate("/error", {
+        replace: true,
+        state: { fromRoleGuard: true },
+      });
+    }
+  }, [hasRole, navigate]);
 
   if (!user) {
     return (
       <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <h2 style={{ color: "red" }}>Usuario no autenticado</h2>
-        <p>Debes iniciar sesión para acceder a esta página.</p>
+        <h2 style={{ color: "red" }}>{"Usuario no autenticado"}</h2>
+        <p>{"Debes iniciar sesión para acceder a esta página."}</p>
         <button
-          onClick={() => navigate("/login")}
+          onClick={handleLoginRedirect}
           style={{
             padding: "10px 20px",
             fontSize: "16px",
@@ -28,26 +45,15 @@ const RoleGuard: React.FC<RoleGuardProps> = ({ allowedRoles, children }) => {
             cursor: "pointer",
           }}
         >
-          Ir al login
+          {"Ir al login\r"}
         </button>
       </div>
     );
   }
-  
-  const userRoles = user.roles ?? [];
 
-  const hasRole = allowedRoles.some((role) => userRoles.includes(role));
-
-  useEffect(() => {
-    if (!hasRole) {
-      navigate("/error", { 
-        replace: true,
-        state: { fromRoleGuard: true }
-      });
-    }
-  }, [hasRole]);
-
-  if (!hasRole) return null;
+  if (!hasRole) {
+    return null;
+  }
 
   return <>{children}</>;
 };
