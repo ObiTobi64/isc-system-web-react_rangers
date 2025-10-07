@@ -5,7 +5,7 @@ interface RequireAuthProps {
   children: ReactNode;
 }
 
-export function RequireAuth({ children }: RequireAuthProps) {
+function RequireAuth({ children }: RequireAuthProps) {
   const isAuthenticated = localStorage.getItem("token");
 
   if (!isAuthenticated) {
@@ -14,3 +14,5 @@ export function RequireAuth({ children }: RequireAuthProps) {
 
   return children;
 }
+
+export default RequireAuth;

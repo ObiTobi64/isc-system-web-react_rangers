@@ -1,8 +1,6 @@
-import * as React from "react";
-
+import { useCallback, useState, MouseEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
 import Box from "@mui/material/Box";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,6 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
+import Sidebar from "./Sidebar";
 import { useUserStore } from "../store/store";
 
 interface AppBarProps extends MuiAppBarProps {
@@ -57,39 +56,46 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const Layout = () => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const { clearUser, user } = useUserStore();
+
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const handleOpenUserMenu = useCallback((event: MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  }, []);
+
+  const handleDrawerOpen = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const handleCloseUserMenu = useCallback(() => {
+    setAnchorElUser(null);
+  }, []);
+
+  const handleProfileClick = useCallback(() => {
+    navigate("/profile");
+    handleCloseUserMenu();
+  }, [navigate, handleCloseUserMenu]);
+
+  const handleLogoutClick = useCallback(() => {
+    localStorage.removeItem("token");
+    clearUser();
+    navigate("/login", { replace: true });
+    handleCloseUserMenu();
+  }, [clearUser, navigate, handleCloseUserMenu]);
+
   const settings = [
     {
       title: "Perfil",
-      onClick: () => {
-        navigate("/profile");
-      },
+      onClick: handleProfileClick,
     },
     {
       title: "Logout",
-      onClick: () => {
-        localStorage.removeItem("token");
-        clearUser();
-        navigate("/login", { replace: true });
-      },
+      onClick: handleLogoutClick,
     },
   ];
-
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -114,12 +120,12 @@ const Layout = () => {
               variant="subtitle1"
               noWrap
               color="primary"
-              textAlign={"right"}
+              textAlign="right"
               className="font-bold"
             >
               {user?.name}
             </Typography>
-            <Typography variant="subtitle2" color="textSecondary" textAlign={"right"}>
+            <Typography variant="subtitle2" color="textSecondary" textAlign="right">
               {TranslateRole(user?.roles?.join(", ") || "")}
             </Typography>
           </Box>
