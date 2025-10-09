@@ -60,6 +60,18 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
       .max(80, "El título no debe superar los 80 caracteres")
       .matches(/^[a-zA-Z0-9\s]+$/, "El título solo debe contener letras y números")
       .matches(/[a-zA-Z]/, "El título debe contener texto descriptivo.")
+      .test(
+        "no-excessive-spaces",
+        "El título no puede contener espacios excesivos al inicio, final o consecutivos",
+        (value) => {
+          if (!value) return true;
+          // Verificar que no tenga espacios al inicio o final
+          if (value !== value.trim()) return false;
+          // Verificar que no tenga más de un espacio consecutivo
+          if (/\s{2,}/.test(value)) return false;
+          return true;
+        }
+      )
       .required("Campo requerido"),
   });
 
@@ -70,14 +82,53 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
       setModes(responseModes.data);
       setStudents([...responseStudents.data]);
     } catch (error) {
-      console.error("Failed to fetch data: ", error);
       setError("Failed to load data, please try again.");
     }
   }, []);
 
+  const formik = useFormik({
+    initialValues: {
+      studentId: "",
+      studentCode: "",
+      modeId: "",
+      period: "",
+      titleProject: "",
+      stageId: 1,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      setLoading(true);
+      setTitleError(null);
+      try {
+        const response = await createGraduationProcess(values);
+        if (response.success) {
+          updateProcess(response.data);
+          navigate(`/studentProfile/${response.data.id}`);
+        }
+      } catch (error) {
+        setTitleError(
+          "Este título ya ha sido registrado por otro estudiante. Por favor, ingrese un título diferente."
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Limpiar formulario cuando el modal se cierra
+  useEffect(() => {
+    if (!isVisible) {
+      // Resetear el formulario a valores iniciales
+      formik.resetForm();
+      // Limpiar errores adicionales
+      setTitleError(null);
+      setError(null);
+    }
+  }, [isVisible, formik]);
 
   const setPeriods = (option: number) => {
     let firstSemester = actualDate.getMonth() <= 5;
@@ -114,7 +165,7 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
           navigate(`/studentProfile/${response.data.id}`);
         }
       } catch (error) {
-        console.error("Error al crear proceso:", error);
+
 
         setTitleError(
           "Este título ya ha sido registrado por otro estudiante. Por favor, ingrese un título diferente."
@@ -131,16 +182,39 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
   };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    formik.handleChange(event);
+    let value = event.target.value;
+    
+    // Normalizar espacios: eliminar espacios al inicio y final, y reducir espacios múltiples a uno solo
+    value = value.replace(/\s+/g, ' ').trim();
+    
+    // Actualizar el valor en el evento
+    const normalizedEvent = {
+      ...event,
+      target: {
+        ...event.target,
+        value: value
+      }
+    };
+    
+    formik.handleChange(normalizedEvent);
     if (titleError) {
       setTitleError(null);
     }
   };
 
+  const handleCloseModal = () => {
+    // Limpiar formulario antes de cerrar
+    formik.resetForm();
+    setTitleError(null);
+    setError(null);
+    // Cerrar el modal
+    isClosed();
+  };
+
   const isSubmitDisabled = loading || !!titleError || !formik.isValid;
 
   return (
-    <Modal open={isVisible} onClose={isClosed}>
+    <Modal open={isVisible} onClose={handleCloseModal}>
       <Box
         sx={{
           position: "absolute",
