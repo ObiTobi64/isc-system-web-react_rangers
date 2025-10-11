@@ -139,10 +139,10 @@ const UsersPage = () => {
       });
     }
 
-    if (filterRoles) {
-      filteredData = filteredData.filter((user: User) => {
-        return user.roles.includes(Number(filterRoles));
-      });
+    if (filterRoles) { 
+      filteredData = filteredData.filter((user: User) => 
+        user.roles?.includes(filterRoles) 
+      ); 
     }
 
     setFilteredUsers(filteredData);
@@ -264,9 +264,8 @@ const UsersPage = () => {
     fetchRoles();
   }, []);
 
-  const countStudentsWithRole = (role: string) => {
-    return users.filter((user) => user.roles.includes(Number(role))).length;
-  };
+  const countStudentsWithRole = (role: string) =>
+    users.filter((user) => user.roles?.includes(role)).length;
 
   return (
     <ContainerPage
