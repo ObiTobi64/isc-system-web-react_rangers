@@ -19,11 +19,11 @@ import axios from "axios";
 import ContainerPage from "../../components/common/ContainerPage";
 import SpinModal from "../../components/common/SpinModal";
 import { deleteProfessor, getMentors } from "../../services/mentorsService";
-import { Permission } from "../../models/permissionInterface";
+import Permission from "../../models/permissionInterface";
 import { getPermissionById } from "../../services/permissionsService";
-import { HasPermission } from "../../helper/permissions";
+import HasPermission from "../../helper/permissions";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
-import { SnackbarProps } from "../../models/SnackBarProps";
+import SnackbarProps from "../../models/SnackBarProps";
 import SnackBar from "../../components/common/SnackBar";
 import ProfessorModal from "../../components/common/ProfessorModal";
 

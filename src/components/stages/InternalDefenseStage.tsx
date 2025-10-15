@@ -89,7 +89,9 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const downloadEditedPDF = async (values: any) => {
     try {
-      const [year, month, day, hour, minute] = values.date.format("YYYY-MM-DD HH:mm").split(/[- :]/);
+      const [year, month, day, hour, minute] = values.date
+        .format("YYYY-MM-DD HH:mm")
+        .split(/[- :]/);
       const response = await getProfessorById(parseInt(values.president));
       const fullName = response.fullname;
       const student = process?.student_fullname || "";
@@ -108,9 +110,7 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
         { x: 222, y: 317, size: 10, text: tutor },
         { x: 222, y: 340, size: 10, text: reviewer },
         { x: 305, y: 369, size: 10, text: projectName },
-
       ];
-      
 
       const pdfArrayBuffer = await fetch(pdfFile).then((res) => res.arrayBuffer());
       const modifiedPdf = await modifyPdf(pdfArrayBuffer, data);
@@ -164,9 +164,9 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
   const canApproveStage = () =>
     Boolean(
       formik.values.president &&
-      formik.values.firstJuror &&
-      formik.values.secondJuror &&
-      formik.values.date
+        formik.values.firstJuror &&
+        formik.values.secondJuror &&
+        formik.values.date
     );
 
   const isApproveButton = canApproveStage();
@@ -195,9 +195,7 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
       </Typography>
       {subStage === 0 && (
         <>
-          <EmailSender id={0} onClose={function (): void {
-            throw new Error("Function not implemented.");
-          } } />
+          <EmailSender id={0} onClose={() => {}} />
           <Box display="flex" justifyContent="space-between" pt={1} pb={0}>
             <Button type="button" onClick={prevSubStage} variant="contained" color="secondary">
               {"Anterior"}

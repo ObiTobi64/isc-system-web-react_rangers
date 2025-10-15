@@ -47,7 +47,7 @@ export const getUserById = async (id: number) => {
     const response = await apiClient.get(`${baseURL}/${id}`);
     return response.data;
   } catch (error) {
-    throw new Error(`Failed to get user by id${(error as Error).message}`);
+    throw new Error(`Failed to get user by id: ${(error as Error).message}`);
   }
 };
 

@@ -1,4 +1,5 @@
-import { FC } from "react";import Alert from "@mui/material/Alert";
+import { FC } from "react";
+import Alert from "@mui/material/Alert";
 import { Snackbar } from "@mui/material";
 import AlertSnackbarsProps from "../../models/alertSnackbarProps";
 

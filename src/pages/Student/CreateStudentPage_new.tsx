@@ -2,7 +2,7 @@
 import { useState, useEffect, ChangeEvent, SyntheticEvent } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import useNavigate from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Button,

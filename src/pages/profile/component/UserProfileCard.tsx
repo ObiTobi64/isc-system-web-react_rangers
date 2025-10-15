@@ -2,7 +2,7 @@ import { Button, Typography, Avatar, Paper, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { IconButton } from "@mui/material";
-import { HasPermission } from "../../../helper/permissions";
+import HasPermission from "../../../helper/permissions";
 import { FC, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Permission from "../../../models/permissionInterface";
