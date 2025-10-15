@@ -1,5 +1,6 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-console */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -12,31 +13,61 @@ import { getAllCompleteInternService } from "../../services/internService";
 import { CompleteIntern } from "../../models/internsInterface";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
 
+interface Event {
+  title: string;
+  is_supervisor: boolean;
+  id?: number;
+}
+
 const EventByInterns = () => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [students, setStudents] = useState<CompleteIntern[]>([]);
 
-  useEffect(() => {
-    fetchInternsFull();
-  }, []);
-  const fetchInternsFull = async () => {
+  const fetchInternsFull = useCallback(async () => {
     try {
       const res = await getAllCompleteInternService();
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching complete students info", error);
     }
-  };
-  const handleEditHoursOpen = (id: number) => {
+  }, []);
+
+  useEffect(() => {
+    fetchInternsFull();
+  }, [fetchInternsFull]);
+
+  const handleEditHoursOpen = useCallback((id: number) => {
     setSelectedId(id);
     setDetailOpen(true);
-  };
+  }, []);
 
-  const handleEditHoursClose = () => {
+  const handleEditHoursClose = useCallback(() => {
     setDetailOpen(false);
     setSelectedId(null);
-  };
+  }, []);
+
+  const getRowId = useCallback((row: CompleteIntern) => row.id, []);
+
+  const createEventClickHandler = useCallback(
+    (id: number) => () => handleEditHoursOpen(id),
+    [handleEditHoursOpen]
+  );
+
+  const renderEventsCell = useCallback(
+    (params: GridRenderCellParams) => {
+      const clickHandler = createEventClickHandler(params.row.id);
+
+      return (
+        <Tooltip title = "Ver eventos" placement = "bottom">
+          <IconButton color = "primary" aria-label = "ver" onClick = {clickHandler}>
+            <VisibilityIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    },
+    [createEventClickHandler]
+  );
 
   const columns: GridColDef[] = [
     {
@@ -45,6 +76,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
     },
@@ -54,6 +86,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
     },
@@ -63,6 +96,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
       valueGetter: (params: GridRenderCellParams) => `${params} horas`,
@@ -73,6 +107,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
       valueGetter: (params: GridRenderCellParams) => `${params} horas`,
@@ -83,20 +118,33 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       headerClassName: "headerStyle",
-      renderCell: (params) => (
-        <Tooltip title = "Ver eventos" placement = "bottom">
-          <IconButton
-            color = "primary"
-            aria-label = "ver"
-            onClick = {() => handleEditHoursOpen(params.row.id)}
-          >
-            <VisibilityIcon />
-          </IconButton>
-        </Tooltip>
-      ),
+      renderCell: renderEventsCell,
     },
   ];
+
+  const selectedStudent = students.find((student) => student.id === selectedId);
+  const studentEvents = selectedStudent?.events || [];
+
+  const renderEventRow = useCallback((event: Event) => {
+    const eventKey = event.id ? `event-${event.id}` : `event-${event.title}-${event.is_supervisor}`;
+
+    return (
+      <tr key = {eventKey}>
+        <td style = {{ padding: "8px", border: "1px solid #ddd" }}>{event.title}</td>
+        <td
+          style = {{
+            padding: "8px",
+            border: "1px solid #ddd",
+            color: event.is_supervisor ? "orange" : "blue",
+          }}
+        >
+          {event.is_supervisor ? "Supervisor" : "Participante"}
+        </td>
+      </tr>
+    );
+  }, []);
 
   return (
     <div style = {{ height: "100vh", padding: "20px" }}>
@@ -107,26 +155,39 @@ const EventByInterns = () => {
         {"Eventos hechos por becarios\r"}
       </Typography>
 
-      <div style = {{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows = {students}
-          columns = {columns}
-          localeText = {dataGridLocaleText}
-          initialState = {{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
-            },
+      <div
+        style = {{
+          height: 400,
+          width: "100%",
+          overflow: "auto",
+        }}
+      >
+        <div
+          style = {{
+            minWidth: "800px",
+            height: "100%",
           }}
-          getRowId = {(row) => row.id}
-          classes = {{
-            root: "bg-white dark:bg-gray-800",
-            columnHeader: "bg-gray-200 dark:bg-gray-800 ",
-            cell: "bg-white dark:bg-gray-800",
-            row: "bg-white dark:bg-gray-800",
-            columnHeaderTitle: "!font-bold text-center",
-          }}
-          pageSizeOptions = {[5, 10]}
-        />
+        >
+          <DataGrid
+            rows = {students}
+            columns = {columns}
+            localeText = {dataGridLocaleText}
+            initialState = {{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            getRowId = {getRowId}
+            classes = {{
+              root: "bg-white dark:bg-gray-800",
+              columnHeader: "bg-gray-200 dark:bg-gray-800 ",
+              cell: "bg-white dark:bg-gray-800",
+              row: "bg-white dark:bg-gray-800",
+              columnHeaderTitle: "!font-bold text-center",
+            }}
+            pageSizeOptions = {[5, 10]}
+          />
+        </div>
       </div>
 
       <Dialog
@@ -139,8 +200,8 @@ const EventByInterns = () => {
           <Typography
             variant = "h5" align = "center" color = "primary"
             style = {{ fontWeight: "bold" }}>
-            {students.find((student) => student.id === selectedId)?.name}
-            {" -"} {students.find((student) => student.id === selectedId)?.total_hours} {"horas\r"}
+            {selectedStudent?.name}
+            {" -"} {selectedStudent?.total_hours} {"horas\r"}
           </Typography>
           <IconButton
             aria-label = "close"
@@ -184,24 +245,7 @@ const EventByInterns = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {students
-                    .find((student) => student.id === selectedId)
-                    ?.events?.map((event, index) => (
-                      <tr key = {index}>
-                        <td style = {{ padding: "8px", border: "1px solid #ddd" }}>{event.title}</td>
-                        <td
-                          style = {{
-                            padding: "8px",
-                            border: "1px solid #ddd",
-                            color: event.is_supervisor ? "orange" : "blue",
-                          }}
-                        >
-                          {event.is_supervisor ? "Supervisor" : "Participante"}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
+                <tbody>{studentEvents.map(renderEventRow)}</tbody>
               </table>
             </div>
           )}

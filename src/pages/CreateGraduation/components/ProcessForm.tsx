@@ -64,6 +64,8 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
       .max(80, "El título no debe superar los 80 caracteres")
       .matches(/^[a-zA-Z0-9\s]+$/, "El título solo debe contener letras y números")
       .matches(/[a-zA-Z]/, "El título debe contener texto descriptivo.")
+      .matches(/^[^\s].*[^\s]$/, "El título no debe tener espacios al inicio o final")
+      .matches(/^(?!.*\s{2}).*$/, "El título no debe tener espacios consecutivos")
       .required(FIELD_REQUIRED_MESSAGE),
   });
 
@@ -74,8 +76,7 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
       setModes(responseModes.data);
       setStudents([...responseStudents.data]);
     } catch (error) {
-      console.error("Failed to fetch data: ", error);
-      setError("Failed to load data, please try again.");
+      setError("Error al cargar los datos. Por favor, intente de nuevo.");
     }
   }, []);
 
@@ -118,8 +119,6 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
           navigate(`/studentProfile/${response.data.id}`);
         }
       } catch (error) {
-        console.error("Error al crear proceso:", error);
-
         setTitleError(
           "Este título ya ha sido registrado por otro estudiante. Por favor, ingrese un título diferente."
         );
@@ -128,6 +127,13 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
       }
     },
   });
+
+  const handleClose = useCallback(() => {
+    formik.resetForm();
+    setTitleError(null);
+    setError(null);
+    isClosed();
+  }, [formik, isClosed]);
 
   const handleStudentChange = useCallback(
     (_event: ChangeEvent<object | null>, value: Student | null) => {
@@ -177,7 +183,7 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
   const getStudentOptionLabel = useCallback((student: Student) => `${student.name}`, []);
 
   return (
-    <Modal open = {isVisible} onClose = {isClosed}>
+    <Modal open = {isVisible} onClose = {handleClose}>
       <Box
         sx = {{
           position: "absolute",

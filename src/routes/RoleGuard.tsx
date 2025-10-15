@@ -1,6 +1,8 @@
 import { FC, ReactNode, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/store";
+import SessionActive from "../components/authentication/SessionActive";
+import useSingleSession from "../hooks/useSingleSession";
 
 interface RoleGuardProps {
   allowedRoles: string[];
@@ -10,6 +12,8 @@ interface RoleGuardProps {
 const RoleGuard: FC<RoleGuardProps> = ({ allowedRoles, children }) => {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
+
+  const isSessionConflict = useSingleSession();
 
   const handleLoginRedirect = useCallback(() => {
     navigate("/login");
@@ -28,14 +32,18 @@ const RoleGuard: FC<RoleGuardProps> = ({ allowedRoles, children }) => {
     }
   }, [hasRole, navigate]);
 
+  if (isSessionConflict) {
+    return <SessionActive />;
+  }
+
   if (!user) {
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <h2 style={{ color: "red" }}>{"Usuario no autenticado"}</h2>
+      <div style = {{ textAlign: "center", marginTop: "50px" }}>
+        <h2 style = {{ color: "red" }}>{"Usuario no autenticado"}</h2>
         <p>{"Debes iniciar sesión para acceder a esta página."}</p>
         <button
-          onClick={handleLoginRedirect}
-          style={{
+          onClick = {handleLoginRedirect}
+          style = {{
             padding: "10px 20px",
             fontSize: "16px",
             backgroundColor: "#007bff",

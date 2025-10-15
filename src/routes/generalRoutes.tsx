@@ -217,7 +217,7 @@ const routes: AppRoute[] = [
             ),
           },
           {
-            path: "/EventHistory/:id_event",
+            path: "/eventHistory",
             element: (
               <RoleGuard allowedRoles={[ADMIN, INTERN, SUPERVISOR]}>
                 <EventHistory />

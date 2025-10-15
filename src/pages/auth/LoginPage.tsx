@@ -37,6 +37,13 @@ const LoginPage = () => {
           const dashboardProcess = [ADMIN, STUDENT, PROFESSOR, PROGRAM_DIRECTOR];
           localStorage.setItem("token", isAuthenticated.token);
           setUser(isAuthenticated);
+          localStorage.setItem(
+            "sessionActive",
+            JSON.stringify({
+              userId: isAuthenticated.id,
+              active: true,
+            })
+          );
           if (isAuthenticated.roles.some((role) => dashboardProcess.includes(role))) {
             navigate("/dashboard");
           }
@@ -60,7 +67,7 @@ const LoginPage = () => {
   ) : (
     <section className = "h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0 ">
       <div className = "md:w-1/3 max-w-sm mr-10">
-        <img src = {LogoUPB} alt = "UPB logo" />
+        <img src = {LogoUPB} alt = "UPB Logo" />
       </div>
       <div className = "md:w-1/3 max-w-sm">
         <form onSubmit = {formik.handleSubmit}>
