@@ -11,7 +11,7 @@ export interface User {
   code: string;
   phone: string;
   degree: string;
-  roles: number[];
+  roles: string[];
   rolesAndPermissions?: { [id: number]: Role };
 }
 

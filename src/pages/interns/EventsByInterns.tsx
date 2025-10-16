@@ -6,8 +6,8 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import DialogContent from "@mui/material/DialogContent";
 import Typography from "@mui/material/Typography";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { getAllCompleteInternService } from "../../services/internService";
 import { IconButton, Tooltip } from "@mui/material";
+import { getAllCompleteInternService } from "../../services/internService";
 import { CompleteIntern } from "../../models/internsInterface";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
 
@@ -15,10 +15,6 @@ const EventByInterns = () => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [students, setStudents] = useState<CompleteIntern[]>([]);
-
-  useEffect(() => {
-    fetchInternsFull();
-  }, []);
   const fetchInternsFull = async () => {
     try {
       const res = await getAllCompleteInternService();
@@ -27,6 +23,10 @@ const EventByInterns = () => {
       console.error("Error fetching complete students info", error);
     }
   };
+  useEffect(() => {
+    fetchInternsFull();
+  }, []);
+
   const handleEditHoursOpen = (id: number) => {
     setSelectedId(id);
     setDetailOpen(true);
@@ -44,6 +44,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
     },
@@ -53,6 +54,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
     },
@@ -62,6 +64,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
       valueGetter: (params: GridRenderCellParams) => `${params} horas`,
@@ -72,6 +75,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 150,
       headerClassName: "headerStyle",
       cellClassName: "cellStyle",
       valueGetter: (params: GridRenderCellParams) => `${params} horas`,
@@ -82,6 +86,7 @@ const EventByInterns = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       headerClassName: "headerStyle",
       renderCell: (params) => (
         <Tooltip title="Ver eventos" placement="bottom">
@@ -100,32 +105,45 @@ const EventByInterns = () => {
   return (
     <div style={{ height: "100vh", padding: "20px" }}>
       <Typography variant="h4" color="primary" style={{ marginBottom: "10px" }}>
-        Lista de Becarios
+        {"Lista de Becarios\r"}
       </Typography>
       <Typography variant="subtitle1" color="textSecondary" style={{ marginBottom: "20px" }}>
-        Eventos hechos por becarios
+        {"Eventos hechos por becarios\r"}
       </Typography>
 
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={students}
-          columns={columns}
-          localeText={dataGridLocaleText}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
-            },
+      <div
+        style={{
+          height: 400,
+          width: "100%",
+          overflow: "auto",
+        }}
+      >
+        <div
+          style={{
+            minWidth: "800px",
+            height: "100%",
           }}
-          getRowId={(row) => row.id}
-          classes={{
-            root: "bg-white dark:bg-gray-800",
-            columnHeader: "bg-gray-200 dark:bg-gray-800 ",
-            cell: "bg-white dark:bg-gray-800",
-            row: "bg-white dark:bg-gray-800",
-            columnHeaderTitle: "!font-bold text-center",
-          }}
-          pageSizeOptions={[5, 10]}
-        />
+        >
+          <DataGrid
+            rows={students}
+            columns={columns}
+            localeText={dataGridLocaleText}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            getRowId={(row) => row.id}
+            classes={{
+              root: "bg-white dark:bg-gray-800",
+              columnHeader: "bg-gray-200 dark:bg-gray-800 ",
+              cell: "bg-white dark:bg-gray-800",
+              row: "bg-white dark:bg-gray-800",
+              columnHeaderTitle: "!font-bold text-center",
+            }}
+            pageSizeOptions={[5, 10]}
+          />
+        </div>
       </div>
 
       <Dialog
@@ -136,8 +154,8 @@ const EventByInterns = () => {
       >
         <DialogTitle id="edit-hours-dialog-title">
           <Typography variant="h5" align="center" color="primary" style={{ fontWeight: "bold" }}>
-            {students.find((student) => student.id === selectedId)?.name} -{" "}
-            {students.find((student) => student.id === selectedId)?.total_hours} horas
+            {students.find((student) => student.id === selectedId)?.name}
+            {" -"} {students.find((student) => student.id === selectedId)?.total_hours} {"horas\r"}
           </Typography>
           <IconButton
             aria-label="close"
@@ -167,7 +185,7 @@ const EventByInterns = () => {
                         border: "1px solid #ddd",
                       }}
                     >
-                      Evento
+                      {"Evento\r"}
                     </th>
                     <th
                       style={{
@@ -177,7 +195,7 @@ const EventByInterns = () => {
                         border: "1px solid #ddd",
                       }}
                     >
-                      Estado
+                      {"Estado\r"}
                     </th>
                   </tr>
                 </thead>

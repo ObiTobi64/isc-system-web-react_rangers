@@ -46,18 +46,9 @@ const UsersPage = () => {
   const [filterRoles, setFilterRoles] = useState("");
   const [search, setSearch] = useState("");
   const [user, setUser] = useState<User | null>(null);
-  const [viewUserReport, setViewUserReport] = useState<Permission>();
-  const [deleteUserPermission, setDeleteUserPermission] = useState<Permission>();
-  const [editUserPermission, setEditUserPermission] = useState<Permission>();
   const [addUserPermission, setAddUserPermission] = useState<Permission>();
   useEffect(() => {
     const fetchPermissions = async () => {
-      const viewReportResponse = await getPermissionById(19);
-      setViewUserReport(viewReportResponse.data[0]);
-      const deleteUserResponse = await getPermissionById(20);
-      setDeleteUserPermission(deleteUserResponse.data[0]);
-      const editUserResponse = await getPermissionById(21);
-      setEditUserPermission(editUserResponse.data[0]);
       const addUserResponse = await getPermissionById(22);
       setAddUserPermission(addUserResponse.data[0]);
       console.log("permissos:", addUserPermission);
@@ -139,10 +130,10 @@ const UsersPage = () => {
       });
     }
 
-    if (filterRoles) {
-      filteredData = filteredData.filter((user: User) => {
-        return user.roles.includes(Number(filterRoles));
-      });
+    if (filterRoles) { 
+      filteredData = filteredData.filter((user: User) => 
+        user.roles?.includes(filterRoles) 
+      ); 
     }
 
     setFilteredUsers(filteredData);
@@ -200,32 +191,18 @@ const UsersPage = () => {
       align: "center",
       flex: 1,
       width: 200,
-      renderCell: (params) => (
-        <div>
-          {HasPermission(viewUserReport?.name || "") && (
-            <IconButton color="primary" aria-label="ver" onClick={() => handleView(params.row.id)}>
-              <VisibilityIcon />
-            </IconButton>
-          )}
-          {HasPermission(editUserPermission?.name || "") && (
-            <IconButton
-              color="primary"
-              aria-label="editar"
-              onClick={() => handleEdit(params.row.id)}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-          {HasPermission(deleteUserPermission?.name || "") && (
-            <IconButton
-              color="secondary"
-              aria-label="eliminar"
-              onClick={() => handleClickDelete(params.row.id)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          )}
-        </div>
+      renderCell: (params) => ( 
+        <div> 
+          <IconButton color="primary" aria-label="ver" onClick={() => handleView(params.row.id)}> 
+            <VisibilityIcon /> 
+          </IconButton> 
+          <IconButton color="primary" aria-label="editar" onClick={() => handleEdit(params.row.id)}> 
+            <EditIcon /> 
+          </IconButton> 
+          <IconButton color="secondary" aria-label="eliminar" onClick={() => handleClickDelete(params.row.id)}> 
+            <DeleteIcon /> 
+          </IconButton> 
+        </div> 
       ),
     },
   ];
@@ -264,9 +241,8 @@ const UsersPage = () => {
     fetchRoles();
   }, []);
 
-  const countStudentsWithRole = (role: string) => {
-    return users.filter((user) => user.roles.includes(Number(role))).length;
-  };
+  const countStudentsWithRole = (role: string) =>
+    users.filter((user) => user.roles?.includes(role)).length;
 
   return (
     <ContainerPage
@@ -285,7 +261,7 @@ const UsersPage = () => {
         )
       }
       children={
-        <div style={{ height: 400, width: "100%" }}>
+        <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
           <Grid container spacing={1} style={{ paddingBottom: 20 }}>
             <Grid item xs={9} md={8}>
               <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between m-5 mb-8 overflow-hidden">
