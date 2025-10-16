@@ -31,8 +31,8 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
 
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [editMode, setEditMode] = useState<boolean>(CURRENT_STAGE < (process?.stage_id || 0));
-  const isBlocked = process?.stage_id !== 2;
+  const [editMode, setEditMode] = useState<boolean>((process?.stage_id ?? 0) !== CURRENT_STAGE);
+  const isBlocked = (process?.stage_id ?? 0) !== CURRENT_STAGE; 
 
   const { formik, canApproveStage } = useMentorFormik(process, () => {
     if (canApproveStage) {
@@ -44,6 +44,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
 
   const saveStage = useCallback(async () => {
     if (!process) return;
+    if ((process?.stage_id ?? 0) !== CURRENT_STAGE) return;
 
     setLoading(true);
 
@@ -92,6 +93,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
   };
 
   const editForm = () => {
+    if (isBlocked) return;
     setEditMode(false);
   };
 
@@ -125,7 +127,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
           <Button type="button" onClick={onPrevious} variant="contained" color="secondary">
             Anterior
           </Button>
-          <Button type="submit" variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary" disabled={isBlocked}>
             {canApproveStage ? "Aprobar Etapa" : "Guardar"}
           </Button>
         </Box>
