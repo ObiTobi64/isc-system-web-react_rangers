@@ -10,7 +10,7 @@ import { periods, currentPeriod } from "../../data/periods";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import {Typography } from "@mui/material";
+import {Typography, Alert, AlertTitle } from "@mui/material";
 import {
   FormControl,
   FormControlLabel,
@@ -23,10 +23,25 @@ import {
   Button,
   Grid,
 } from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
 
 const validationSchema = Yup.object({
-  mode: Yup.string().required("* La modalidad es obligatoria"),
-  period: Yup.date().required("* El periodo es obligatorio"),
+  mode: Yup.string()
+    .required("* La modalidad es obligatoria")
+    .test('is-locked', 'No se puede modificar un seminario aprobado', 
+      function() {
+        // @ts-ignore - this.options está disponible en tiempo de ejecución
+        return !this.options?.context?.isReadOnly;
+      }
+    ),
+  period: Yup.date()
+    .required("* El periodo es obligatorio")
+    .test('is-locked', 'No se puede modificar un seminario aprobado', 
+      function() {
+        // @ts-ignore - this.options está disponible en tiempo de ejecución
+        return !this.options?.context?.isReadOnly;
+      }
+    ),
 });
 
 interface RegistrationStageProps {
@@ -47,12 +62,31 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
   const studentProcess = useProcessStore((state) => state.process);
   const setProcess = useProcessStore((state) => state.setProcess);
   const [modes, setModes] = useState<Modes[]>([]);
-  const readOnly = true;
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [, setError] = useState<any | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [edited, setEdited] = useState(false)
+  const [edited, setEdited] = useState(false);
+  const [readOnly, setReadOnly] = useState<boolean>(true);
+
+  const checkSeminarApproved = () => {
+    if (!studentProcess) return true;
+
+    const isApproved = Boolean(
+      studentProcess.seminar_enrollment === "true" &&
+      studentProcess.date_seminar_enrollment &&
+      studentProcess.stage_id > 0
+    );
+
+    // También bloquear si estamos en una etapa posterior
+    const isLaterStage = studentProcess.stage_id > 0;
+
+    return isApproved || isLaterStage;
+  };
+
+  // Actualizar el estado de solo lectura cuando cambie el proceso
+  useEffect(() => {
+    setReadOnly(checkSeminarApproved());
+  }, [studentProcess]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,12 +101,30 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
   }, []);
 
   const saveStage = async (mode: number, period: string) => {
-    if (studentProcess) {
-      studentProcess.modality_id = mode;
-      studentProcess.period = period;
-      setProcess({ ...studentProcess });
-      await updateProcess(studentProcess);
+    if (!studentProcess) {
+      return;
+    }
+
+    // Volver a verificar el estado de aprobación antes de guardar
+    if (checkSeminarApproved()) {
+      return;
+    }
+
+    try {
+      // Primero crear una copia del proceso para no mutar el estado directamente
+      const updatedProcess = { ...studentProcess };
+      updatedProcess.modality_id = mode;
+      updatedProcess.period = period;
+      
+      // Intentar actualizar en el backend primero
+      await updateProcess(updatedProcess);
+      
+      // Si la actualización fue exitosa, actualizar el estado local
+      setProcess(updatedProcess);
       onNext();
+    } catch (error) {
+      console.error('Error al guardar los cambios:', error);
+      setError('No se pudieron guardar los cambios. Por favor, intente de nuevo.');
     }
   };
 
@@ -86,26 +138,59 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
       mode: Number(studentProcess?.modality_id),
       period: getIdFromValue(studentProcess?.period || currentPeriod),
     },
-    validationSchema,
+    validationSchema: validationSchema.concat(
+      Yup.object().shape({
+        mode: Yup.string().test(
+          'is-editable',
+          'No se puede modificar un seminario aprobado',
+          () => !readOnly
+        ),
+        period: Yup.string().test(
+          'is-editable',
+          'No se puede modificar un seminario aprobado',
+          () => !readOnly
+        ),
+      })
+    ),
     onSubmit: () => {
+      // No permitir envío del formulario si está en modo solo lectura
+      if (readOnly) {
+        return;
+      }
+
       if (!edited) {
         onNext()
       } else {
         setShowModal(true)
       }
     },
+    enableReinitialize: true // Esto asegura que el formulario se actualice si cambia el proceso
   });
 
   const handleOnChange = (event: any) => {
-    setEdited(true)
+    if (readOnly) {
+      return;
+    }
+    setEdited(true);
     formik.handleChange(event);
   }
 
   return (
     <>
       <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold' }}>
-        Etapa 1: Seminario de Grado<ModeEditIcon style={{ cursor: "not-allowed", opacity: 0.5 }}/>
+        Etapa 1: Seminario de Grado
+        {!readOnly && <ModeEditIcon style={{ cursor: "pointer" }} />}
+        {readOnly && <ModeEditIcon style={{ cursor: "not-allowed", opacity: 0.5 }} />}
       </Typography>
+
+      {readOnly && (
+        <Alert severity="warning" sx={{ mb: 2 }} icon={<WarningIcon />}>
+          <AlertTitle>{"Fase de Seminario de Grado Registrada"}</AlertTitle>
+          {"Esta fase ya ha sido aprobada y registrada. No se pueden modificar los datos del seminario \r"}
+          {"una vez que han sido aprobados. Si necesita realizar cambios excepcionales, por favor \r"}
+          {"contacte al administrador del sistema.\r"}
+        </Alert>
+      )}
   
       <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">
         <Grid container spacing={3}>
@@ -156,7 +241,12 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
           </Grid>
         </Grid>
         <div className="flex justify-end pt-5">
-          <Button type="submit" variant="contained" color="primary">
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="primary"
+            disabled={readOnly && edited} // Deshabilitar solo si está en modo lectura y se intentó editar
+          >
             Siguiente
           </Button>
         </div>
