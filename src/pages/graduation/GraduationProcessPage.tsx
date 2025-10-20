@@ -56,7 +56,7 @@ const GraduationProcessPage = () => {
 
   const goToCreateProcessPage = useCallback(() => {
     handleOpen();
-  }, []);
+  }, [handleOpen]);
 
   const handleViewStudent = useCallback(
     (studentId: string) => {
@@ -165,7 +165,6 @@ const GraduationProcessPage = () => {
           value={search}
           onChange={handleSearchChange}
           size={isSmallScreen ? "small" : "medium"}
-          fullWidth
           multiline
           maxRows={3}
           sx={{
