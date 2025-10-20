@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
 import { Container, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import NumberCard from "../../components/common/NumberCard";
 import AreaChartCard from "../../components/common/AreaChart";
 import CalendarCard from "../../components/common/CalendarComponent";
 import { getStats } from "../../services/statsService";
+
+const DASHBOARD_MIN_WIDTH = 1200;
 
 const data = [
   { period: "2021 Q1", approved: 200 },
@@ -38,38 +41,52 @@ interface Stats {
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState<Stats>();
-  
+
   useEffect(() => {
-    getStats().then((result) => {
-      setStats(result.data);
-    });
+    const fetchStats = async () => {
+      try {
+        const result = await getStats();
+        setStats(result.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+    
+    fetchStats();
   }, []);
 
   return (
-    <Container 
-      fixed 
-      sx = {{ 
-        minWidth: 1200,
+    <Container
+      fixed
+      sx = {{
+        minWidth: DASHBOARD_MIN_WIDTH,
         maxWidth: 1400,
-        overflowX: 'auto',
-        '&::-webkit-scrollbar': {
+        overflowX: "auto",
+        scrollbarColor: "#c1c1c1 #f1f1f1",
+        scrollbarWidth: "thin",
+        "&::-webkit-scrollbar": {
           height: 8,
         },
-        '&::-webkit-scrollbar-track': {
-          background: '#f1f1f1',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: '#c1c1c1',
+        "&::-webkit-scrollbar-track": {
+          background: "#f1f1f1",
           borderRadius: 4,
         },
-        '&::-webkit-scrollbar-thumb:hover': {
-          background: '#a8a8a8',
-        }
+        "&::-webkit-scrollbar-thumb": {
+          background: "#c1c1c1",
+          borderRadius: 4,
+          transition: "background 0.3s ease",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          background: "#a8a8a8",
+        },
+        "&::-webkit-scrollbar-corner": {
+          background: "#f1f1f1",
+        },
       }}
     >
-      <Grid container spacing = {3} sx = {{ minWidth: 1200 }}>
+      <Grid container spacing = {3} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
         <Grid item xs = {12}>
-          <Grid container spacing = {3} sx = {{ minWidth: 1200 }}>
+          <Grid container spacing = {3} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
             <Grid item xs = {4} sx = {{ minWidth: 400 }}>
               <Grid container spacing = {3} marginTop = "15px">
                 <Grid item xs = {12}>
@@ -117,7 +134,7 @@ export const DashboardPage = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs = {12} sx = {{ minWidth: 1200 }}>
+        <Grid item xs = {12} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
           <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
         </Grid>
       </Grid>
