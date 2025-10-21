@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, Typography } from "@mui/material";
-// @ts-ignore
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer, Event } from "react-big-calendar";
+// npm install --save-dev @types/react-big-calendar
 import moment from "moment";
 import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
+interface CalendarCardProps {
+  events: Event[];
+}
 
 const calendarStyles = `
   .rbc-toolbar {
@@ -55,39 +60,35 @@ const messages = {
   showMore: (total: number) => `+ Ver más (${total})`,
 };
 
-// Componente CalendarCard
-// @ts-ignore
-const CalendarCard = ({ events }) => {
-  return (
-    <Card raised sx={{ margin: 2, padding: 2 }}>
-      <CardContent>
-        <Typography
-          data-test-id="calendar-title"
-          variant="h6"
-          component="div"
-          gutterBottom
-          sx={{
-            textAlign: "center",
-            color: "primary.main",
-            fontWeight: "bold",
-          }}
-        >
-          Calendario de Eventos
-        </Typography>
-        <style>{calendarStyles}</style>
-        <div style={{ height: 400 }}>
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: "100%" }}
-            messages={messages}
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+const CalendarCard = ({ events }: CalendarCardProps) => (
+  <Card raised sx = {{ margin: 2, padding: 2 }}>
+    <CardContent>
+      <Typography
+        data-test-id = "calendar-title"
+        variant = "h6"
+        component = "div"
+        gutterBottom
+        sx = {{
+          textAlign: "center",
+          color: "primary.main",
+          fontWeight: "bold",
+        }}
+      >
+        {"Calendario de Eventos\r"}
+      </Typography>
+      <style>{calendarStyles}</style>
+      <div style = {{ height: 400 }}>
+        <Calendar
+          localizer = {localizer}
+          events = {events}
+          startAccessor = "start"
+          endAccessor = "end"
+          style = {{ height: "100%" }}
+          messages = {messages}
+        />
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default CalendarCard;

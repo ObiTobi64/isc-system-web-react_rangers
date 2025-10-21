@@ -1,4 +1,4 @@
-import React from "react";
+import { ReactNode } from "react";
 import { Navigate, LoaderFunction } from "react-router-dom";
 import axios from "axios";
 
@@ -33,7 +33,7 @@ import ViewInternSupervisor from "../pages/supervisor/ViewInternSupervisor";
 
 import { getProcess, getStudentById } from "../services/processServicer";
 
-import { roles } from "../constants/roles";
+import roles from "../constants/roles";
 
 const { ADMIN, PROFESSOR, STUDENT, INTERN, PROGRAM_DIRECTOR, SUPERVISOR } = roles;
 
@@ -65,10 +65,10 @@ const studentLoader: LoaderFunction = async ({ params }) => {
 interface AppRoute {
   path?: string;
   index?: boolean;
-  element: React.ReactNode;
+  element: ReactNode;
   loader?: LoaderFunction;
   children?: AppRoute[];
-  errorElement?: React.ReactNode;
+  errorElement?: ReactNode;
 }
 
 const routes: AppRoute[] = [

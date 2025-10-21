@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { GraduationProcess, Seminar } from '../models/studentProcess';
 import {
   InitGraduationProcess,

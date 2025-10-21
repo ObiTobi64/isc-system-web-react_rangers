@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable camelcase */
 import axios from 'axios';
 import apiClient from './apiInstance';
 import { Event, EventInterns } from '../models/eventInterface';
@@ -9,15 +11,13 @@ export const getEventsService = async () => {
     const response = await apiClient.get('/events');
     if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to get events' };
     }
+    return { error: 'Failed to get events' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -26,15 +26,13 @@ export const getEventsInformationsService = async () => {
     const response = await apiClient.get('/events/register-information');
     if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to get events' };
     }
+    return { error: 'Failed to get events' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -43,15 +41,13 @@ export const getEventsInformations = async (id_event: number, id_becario: number
     const response = await apiClient.get(`/events/${id_event}/status/${id_becario}`);
     if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to get events' };
     }
+    return { error: 'Failed to get events' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -62,15 +58,13 @@ export const registerInternEventService = async (id_event: number, id_intern: nu
     });
     if (response.status === 201) {
       return response.data;
-    } else {
-      return { error: 'Failed to register intern on event' };
     }
+    return { error: 'Failed to register intern on event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -79,32 +73,28 @@ export const createEventService = async (event: Event) => {
     const response = await apiClient.post(`events`, event);
     if (response.status === 201) {
       return response.data;
-    } else {
-      return { error: 'Failed to create event' };
     }
+    return { error: 'Failed to create event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
 export const deleteInternFromEventService = async (id_event: number, id_intern: number) => {
   try {
     const response = await apiClient.delete(`events/${id_event}/registrations/${id_intern}`);
-    if (response.status == 200) {
+    if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to delete intern from an event' };
     }
+    return { error: 'Failed to delete intern from an event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -113,49 +103,43 @@ export const getFullEventInformationService = async (id: string) => {
     const response = await apiClient.get(`events/${id}/registrations`);
     if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to fetch full event info' };
     }
+    return { error: 'Failed to fetch full event info' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
 export const deleteEventService = async (id_event: number) => {
   try {
     const response = await apiClient.delete(`events/${id_event}`);
-    if (response.status == 200) {
+    if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to delete intern on event' };
     }
+    return { error: 'Failed to delete intern on event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
 export const updateEventService = async (id_event: number, event: Event) => {
   try {
     const response = await apiClient.put(`events/${id_event}`, event);
-    if (response.status == 201) {
+    if (response.status === 201) {
       return response.data;
-    } else {
-      return { error: 'Failed to delete intern from an event' };
     }
+    return { error: 'Failed to delete intern from an event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -166,17 +150,15 @@ export const updateInternType = async (
 ) => {
   try {
     const response = await apiClient.put(`events/${id_event}/update/${id_intern}`, eventIntern);
-    if (response.status == 200) {
+    if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to update intern type from event' };
     }
+    return { error: 'Failed to update intern type from event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -185,15 +167,13 @@ export const finishEventService = async (eventId: number) => {
     const response = await apiClient.put(`events/finish/${eventId}`);
     if (response.status === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to finish event' };
     }
+    return { error: 'Failed to finish event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred' };
     }
+    return { error: 'An unexpected error occurred' };
   }
 };
 
@@ -202,7 +182,7 @@ export const getSupervisorEventByIdService = async (id_user: number) => {
     const everyIntern = await getAllCompleteInternService();
     // TODO: show all intern events
     const intern: CompleteIntern = everyIntern.data.find(
-      (intern: CompleteIntern) => intern.user_profile_id === id_user
+      (currentIntern: CompleteIntern) => currentIntern.user_profile_id === id_user
     );
     const supervisedEvent = intern.events?.find((event) => event.is_supervisor);
     if (!supervisedEvent) {
@@ -211,14 +191,12 @@ export const getSupervisorEventByIdService = async (id_user: number) => {
     const response = await getFullEventInformationService(supervisedEvent?.event_id.toString());
     if (response.code === 200) {
       return response.data;
-    } else {
-      return { error: 'Failed to fetch supervised event' };
     }
+    return { error: 'Failed to fetch supervised event' };
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return { error: error.response?.data.message || 'Network error' };
-    } else {
-      return { error: 'An unexpected error occurred', err: error };
     }
+    return { error: 'An unexpected error occurred', err: error };
   }
 };

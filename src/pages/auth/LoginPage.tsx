@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { authenticateUser } from "../../services/authService";
+import authenticateUser from "../../services/authService";
 import LogoUPB from "../../assets/upb_logo.png";
-import { ErrorMessage } from "../../components/common/ErrorMessage";
+import ErrorMessage from "../../components/common/ErrorMessage";
 import SpinModal from "../../components/common/SpinModal";
 import { useUserStore } from "../../store/store";
-import { roles } from "../../constants/roles";
+import roles from "../../constants/roles";
 
 const LoginPage = () => {
   const navigate = useNavigate();

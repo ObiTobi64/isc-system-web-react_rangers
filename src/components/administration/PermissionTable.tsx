@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,16 +13,16 @@ import {
   Collapse,
 } from "@mui/material";
 import { getPermissions } from "../../services/permissionsService";
-import { Section } from "../../models/sectionInterface";
-import { Permission } from "../../models/permissionInterface";
+import Section from "../../models/sectionInterface";
+import Permission from "../../models/permissionInterface";
 import SavePermissionsModal from "../common/SavePermissionsModal";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { PermissionsCategory } from "../../models/permissionsCategoryInterface";
-import { PermissionTableProps } from "../../models/permissionTablePropsInterface";
+import PermissionsCategory from "../../models/permissionsCategoryInterface";
+import PermissionTableProps from "../../models/permissionTablePropsInterface";
 import { addPermisionToRole, removePermisionToRole } from "../../services/roleService";
 import AlertSnackbar from "../common/AlertSnackbar";
 
-const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
+const PermissionTable: FC<PermissionTableProps> = ({ currentRol }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [listOfChanges, setListOfChanges] = useState<Permission[]>([]);
   const [buttonVisible, setButtonVisible] = useState(false);

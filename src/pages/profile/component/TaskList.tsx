@@ -49,77 +49,78 @@ const tasks = [
   },
 ];
 
-const TaskList = () => {
-  return (
-    <Box
-      sx={{
-        maxHeight: "400px",
-        overflowY: "auto",
-        padding: 2,
-        "&::-webkit-scrollbar": {
-          width: "6px",
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "transparent",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#cccccc",
-          borderRadius: "10px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-          background: "#aaaaaa",
-        },
-      }}
-    >
-      {tasks.map((task, index) => (
-        <Grid
-          container
-          key={index}
-          spacing={2}
-          alignItems="center"
-          sx={{ mb: 2, padding: 2, borderBottom: "1px solid #e0e0e0" }}
-        >
-          <Grid item xs={2}>
-            <Typography variant="h6" component="div">
-              {task.date}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              {task.month}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              {task.task}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              {task.time}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            {task.status === "Cancelled" ? (
-              <Chip label="Cancelled" sx={{ backgroundColor: "#ffe0b2", color: "#f57c00" }} />
-            ) : task.status === "Booked" ? (
-              <Chip label="Booked" sx={{ backgroundColor: "#e3f2fd", color: "#2196f3" }} />
-            ) : (
-              <Chip
-                icon={<CheckCircleIcon style={{ color: "#4caf50" }} />}
-                label="Done"
-                sx={{ backgroundColor: "#e8f5e9", color: "#4caf50" }}
-              />
-            )}
-          </Grid>
-          <Grid item xs={3} sx={{ textAlign: "right" }}>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              ${task.amount}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              ${task.rate}/hr
-            </Typography>
-          </Grid>
+const TaskList = () => (
+  <Box
+    sx = {{
+      maxHeight: "400px",
+      overflowY: "auto",
+      padding: 2,
+      "&::-webkit-scrollbar": {
+        width: "6px",
+      },
+      "&::-webkit-scrollbar-track": {
+        background: "transparent",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        background: "#cccccc",
+        borderRadius: "10px",
+      },
+      "&::-webkit-scrollbar-thumb:hover": {
+        background: "#aaaaaa",
+      },
+    }}
+  >
+    {tasks.map((task, index) => (
+      <Grid
+        container
+        key = {index}
+        spacing = {2}
+        alignItems = "center"
+        sx = {{ mb: 2, padding: 2, borderBottom: "1px solid #e0e0e0" }}
+      >
+        <Grid item xs = {2}>
+          <Typography variant = "h6" component = "div">
+            {task.date}
+          </Typography>
+          <Typography variant = "body2" color = "textSecondary">
+            {task.month}
+          </Typography>
         </Grid>
-      ))}
-    </Box>
-  );
-};
+        <Grid item xs = {4}>
+          <Typography variant = "body1" sx = {{ fontWeight: "bold" }}>
+            {task.task}
+          </Typography>
+          <Typography variant = "body2" color = "textSecondary">
+            {task.time}
+          </Typography>
+        </Grid>
+        <Grid item xs = {3}>
+          {task.status === "Cancelled" ? (
+            <Chip label = "Cancelled" sx = {{ backgroundColor: "#ffe0b2", color: "#f57c00" }} />
+          ) : task.status === "Booked" ? (
+            <Chip label = "Booked" sx = {{ backgroundColor: "#e3f2fd", color: "#2196f3" }} />
+          ) : (
+            <Chip
+              icon = {<CheckCircleIcon style = {{ color: "#4caf50" }} />}
+              label = "Done"
+              sx = {{ backgroundColor: "#e8f5e9", color: "#4caf50" }}
+            />
+          )}
+        </Grid>
+        <Grid item xs = {3} sx = {{ textAlign: "right" }}>
+          <Typography variant = "body1" sx = {{ fontWeight: "bold" }}>
+            {"$"}
+            {task.amount}
+          </Typography>
+          <Typography variant = "body2" color = "textSecondary">
+            {"$"}
+            {task.rate}
+            {"/hr\r"}
+          </Typography>
+        </Grid>
+      </Grid>
+    ))}
+  </Box>
+);
 
 export default TaskList;

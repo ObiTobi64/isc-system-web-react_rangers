@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import apiClient from './apiInstance';
 
 const getModes = async () => {
@@ -10,4 +11,4 @@ const getModes = async () => {
   }
 };
 
-export { getModes };
+export default getModes;

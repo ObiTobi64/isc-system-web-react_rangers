@@ -5,7 +5,7 @@ interface LetterPath {
   extention: string;
 }
 
-export const letters: Record<string, LetterPath> = {
+const letters: Record<string, LetterPath> = {
   TUTOR_APPROBAL: {
     path: '/pdfs/aprobacion_tutor.docx',
     description: 'Carta de aprobación de tutor',
@@ -31,3 +31,5 @@ export const letters: Record<string, LetterPath> = {
     extention: 'docx',
   },
 };
+
+export default letters;
