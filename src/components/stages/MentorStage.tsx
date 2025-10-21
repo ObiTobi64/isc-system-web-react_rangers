@@ -99,10 +99,10 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
     [formik.touched, formik.errors]
   );
 
-  const editForm = () => {
+  const editForm = useCallback(() => {
     if (isBlocked) return;
-    setEditMode(false);
-  }, []);
+    setEditMode(true);
+  }, [isBlocked]);
 
   return (
     <>
