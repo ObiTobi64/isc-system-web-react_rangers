@@ -3,7 +3,7 @@ import { Checkbox, Paper, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 import dayjs from "dayjs";
 import DownloadButton from "../common/DownloadButton";
-import { letters } from "../../constants/letters";
+import letters from "../../constants/letters";
 import { Seminar } from "../../models/studentProcess";
 import { MentorFormValues } from "../../hooks/useMentorFormik";
 import { Carrer } from "../../store/carrerStore";

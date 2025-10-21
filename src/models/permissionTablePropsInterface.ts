@@ -1,5 +1,7 @@
-import { Role } from './roleInterface';
+import Role from './roleInterface';
 
-export interface PermissionTableProps {
+interface PermissionTableProps {
   currentRol: Role;
 }
+
+export default PermissionTableProps;

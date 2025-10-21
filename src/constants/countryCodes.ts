@@ -1,4 +1,4 @@
-export const COUNTRY_CODES = [
+const COUNTRY_CODES = [
   { code: '+591', name: 'Bolivia', flag: '🇧🇴' },
   { code: '+54', name: 'Argentina', flag: '🇦🇷' },
   { code: '+55', name: 'Brasil', flag: '🇧🇷' },
@@ -18,3 +18,5 @@ export const COUNTRY_CODES = [
   { code: '+57', name: 'Colombia', flag: '🇨🇴' },
   { code: '+58', name: 'Venezuela', flag: '🇻🇪' },
 ];
+
+export default COUNTRY_CODES;

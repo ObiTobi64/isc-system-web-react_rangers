@@ -1,5 +1,7 @@
-import { Permission } from './permissionInterface';
+import Permission from './permissionInterface';
 
-export interface PermissionsCategory {
+interface PermissionsCategory {
   [name: string]: [permissions: Permission[]];
 }
+
+export default PermissionsCategory;

@@ -1,4 +1,4 @@
-export const roles = {
+const roles = {
   ADMIN: 'admin',
   PROFESSOR: 'professor',
   STUDENT: 'student',
@@ -6,3 +6,5 @@ export const roles = {
   PROGRAM_DIRECTOR: 'program_director',
   SUPERVISOR: 'supervisor',
 };
+
+export default roles;

@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
 import { Container, Grid } from "@mui/material";
+import { useEffect, useState, useCallback } from "react";
 import NumberCard from "../../components/common/NumberCard";
 import AreaChartCard from "../../components/common/AreaChart";
 import CalendarCard from "../../components/common/CalendarComponent";
-import { useEffect, useState } from "react";
-import { getStats } from "../../services/statsService";
+import getStats from "../../services/statsService";
+
 const data = [
   { period: "2021 Q1", approved: 200 },
   { period: "2021 Q2", approved: 450 },
@@ -37,68 +39,78 @@ interface Stats {
 export const DashboardPage = () => {
   // get stats from the server
   const [stats, setStats] = useState<Stats>();
-  useEffect(() => {
-    getStats().then((result) => {
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const result = await getStats();
       setStats(result.data);
-    });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return (
     <Container fixed>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Grid container spacing={3}>
-            <Grid item xs={4}>
-              <Grid container spacing={3} marginTop={"15px"}>
-                <Grid item xs={12}>
+      <Grid container spacing = {3}>
+        <Grid item xs = {12}>
+          <Grid container spacing = {3}>
+            <Grid item xs = {4}>
+              <Grid container spacing = {3} marginTop = "15px">
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#FAAA1E"
-                    textColor="#ffffff"
-                    title="Procesos Finalizados"
-                    subtitle={`${
+                    backgroundColor = "#FAAA1E"
+                    textColor = "#ffffff"
+                    title = "Procesos Finalizados"
+                    subtitle = {`${
                       (stats?.total_procesos || 0) - (stats?.num_procesos_finalizados || 0)
                     } en curso`}
-                    count={stats?.num_procesos_finalizados || 0}
-                    percentage={
+                    count = {stats?.num_procesos_finalizados || 0}
+                    percentage = {
                       ((stats?.num_procesos_finalizados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#1450A3"
-                    textColor="#FFFFFF"
-                    title="Tutorias finalizadas"
-                    subtitle={`${stats?.num_tutorias_progreso || 0} en curso`}
-                    count={stats?.num_tutorias_aprobadas || 0}
-                    percentage={
+                    backgroundColor = "#1450A3"
+                    textColor = "#FFFFFF"
+                    title = "Tutorias finalizadas"
+                    subtitle = {`${stats?.num_tutorias_progreso || 0} en curso`}
+                    count = {stats?.num_tutorias_aprobadas || 0}
+                    percentage = {
                       ((stats?.num_tutorias_aprobadas || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#337CCF"
-                    textColor="#FFFFFF"
-                    title="Revisiones finalizadas"
-                    subtitle={`${stats?.num_reviewers_progreso || 0} en curso`}
-                    count={stats?.num_reviewers_aprobados || 0}
-                    percentage={
+                    backgroundColor = "#337CCF"
+                    textColor = "#FFFFFF"
+                    title = "Revisiones finalizadas"
+                    subtitle = {`${stats?.num_reviewers_progreso || 0} en curso`}
+                    count = {stats?.num_reviewers_aprobados || 0}
+                    percentage = {
                       ((stats?.num_reviewers_aprobados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={8}>
-              <CalendarCard events={myEventsList} />
+            <Grid item xs = {8}>
+              <CalendarCard events = {myEventsList} />
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <AreaChartCard title="Estudiantes Aprobados por Período" data={data} />
+        <Grid item xs = {12}>
+          <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
         </Grid>
       </Grid>
     </Container>
   );
 };
+
+export default DashboardPage;

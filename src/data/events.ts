@@ -1,6 +1,7 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import dayjs from 'dayjs';
 
-export const events = [
+const events = [
   {
     id_event: 1,
     name: 'Taller de Desarrollo Web',
@@ -140,3 +141,5 @@ export const events = [
     status: 'PENDIENTE',
   },
 ];
+
+export default events;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button, Divider, Grid, MenuItem, TextField, Typography } from "@mui/material";
@@ -16,7 +16,6 @@ import {
   PHONE_REGEX,
   CODE_REGEX,
 } from "../../constants/validation";
-
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -38,9 +37,7 @@ const validationSchema = Yup.object({
   code: Yup.string()
     .matches(CODE_REGEX, CODE_ERROR_MESSAGE)
     .required("El código de docente es obligatorio"),
-
 });
-
 
 const CreateProfessorForm = () => {
   const [message, setMessage] = useState("");
@@ -69,7 +66,6 @@ const CreateProfessorForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-      
         const professorData = {
           ...values,
           code: values.code,
@@ -84,21 +80,19 @@ const CreateProfessorForm = () => {
     },
   });
 
-  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("phone", value);
     }
   };
 
-
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("code", value);
     }
   };
-
 
   return (
     <>
@@ -111,7 +105,6 @@ const CreateProfessorForm = () => {
             </Typography>
             <Divider flexItem sx={{ mt: 2, mb: 2 }} />
           </Grid>
-
 
           <Grid item xs={12}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
@@ -159,8 +152,7 @@ const CreateProfessorForm = () => {
                       fullWidth
                       value={formik.values.mothername}
                       onChange={formik.handleChange}
-                      error={formik.touched.mothername &&
-                        Boolean(formik.errors.mothername)}
+                      error={formik.touched.mothername && Boolean(formik.errors.mothername)}
                       helperText={formik.touched.mothername && formik.errors.mothername}
                       margin="normal"
                     />
@@ -177,9 +169,9 @@ const CreateProfessorForm = () => {
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ 
+                      inputProps={{
                         maxLength: CODE_DIGITS,
-                        minLength: CODE_MIN_DIGITS
+                        minLength: CODE_MIN_DIGITS,
                       }}
                     />
                   </Grid>
@@ -207,7 +199,6 @@ const CreateProfessorForm = () => {
             </Grid>
             <Divider flexItem sx={{ my: 2 }} />
           </Grid>
-
 
           <Grid item xs={12}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
@@ -270,6 +261,5 @@ const CreateProfessorForm = () => {
     </>
   );
 };
-
 
 export default CreateProfessorForm;
