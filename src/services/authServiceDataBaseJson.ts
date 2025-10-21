@@ -5,7 +5,7 @@ import { UserResponse } from './models/LoginResponse';
 const authenticateUser = async (email: string, password: string): Promise<UserResponse> => {
   try {
     const response = await apiClient.get('/login', {
-      params: { email, password }
+      params: { email, password },
     });
 
     if (!response.data.length) {
@@ -15,7 +15,7 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
     const loginData = response.data[0];
 
     const userRes = await apiClient.get('/users', {
-      params: { email: loginData.email }
+      params: { email: loginData.email },
     });
 
     if (!userRes.data.length) {
@@ -24,29 +24,33 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
 
     const user = userRes.data[0];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rolesPermissions: Record<string, { role_name: string; permissions: any[] }> = {};
 
+    await Promise.all(
+      user.roles.map(async (roleName: string) => {
+        const roleRes = await apiClient.get('/roles', {
+          params: { roleName },
+        });
 
+        const role = roleRes.data[0];
+        const roleId = role?.id ?? 0;
 
-    for (const roleName of user.roles) {
-      const roleRes = await apiClient.get('/roles', {
-        params: { roleName }
-      });
+        const permissionsRes = await apiClient.get('/permissions', {
+          params: { subtitle_like: roleName },
+        });
 
-      const role = roleRes.data[0];
-      const roleId = role?.id ?? 0;
+        const permissions: Permissions[] = permissionsRes.data?.flatMap(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (p: any) => p.permissions || []
+        );
 
-      const permissionsRes = await apiClient.get('/permissions', {
-        params: { subtitle_like: roleName } // Simula asociación
-      });
-
-      const permissions: Permissions[] = permissionsRes.data?.flatMap((p: any) => p.permissions || []);
-
-      rolesPermissions[roleId] = {
-        role_name: roleName,
-        permissions
-      };
-    }
+        rolesPermissions[roleId] = {
+          role_name: roleName,
+          permissions,
+        };
+      })
+    );
 
     const result: UserResponse = {
       id: user.id,
@@ -62,7 +66,7 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       code: user.code,
-      token: loginData.token
+      token: loginData.token,
     };
 
     return result;
@@ -75,5 +79,4 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
   }
 };
 
-export { authenticateUser };
-
+export default authenticateUser;

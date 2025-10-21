@@ -6,7 +6,7 @@ const setPeriods = () => {
   let currentYear = actualDate.getFullYear();
   const listPeriods = [];
 
-  for (let i = 0; i < numberPeriods; i++) {
+  for (let i = 0; i < numberPeriods; i += 1) {
     const strPeriod = firstSemester ? 'Primero' : 'Segundo';
     const str = strPeriod + currentYear;
     listPeriods.push({
@@ -14,7 +14,9 @@ const setPeriods = () => {
       value: str,
     });
 
-    if (!firstSemester) currentYear++;
+    if (!firstSemester) {
+      currentYear += 1;
+    }
     firstSemester = !firstSemester;
   }
 

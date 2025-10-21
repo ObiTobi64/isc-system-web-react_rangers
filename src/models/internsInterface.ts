@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Dayjs } from 'dayjs';
 import { Event } from './eventInterface';
 
@@ -27,15 +28,6 @@ export interface InternsInformation extends Interns {
   last_update: Dayjs;
 }
 
-export interface CompleteIntern extends Interns {
-  name: string;
-  lastname: string;
-  mothername: string;
-  full_name: string;
-  code: number;
-  events?: EventPerIntern[];
-}
-
 export interface EventPerIntern extends Event {
   event_id: number;
   is_supervisor: boolean;
@@ -45,4 +37,13 @@ export interface EventPerIntern extends Event {
   registration_date: string;
   last_update: string;
   notes: string;
+}
+
+export interface CompleteIntern extends Interns {
+  name: string;
+  lastname: string;
+  mothername: string;
+  full_name: string;
+  code: number;
+  events?: EventPerIntern[];
 }

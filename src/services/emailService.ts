@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import apiClient from './apiInstance';
 
 interface EmailInterface {
@@ -16,4 +17,4 @@ const sendEmail = async (email: EmailInterface) => {
   }
 };
 
-export { sendEmail };
+export default sendEmail;

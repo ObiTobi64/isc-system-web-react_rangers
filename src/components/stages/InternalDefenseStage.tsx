@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, ChangeEvent, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { Box, Grid, Button, Typography } from "@mui/material";
 
@@ -10,16 +10,16 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import pdfFile from "../../assets/Acta_Defensa_Interna_de_Seminario_de_Grado_V1.1.pdf";
 import { modifyPdf, PDFInsertData } from "../../utils/pdfEditor";
 import { downloadFile } from "../../utils/files";
 import { useProcessStore } from "../../store/store";
 import { postDefenseDetail } from "../../services/defenseDetail";
 import { updateProcess } from "../../services/processServicer";
-import { useDefenseInternalDetail } from "../../hooks/useDefenseInternalDetail";
+import useDefenseInternalDetail from "../../hooks/useDefenseInternalDetail";
 import ProfessorAutocomplete from "../selects/ProfessorAutoComplete";
-import { Mentor } from "../../models/mentorInterface";
+import Mentor from "../../models/mentorInterface";
 import EmailSender from "../common/EmailArea";
 import { getProfessorById } from "../../services/mentorsService";
 
@@ -89,7 +89,9 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const downloadEditedPDF = async (values: any) => {
     try {
-      const [year, month, day, hour, minute] = values.date.format("YYYY-MM-DD HH:mm").split(/[- :]/);
+      const [year, month, day, hour, minute] = values.date
+        .format("YYYY-MM-DD HH:mm")
+        .split(/[- :]/);
       const response = await getProfessorById(parseInt(values.president));
       const fullName = response.fullname;
       const student = process?.student_fullname || "";
@@ -108,9 +110,7 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
         { x: 222, y: 317, size: 10, text: tutor },
         { x: 222, y: 340, size: 10, text: reviewer },
         { x: 305, y: 369, size: 10, text: projectName },
-
       ];
-      
 
       const pdfArrayBuffer = await fetch(pdfFile).then((res) => res.arrayBuffer());
       const modifiedPdf = await modifyPdf(pdfArrayBuffer, data);
@@ -149,24 +149,24 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
     }
   };
 
-  const handlePresidentChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handlePresidentChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("president", value?.id || "");
   };
 
-  const handleFirstJurorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleFirstJurorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("firstJuror", value?.id || "");
   };
 
-  const handleSecondJurorChange = (_event: React.ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleSecondJurorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
     formik.setFieldValue("secondJuror", value?.id || "");
   };
 
   const canApproveStage = () =>
     Boolean(
       formik.values.president &&
-      formik.values.firstJuror &&
-      formik.values.secondJuror &&
-      formik.values.date
+        formik.values.firstJuror &&
+        formik.values.secondJuror &&
+        formik.values.date
     );
 
   const isApproveButton = canApproveStage();
@@ -195,7 +195,7 @@ const InternalDefenseStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNex
       </Typography>
       {subStage === 0 && (
         <>
-          <EmailSender />
+          <EmailSender id={0} onClose={() => {}} />
           <Box display="flex" justifyContent="space-between" pt={1} pb={0}>
             <Button type="button" onClick={prevSubStage} variant="contained" color="secondary">
               {"Anterior"}

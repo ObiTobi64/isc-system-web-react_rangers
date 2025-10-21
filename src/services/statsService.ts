@@ -1,6 +1,8 @@
 import apiClient from './apiInstance';
 
-export const getStats = async () => {
+const getStats = async () => {
   const response = await apiClient.get('/stats');
   return response.data;
 };
+
+export default getStats;

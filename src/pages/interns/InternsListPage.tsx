@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-console */
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Dialog from "@mui/material/Dialog";
@@ -18,7 +20,7 @@ import { useParams } from "react-router-dom";
 import { Event, EventDetails } from "../../models/eventInterface";
 import EventDetailsPage from "../../components/common/EventDetailsPage";
 import { getFullEventInformationService, updateInternType } from "../../services/eventsService";
-import { internRegisterStates } from "../../constants/internRegisterStates";
+import internRegisterStates from "../../constants/internRegisterStates";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
 
 interface FullEvent extends Event {
@@ -152,10 +154,10 @@ const InternsListPage = () => {
       renderCell: (params) => (
         <Select
           fullWidth
-          value={params.value}
-          onChange={(e) => handleStatusChange(params.row.id, e.target.value)}
-          variant="standard"
-          sx={{
+          value = {params.value}
+          onChange = {(e) => handleStatusChange(params.row.id, e.target.value)}
+          variant = "standard"
+          sx = {{
             minHeight: 0,
             lineHeight: 1.5,
             padding: "2px 8px",
@@ -168,21 +170,21 @@ const InternsListPage = () => {
             },
           }}
         >
-          <MenuItem value={ACCEPTED}>Aceptado</MenuItem>
-          <MenuItem value={REJECTED}>Rechazado</MenuItem>
-          <MenuItem value={RESERVE}>Suplente</MenuItem>
-          <MenuItem value={PENDING}>Pendiente</MenuItem>
+          <MenuItem value = {ACCEPTED}>{"Aceptado"}</MenuItem>
+          <MenuItem value = {REJECTED}>{"Rechazado"}</MenuItem>
+          <MenuItem value = {RESERVE}>{"Suplente"}</MenuItem>
+          <MenuItem value = {PENDING}>{"Pendiente"}</MenuItem>
         </Select>
       ),
     },
   ];
 
   return (
-    <div style={{ position: "relative", height: "100vh", padding: "19px" }}>
+    <div style = {{ position: "relative", height: "100vh", padding: "19px" }}>
       <IconButton
-        onClick={() => window.history.back()}
-        aria-label="back"
-        style={{
+        onClick = {() => window.history.back()}
+        aria-label = "back"
+        style = {{
           position: "absolute",
           top: "17px",
           left: "5px",
@@ -191,11 +193,11 @@ const InternsListPage = () => {
         <ArrowBackIcon />
       </IconButton>
       <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAddStudentOpen}
-        startIcon={<AddIcon />}
-        style={{
+        variant = "contained"
+        color = "primary"
+        onClick = {handleAddStudentOpen}
+        startIcon = {<AddIcon />}
+        style = {{
           position: "absolute",
           top: "17px",
           right: "30px",
@@ -207,25 +209,25 @@ const InternsListPage = () => {
           marginLeft: "40px",
         }}
       >
-        Agregar Estudiante
+        {"Agregar Estudiante\r"}
       </Button>
       {eventDetails && (
         <EventDetailsPage
-          event={event!}
-          children={
-            <div style={{ width: "100%", overflowX: "auto" }}>
-              <div style={{ minWidth: "800px" }}>
+          event = {event!}
+          children = {
+            <div style = {{ width: "100%", overflowX: "auto" }}>
+              <div style = {{ minWidth: "800px" }}>
                 <DataGrid
-                  rows={students}
-                  columns={columns}
-                  localeText={dataGridLocaleText}
-                  initialState={{
+                  rows = {students}
+                  columns = {columns}
+                  localeText = {dataGridLocaleText}
+                  initialState = {{
                     pagination: {
                       paginationModel: { page: 0, pageSize: 5 },
                     },
                   }}
-                  pageSizeOptions={[5, 10]}
-                  classes={{
+                  pageSizeOptions = {[5, 10]}
+                  classes = {{
                     root: "bg-white dark:bg-gray-800",
                     columnHeader: "bg-gray-200 dark:bg-gray-800",
                     cell: "bg-white dark:bg-gray-800",
@@ -234,18 +236,18 @@ const InternsListPage = () => {
                   }}
                 />
                 <Dialog
-                  open={addStudentOpen}
-                  onClose={handleAddStudentClose}
-                  aria-labelledby="add-student-dialog-title"
-                  maxWidth="sm"
+                  open = {addStudentOpen}
+                  onClose = {handleAddStudentClose}
+                  aria-labelledby = "add-student-dialog-title"
+                  maxWidth = "sm"
                   fullWidth
                 >
-                  <DialogTitle id="add-student-dialog-title">
-                    Agregar Nuevo Becario
+                  <DialogTitle id = "add-student-dialog-title">
+                    {"Agregar Nuevo Becario\r"}
                     <IconButton
-                      aria-label="close"
-                      onClick={handleAddStudentClose}
-                      style={{
+                      aria-label = "close"
+                      onClick = {handleAddStudentClose}
+                      style = {{
                         color: "#231F74",
                         position: "absolute",
                         right: 13,
@@ -255,53 +257,53 @@ const InternsListPage = () => {
                       <CancelIcon />
                     </IconButton>
                     <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      style={{ marginTop: "8px" }}
+                      variant = "subtitle2"
+                      color = "textSecondary"
+                      style = {{ marginTop: "8px" }}
                     >
-                      Selecciona los becarios para agregar
+                      {"Selecciona los becarios para agregar\r"}
                     </Typography>
                   </DialogTitle>
                   <DialogContent>
                     {availableStudents.length > 0 ? (
                       availableStudents.map((student) => (
                         <MenuItem
-                          key={student.id}
-                          onClick={() => handleSelectStudent(student.id)}
-                          style={{
+                          key = {student.id}
+                          onClick = {() => handleSelectStudent(student.id)}
+                          style = {{
                             display: "flex",
                             justifyContent: "space-between",
                           }}
                         >
                           <Typography>{student.name}</Typography>
                           <Checkbox
-                            checked={selectedStudents.includes(student.id)}
-                            color="primary"
+                            checked = {selectedStudents.includes(student.id)}
+                            color = "primary"
                           />
                         </MenuItem>
                       ))
                     ) : (
-                      <Typography>No hay becarios disponibles para agregar.</Typography>
+                      <Typography>{"No hay becarios disponibles para agregar."}</Typography>
                     )}
                   </DialogContent>
-                  <DialogActions style={{ marginRight: "15px", marginTop: "-1%" }}>
+                  <DialogActions style = {{ marginRight: "15px", marginTop: "-1%" }}>
                     <Button
-                      onClick={handleAddStudentClose}
-                      style={{
+                      onClick = {handleAddStudentClose}
+                      style = {{
                         backgroundColor: "#231F74",
                         color: "#fff",
                       }}
                     >
-                      Cancelar
+                      {"Cancelar\r"}
                     </Button>
                     <Button
-                      onClick={handleAddStudents}
-                      style={{
+                      onClick = {handleAddStudents}
+                      style = {{
                         backgroundColor: "#d32f2f",
                         color: "#fff",
                       }}
                     >
-                      Agregar
+                      {"Agregar\r"}
                     </Button>
                   </DialogActions>
                 </Dialog>

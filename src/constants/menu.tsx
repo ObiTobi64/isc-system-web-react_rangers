@@ -13,9 +13,10 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import HistoryIcon from "@mui/icons-material/History";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 
-import { roles } from "./roles";
+import roles from "./roles";
+
 const { ADMIN, PROFESSOR, STUDENT, INTERN, PROGRAM_DIRECTOR, SUPERVISOR } = roles;
-export const menu = [
+const menu = [
   // TODO: check roles on sidebar
   {
     key: "users",
@@ -124,3 +125,5 @@ export const menu = [
     roles: [ADMIN, PROGRAM_DIRECTOR],
   },
 ];
+
+export default menu;
