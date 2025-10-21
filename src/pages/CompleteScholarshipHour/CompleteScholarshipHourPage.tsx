@@ -1,5 +1,5 @@
 import { Grid, Tabs, Tab, Box } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, SyntheticEvent, useEffect } from "react";
 import { Event } from "../../models/eventInterface";
 import CompleteScholarshipHourEventCard from "../../components/cards/CompleteScholarshipHourEventCard";
 import { getEventsService } from "../../services/eventsService";
@@ -9,7 +9,7 @@ const CompleteScholarshipHourPage = () => {
   const [tabValue, setTabValue] = useState(0);
   const [events, setEvents] = useState<Event[]>();
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

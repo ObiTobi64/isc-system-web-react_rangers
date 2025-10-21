@@ -1,8 +1,11 @@
-import { Role } from './roleInterface';
+/* eslint-disable no-unused-vars */
+import Role from './roleInterface';
 
-export interface AddTextModalProps {
+interface AddTextModalProps {
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
   onCreate: (name: string, category: string) => void;
   existingRoles: Role[];
 }
+
+export default AddTextModalProps;

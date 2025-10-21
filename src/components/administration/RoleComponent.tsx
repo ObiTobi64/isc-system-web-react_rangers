@@ -1,4 +1,4 @@
-import { useState, MouseEvent, ChangeEvent } from "react";
+import { FC, useState, MouseEvent, ChangeEvent } from "react";
 
 import {
   Box,
@@ -22,8 +22,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import ConfirmDelete from "../common/ConfirmDelete";
 import PermissionTable from "./PermissionTable";
-import { ExpandMoreProps } from "../../models/expandMorePropsInterface";
-import { RoleComponentProps } from "../../models/roleComponentProps";
+import ExpandMoreProps from "../../models/expandMorePropsInterface";
+import RoleComponentProps from "../../models/roleComponentProps";
 import SavePermissionsModal from "../common/SavePermissionsModal";
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
@@ -36,7 +36,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const RoleComponent: React.FC<RoleComponentProps> = ({
+const RoleComponent: FC<RoleComponentProps> = ({
   role,
   selectedRole,
   onRoleClick,

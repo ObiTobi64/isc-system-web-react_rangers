@@ -1,4 +1,4 @@
-import { Permission } from '../../models/permissionInterface';
+import Permission from '../../models/permissionInterface';
 
 export interface LoginResponse {
   token: string;
@@ -22,8 +22,8 @@ export interface UserResponse {
       permissions: Permission[];
     };
   };
-  created_at: string; // Puede ser `Date` si necesitas manipular las fechas
-  updated_at: string; // Puede ser `Date` si necesitas manipular las fechas
+  created_at: string;
+  updated_at: string;
   code: string;
   token: string;
 }

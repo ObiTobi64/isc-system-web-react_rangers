@@ -9,6 +9,7 @@ export interface Carrer {
 
 interface ICarrer {
   carrer: Carrer | null;
+  // eslint-disable-next-line no-unused-vars
   setCarrer: (newCarrer: Carrer) => void;
 }
 

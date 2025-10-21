@@ -25,7 +25,7 @@ import AdministratorPage from "../pages/Administrator/AdministratorPage";
 import EventHistory from "../components/cards/EventHistory";
 import ViewInternSupervisor from "../pages/supervisor/ViewInternSupervisor";
 import EventsByInternsPage from "../pages/interns/EventsByInterns";
-import { roles } from "../constants/roles";
+import roles from "../constants/roles";
 import EventRegisterPage from "../pages/Events/EventRegisterPage";
 
 function loader() {
@@ -42,7 +42,7 @@ const getStudentProcess: LoaderFunction = async ({ params }: LoaderFunctionArgs<
 };
 const { ADMIN, PROFESSOR, STUDENT, INTERN, PROGRAM_DIRECTOR, SUPERVISOR } = roles;
 
-//TODO: check proper roles on routes
+// TODO: check proper roles on routes
 const protectedRoutes = [
   {
     path: "/",
@@ -62,7 +62,7 @@ const protectedRoutes = [
       },
       {
         path: "/process",
-        loader: loader,
+        loader,
         element: (
           <RoleGuard allowedRoles={[ADMIN, PROFESSOR, PROGRAM_DIRECTOR, STUDENT]}>
             <GraduationProcessPage />
@@ -79,7 +79,7 @@ const protectedRoutes = [
       },
       {
         path: "/students",
-        loader: loader,
+        loader,
         element: (
           <RoleGuard allowedRoles={[ADMIN, PROFESSOR, PROGRAM_DIRECTOR]}>
             <StudentPage />
@@ -96,7 +96,7 @@ const protectedRoutes = [
       },
       {
         path: "/create-student",
-        loader: loader,
+        loader,
         element: (
           <RoleGuard allowedRoles={[ADMIN, PROFESSOR, PROGRAM_DIRECTOR]}>
             <CreateStudentPage />
@@ -114,7 +114,7 @@ const protectedRoutes = [
       },
       {
         path: "/createProcess",
-        loader: loader,
+        loader,
         element: (
           <RoleGuard allowedRoles={[ADMIN, PROFESSOR, PROGRAM_DIRECTOR]}>
             <CreateProcessPage />

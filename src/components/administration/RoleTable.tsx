@@ -15,12 +15,12 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import RoleComponent from "./RoleComponent";
 import { RoleTableProps } from "../../models/roleTablePropsInterface";
-import { ChangeEvent, useEffect, useState } from "react";
-import { Role } from "../../models/roleInterface";
+import { ChangeEvent, FC, useEffect, useState } from "react";
+import Role from "../../models/roleInterface";
 import { deleteRole, editRole } from "../../services/roleService";
 import AlertSnackbar from "../common/AlertSnackbar";
 
-const RoleTable: React.FC<RoleTableProps> = ({
+const RoleTable: FC<RoleTableProps> = ({
   roles,
   onRoleSelect,
   selectedRole,
