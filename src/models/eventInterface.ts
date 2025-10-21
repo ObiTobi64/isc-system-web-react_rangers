@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Dayjs } from 'dayjs';
 import { InternsInformation } from './internsInterface';
 
@@ -63,9 +64,6 @@ export interface EventInterns {
   notes: string;
   created_at: Dayjs;
   updated_at: Dayjs;
-}
-export interface EventInternsType extends Event {
-  type: string;
 }
 
 export interface EventScholar {

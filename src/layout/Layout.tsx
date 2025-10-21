@@ -1,8 +1,6 @@
-import * as React from "react";
-
+import { useCallback, useState, MouseEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
 import Box from "@mui/material/Box";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,6 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
+import Sidebar from "./Sidebar";
 import { useUserStore } from "../store/store";
 
 interface AppBarProps extends MuiAppBarProps {
@@ -57,110 +56,116 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const Layout = () => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const { clearUser, user } = useUserStore();
+
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const handleOpenUserMenu = useCallback((event: MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  }, []);
+
+  const handleDrawerOpen = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const handleCloseUserMenu = useCallback(() => {
+    setAnchorElUser(null);
+  }, []);
+
+  const handleProfileClick = useCallback(() => {
+    navigate("/profile");
+    handleCloseUserMenu();
+  }, [navigate, handleCloseUserMenu]);
+
+  const handleLogoutClick = useCallback(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("sessionActive");
+    clearUser();
+    navigate("/login", { replace: true });
+    handleCloseUserMenu();
+  }, [clearUser, navigate, handleCloseUserMenu]);
+
   const settings = [
     {
       title: "Perfil",
-      onClick: () => {
-        navigate("/profile");
-      },
+      onClick: handleProfileClick,
     },
     {
       title: "Logout",
-      onClick: () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("sessionActive");
-
-        clearUser();
-        navigate("/login", { replace: true });
-      },
+      onClick: handleLogoutClick,
     },
   ];
 
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx = {{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{ bgcolor: "#ffffff" }}>
+      <AppBar position = "fixed" open = {open} sx = {{ bgcolor: "#ffffff" }}>
         <Toolbar>
           <IconButton
-            color="primary"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
+            color = "primary"
+            aria-label = "open drawer"
+            onClick = {handleDrawerOpen}
+            edge = "start"
+            sx = {{
               marginRight: 5,
               ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ flexGrow: 1 }} />
-          <Box mr={2}>
+          <Box sx = {{ flexGrow: 1 }} />
+          <Box mr = {2}>
             <Typography
-              variant="subtitle1"
+              variant = "subtitle1"
               noWrap
-              color="primary"
-              textAlign={"right"}
-              className="font-bold"
+              color = "primary"
+              textAlign = "right"
+              className = "font-bold"
             >
               {user?.name}
             </Typography>
-            <Typography variant="subtitle2" color="textSecondary" textAlign={"right"}>
+            <Typography variant = "subtitle2" color = "textSecondary" textAlign = "right">
               {TranslateRole(user?.roles?.join(", ") || "")}
             </Typography>
           </Box>
 
-          <Tooltip data-test-id="user_icon" title="Abrir configuraciones">
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt={user?.name} src="/static/images/avatar/2.jpg" />
+          <Tooltip data-test-id = "user_icon" title = "Abrir configuraciones">
+            <IconButton onClick = {handleOpenUserMenu} sx = {{ p: 0 }}>
+              <Avatar alt = {user?.name} src = "/static/images/avatar/2.jpg" />
             </IconButton>
           </Tooltip>
           <Menu
-            sx={{ mt: "45px" }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
+            sx = {{ mt: "45px" }}
+            id = "menu-appbar"
+            anchorEl = {anchorElUser}
+            anchorOrigin = {{
               vertical: "top",
               horizontal: "right",
             }}
             keepMounted
-            transformOrigin={{
+            transformOrigin = {{
               vertical: "top",
               horizontal: "right",
             }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
+            open = {Boolean(anchorElUser)}
+            onClose = {handleCloseUserMenu}
           >
             {settings.map((setting) => (
               <MenuItem
-                key={setting.title}
-                data-test-id={setting.title === "Logout" ? "logout_button" : undefined}
-                onClick={setting.onClick}
+                key = {setting.title}
+                data-test-id = {setting.title === "Logout" ? "logout_button" : undefined}
+                onClick = {setting.onClick}
               >
-                <Typography textAlign="center">{setting.title}</Typography>
+                <Typography textAlign = "center">{setting.title}</Typography>
               </MenuItem>
             ))}
           </Menu>
         </Toolbar>
       </AppBar>
-      <Sidebar open={open} setOpen={setOpen} />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, overflowX: "auto", width: "100%" }}>
+      <Sidebar open = {open} setOpen = {setOpen} />
+      <Box component = "main" sx = {{ flexGrow: 1, p: 3, overflowX: "auto", width: "100%" }}>
         <DrawerHeader />
         <Outlet />
       </Box>

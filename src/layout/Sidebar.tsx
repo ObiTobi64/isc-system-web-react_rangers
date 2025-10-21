@@ -10,10 +10,10 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import { Divider, ListItemButton } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useEffect } from "react";
+import { FC, useEffect, useCallback } from "react";
 
 import UPB_LOGO from "../assets/upb_logo.png";
-import { menu } from "../constants/menu";
+import menu from "../constants/menu";
 import { useUserStore } from "../store/store";
 
 const drawerWidth = 240;
@@ -66,14 +66,36 @@ const Drawer = styled(MuiDrawer, {
 
 interface SidebarProps {
   open: boolean;
+  // eslint-disable-next-line no-unused-vars
   setOpen: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
+const Sidebar: FC<SidebarProps> = ({ open, setOpen }) => {
   const user = useUserStore((state) => state.user);
   const theme = useTheme();
   const isSmallOrMediumScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+
+  const handleDrawerClose = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const goToPage = useCallback(
+    (path: string) => {
+      navigate(path);
+      if (isSmallOrMediumScreen) {
+        setOpen(false);
+      }
+    },
+    [navigate, isSmallOrMediumScreen, setOpen]
+  );
+
+  const handleItemClick = useCallback(
+    (path: string) => () => {
+      goToPage(path);
+    },
+    [goToPage]
+  );
 
   useEffect(() => {
     if (isSmallOrMediumScreen) {
@@ -83,16 +105,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
     }
   }, [isSmallOrMediumScreen, setOpen]);
 
-  const goToPage = (path: string) => {
-    navigate(path);
-    if (isSmallOrMediumScreen) {
-      setOpen(false);
-    }
-  };
-
-  for (const key in user?.roles_permissions) {
-    if (!user.roles.some((role) => role == user?.roles_permissions[key].role_name))
-      user.roles.push(user?.roles_permissions[key].role_name);
+  // CORRECCIÓN: Reemplazar for...in con Object.keys
+  if (user?.roles_permissions) {
+    Object.keys(user.roles_permissions).forEach((key) => {
+      const roleName = user.roles_permissions[key].role_name;
+      if (!user.roles.some((role) => role === roleName)) {
+        user.roles.push(roleName);
+      }
+    });
   }
 
   const filteredMenu = menu.filter((item) =>
@@ -103,11 +123,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
     <Drawer
       variant="permanent"
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={handleDrawerClose}
       sx={{
-      "& .MuiDrawer-paper": {
-        width: !open && window.innerWidth < 500 ? 0 : undefined,
-      },
+        "& .MuiDrawer-paper": {
+          width: !open && window.innerWidth < 500 ? 0 : undefined,
+        },
       }}
     >
       <DrawerHeader>
@@ -117,43 +137,41 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           style={{ width: "100%", height: "auto", maxWidth: "125px" }}
           className="h-10 ms-6 me-1"
         />
-        <IconButton onClick={() => setOpen(false)}>
+        <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </DrawerHeader>
       <Divider />
       <List>
-        {filteredMenu.map((item) => {
-          return (
-            <ListItem key={item.key} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                data-test-id="sidebar-list-button"
+        {filteredMenu.map((item) => (
+          <ListItem key={item.key} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              data-test-id="sidebar-list-button"
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
+              }}
+              onClick={handleItemClick(item.path)}
+            >
+              <ListItemIcon
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
                 }}
-                onClick={() => goToPage(item.path)}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  data-test-id="sidebar-list-title"
-                  color="primary"
-                  primary={item.text}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                data-test-id="sidebar-list-title"
+                color="primary"
+                primary={item.text}
+                sx={{ opacity: open ? 1 : 0 }}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Drawer>
   );

@@ -1,183 +1,255 @@
-import { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { styled } from "@mui/system";
-import * as yup from "yup";
-import { useCarrerStore } from "../../store/carrerStore";
-import { sendEmail } from "../../services/emailService";
-import { useProcessStore } from "../../store/store";
-import { getUserById } from "../../services/usersService";
+/* eslint-disable no-console */
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { Button, Divider, Grid, TextField, Typography, Snackbar, Alert } from "@mui/material";
+import { ChangeEvent, FC, SyntheticEvent, useEffect, useState, useCallback } from "react";
+import FormContainer from "../../pages/CreateGraduation/components/FormContainer";
+import { getUserById, updateStudent } from "../../services/studentService";
+import {
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
+  CODE_REGEX,
+} from "../../constants/validation";
 
-const stripHtml = (html: string) => {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return div.textContent || div.innerText || "";
-};
-
-interface StudentProcess {
-  student_fullname?: string;
-  student_code?: string;
-  student_phone?: string;
-  student_email?: string;
-  modality_name?: string;
-}
-
-const emailSchema = yup.object().shape({
-  subject: yup
-    .string()
-    .min(10, "El asunto debe tener al menos 10 caracteres")
-    .required("El asunto es obligatorio"),
-  emailContent: yup
-    .string()
-    .test("len", "El cuerpo debe tener al menos 20 caracteres", (value) => {
-      const plainText = stripHtml(value || "");
-      return plainText.trim().length >= 20;
-    })
-    .required("El cuerpo es obligatorio"),
+const validationSchema = Yup.object({
+  name: Yup.string().required("El nombre completo es obligatorio"),
+  lastname: Yup.string().required("El apellido es obligatorio"),
+  mothername: Yup.string().required("El apellido materno es obligatorio"),
+  email: Yup.string()
+    .email("Ingrese un correo electrónico válido")
+    .required("El correo electrónico es obligatorio"),
+  phone: Yup.string()
+    .matches(/^[0-9]{8}$/, "Ingrese un número de teléfono válido")
+    .optional(),
+  code: Yup.string()
+    .optional()
+    .test("code-validation", CODE_ERROR_MESSAGE, (value) => {
+      if (value === undefined || value === null || value === "") {
+        return true;
+      }
+      return CODE_REGEX.test(value);
+    }),
 });
 
-const Root = styled(Box)(({ theme }) => ({
-  width: "100%",
-  maxWidth: 800,
-  margin: "auto",
-  marginTop: theme.spacing(5),
-}));
+const EditStudentComponent: FC<{ id: number; onClose: () => void }> = ({ id, onClose }) => {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState<"success" | "error">("success");
 
-const quillModules = {
-  toolbar: [
-    [{ header: "1" }, { header: "2" }, { font: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["bold", "italic", "underline"],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-    ["link", "image", "video"],
-    ["clean"],
-  ],
-};
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      lastname: "",
+      email: "",
+      phone: "",
+      code: "",
+      mothername: "",
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        await updateStudent(values);
+        setMessage("Estudiante actualizado con éxito");
+        setSeverity("success");
+        setOpen(true);
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } catch (error) {
+        setMessage("Error al crear el estudiante");
+        setSeverity("error");
+        setOpen(true);
+      }
+    },
+  });
 
-const generateEmailContent = (studentProcess: StudentProcess): string => `
-  <p><strong><u>${studentProcess?.student_fullname?.toUpperCase() || "ALUMNO"}</u></strong></p>
-  <p><strong>Nombre:</strong> ${studentProcess?.student_fullname || "-"}</p>
-  <p><strong>Código:</strong> ${studentProcess?.student_code || "-"}</p>
-  <p><strong>Celular:</strong> ${studentProcess?.student_phone || "-"}</p>
-  <p><strong>Email:</strong> <a href="mailto:${studentProcess?.student_email}">${studentProcess?.student_email || "-"}</a></p>
-  <p><strong>Modalidad:</strong> ${studentProcess?.modality_name || "-"}</p>
-`;
-
-const EmailSender = () => {
-  const process = useProcessStore((state) => state.process);
-  const carrer = useCarrerStore((state) => state.carrer);
-  const [emailSent, setEmailSent] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [subject, setSubject] = useState(
-    `Revision de Carpeta - ${carrer?.shortName} - ${process?.student_fullname}`
-  );
-  const defaultEmailContent = `
-    <p><strong><u>ALUMNO 1</u></strong></p>
-    <p><strong>Nombre:</strong> ${process?.student_fullname}</p>
-    <p><strong>Código:</strong> ${process?.student_code}</p>
-    <p><strong>Celular:</strong> ${process?.student_phone}</p>
-    <p><strong>Email:</strong> <a href="mailto:${process?.student_email}">${process?.student_email}</a></p>
-    <p><strong>Modalidad:</strong> ${process?.modality_name}</p>
-  `;
-  const [emailContent, setEmailContent] = useState(defaultEmailContent);
+  const fetchStudent = useCallback(async () => {
+    try {
+      const response = await getUserById(id);
+      formik.setValues(response);
+    } catch (error) {
+      console.error("Error al obtener el estudiante:", error);
+    }
+  }, [id, formik]);
 
   useEffect(() => {
-    const fetchStudentInfo = async () => {
-      if (!process?.student_id) {
-        return;
-      }
+    fetchStudent();
+  }, [fetchStudent]);
 
-      try {
-        const response = await getUserById(process.student_id);
-        const student = response.data;
-
-        setEmailContent(
-          generateEmailContent({
-            ...process,
-            student_email: student.email,
-            student_phone: student.phone,
-            student_code: student.code,
-          })
-        );
-      } catch (err) {
-        console.error("Error al obtener datos del estudiante:", err);
-      }
-    };
-
-    fetchStudentInfo();
+  const handleClose = useCallback((_event: SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
   }, []);
 
-  const handleEmailContentChange = (content: string) => {
-    setEmailContent(content);
-  };
+  const handlePhoneChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      if (/^[0-9]*$/.test(value)) {
+        formik.setFieldValue("phone", value);
+      }
+    },
+    [formik]
+  );
 
-  const handleSendEmail = async () => {
-    setIsSending(true);
-    setError("");
-    try {
-      await emailSchema.validate({ subject, emailContent });
-      const response = await sendEmail({
-        email: process?.student_email || "",
-        subject,
-        textHtml: emailContent,
-      });
-      if (!response.success) {
-        throw new Error("Error al enviar el correo");
+  const handleCodeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      if (/^[0-9]*$/.test(value)) {
+        formik.setFieldValue("code", value);
+        formik.setFieldTouched("code", true);
       }
-      setEmailSent(true);
-    } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        setError(err.message);
-      } else {
-        setError(err instanceof Error ? err.message : "Error al enviar el correo");
-      }
-    } finally {
-      setIsSending(false);
-    }
-  };
+    },
+    [formik]
+  );
 
   return (
-    <Root>
-      <TextField
-        label="Asunto"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-      />
-      <ReactQuill
-        value={emailContent}
-        onChange={handleEmailContentChange}
-        theme="snow"
-        modules={quillModules}
-      />
-      {error && (
-        <Typography color="error" variant="body2" sx={{ mt: 2 }}>
-          {error}
-        </Typography>
-      )}
-      {emailSent && (
-        <Typography color="success" variant="body2" sx={{ mt: 2 }}>
-          {"Correo enviado exitosamente"}
-        </Typography>
-      )}
-      {!emailSent && (
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-          onClick={handleSendEmail}
-          disabled={isSending}
-        >
-          {isSending ? "Enviando..." : "Enviar Correo"}
-        </Button>
-      )}
-    </Root>
+    <FormContainer>
+      <form onSubmit = {formik.handleSubmit}>
+        <Grid container spacing = {2} sx = {{ padding: 2 }}>
+          <Grid item xs = {12}>
+            <Typography variant = "h4">{"Editar estudiante"}</Typography>
+            <Typography variant = "body2" sx = {{ fontSize: 14, color: "gray" }}>
+              {"Ingrese los datos del estudiante a continuación.\r"}
+            </Typography>
+            <Divider flexItem sx = {{ mt: 2, mb: 2 }} />
+          </Grid>
+
+          <Grid item xs = {12}>
+            <Grid container spacing = {2} sx = {{ padding: 2 }}>
+              <Grid item xs = {3}>
+                <Typography variant = "h6">{"Información del Estudiante"}</Typography>
+              </Grid>
+              <Grid item xs = {9}>
+                <Grid container spacing = {2}>
+                  <Grid item xs = {6}>
+                    <TextField
+                      id = "name"
+                      name = "name"
+                      label = "Nombres"
+                      variant = "outlined"
+                      fullWidth
+                      value = {formik.values.name}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.name && Boolean(formik.errors.name)}
+                      helperText = {formik.touched.name && formik.errors.name}
+                      margin = "normal"
+                    />
+                  </Grid>
+                  <Grid item xs = {6}>
+                    <TextField
+                      id = "lastname"
+                      name = "lastname"
+                      label = "Apellido Paterno"
+                      variant = "outlined"
+                      fullWidth
+                      value = {formik.values.lastname}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.lastname && Boolean(formik.errors.lastname)}
+                      helperText = {formik.touched.lastname && formik.errors.lastname}
+                      margin = "normal"
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container spacing = {2}>
+                  <Grid item xs = {6}>
+                    <TextField
+                      id = "mothername"
+                      name = "mothername"
+                      label = "Apellido Materno"
+                      variant = "outlined"
+                      fullWidth
+                      value = {formik.values.mothername}
+                      onChange = {formik.handleChange}
+                      error = {formik.touched.mothername && Boolean(formik.errors.mothername)}
+                      helperText = {formik.touched.mothername && formik.errors.mothername}
+                      margin = "normal"
+                    />
+                  </Grid>
+                  <Grid item xs = {6}>
+                    <TextField
+                      id = "code"
+                      name = "code"
+                      label = "Código de Estudiante"
+                      variant = "outlined"
+                      fullWidth
+                      value = {formik.values.code}
+                      onChange = {handleCodeChange}
+                      error = {formik.touched.code && Boolean(formik.errors.code)}
+                      helperText = {formik.touched.code && formik.errors.code}
+                      margin = "normal"
+                      inputProps = {{
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Divider flexItem sx = {{ my: 2 }} />
+          </Grid>
+
+          <Grid item xs = {12}>
+            <Grid container spacing = {2} sx = {{ padding: 2 }}>
+              <Grid item xs = {3}>
+                <Typography variant = "h6">{"Información Adicional"}</Typography>
+              </Grid>
+              <Grid item xs = {9}>
+                <TextField
+                  id = "email"
+                  name = "email"
+                  label = "Correo Electrónico"
+                  variant = "outlined"
+                  fullWidth
+                  value = {formik.values.email}
+                  onChange = {formik.handleChange}
+                  error = {formik.touched.email && Boolean(formik.errors.email)}
+                  helperText = {formik.touched.email && formik.errors.email}
+                  margin = "normal"
+                  inputProps = {{ maxLength: 50 }}
+                />
+                <TextField
+                  id = "phone"
+                  name = "phone"
+                  label = "Número de Teléfono"
+                  variant = "outlined"
+                  fullWidth
+                  value = {formik.values.phone}
+                  onChange = {handlePhoneChange}
+                  error = {formik.touched.phone && Boolean(formik.errors.phone)}
+                  helperText = {formik.touched.phone && formik.errors.phone}
+                  margin = "normal"
+                  inputProps = {{ maxLength: 8 }}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs = {12}>
+            <Grid container spacing = {2} justifyContent = "flex-end">
+              <Grid item>
+                <Button variant = "contained" color = "primary" type = "submit">
+                  {"GUARDAR\r"}
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </form>
+      <Snackbar
+        open = {open}
+        autoHideDuration = {6000}
+        onClose = {handleClose}
+        anchorOrigin = {{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose = {handleClose} severity = {severity} sx = {{ width: "100%" }}>
+          {message}
+        </Alert>
+      </Snackbar>
+    </FormContainer>
   );
 };
 
-export default EmailSender;
+export default EditStudentComponent;

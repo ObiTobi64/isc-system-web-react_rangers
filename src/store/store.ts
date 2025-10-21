@@ -5,11 +5,13 @@ import { UserResponse } from '../services/models/LoginResponse';
 
 interface IProcessStore {
   process: Seminar | null;
+  // eslint-disable-next-line no-unused-vars
   setProcess: (newProcess: Seminar) => void;
 }
 
 interface IUserStore {
   user: UserResponse | null;
+  // eslint-disable-next-line no-unused-vars
   setUser: (user: UserResponse | null) => void;
   clearUser: () => void;
 }
@@ -22,7 +24,7 @@ export const useUserStore = create<IUserStore>()(
       clearUser: () => set({ user: null }),
     }),
     {
-      name: 'user-storage', // clave en localStorage
+      name: 'user-storage',
     }
   )
 );

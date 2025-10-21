@@ -1,16 +1,16 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Modes } from "../../models/modeInterface";
-import { getModes } from "../../services/modesService";
+import Modes from "../../models/modeInterface";
+import getModes from "../../services/modesService";
 import { Modal } from "../common/Modal";
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import { periods, currentPeriod } from "../../data/periods";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import {Typography } from "@mui/material";
+import { Typography, SelectChangeEvent } from "@mui/material";
 import {
   FormControl,
   FormControlLabel,
@@ -52,34 +52,33 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [, setError] = useState<any | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [edited, setEdited] = useState(false)
+  const [edited, setEdited] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getModes();
-        setModes(response.data);
-      } catch (error) {
-        setError(error);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await getModes();
+      setModes(response.data);
+    } catch (error) {
+      setError(error);
+    }
   }, []);
 
-  const saveStage = async (mode: number, period: string) => {
-    if (studentProcess) {
-      studentProcess.modality_id = mode;
-      studentProcess.period = period;
-      setProcess({ ...studentProcess });
-      await updateProcess(studentProcess);
-      onNext();
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const handleModalAction = () => {
-    saveStage(formik.values.mode, getValueFromId(Number(formik.values.period)));
-    setIsVisible(false);
-  };
+  const saveStage = useCallback(
+    async (mode: number, period: string) => {
+      if (studentProcess) {
+        studentProcess.modality_id = mode;
+        studentProcess.period = period;
+        setProcess({ ...studentProcess });
+        await updateProcess(studentProcess);
+        onNext();
+      }
+    },
+    [studentProcess, setProcess, onNext]
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -89,24 +88,49 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
     validationSchema,
     onSubmit: () => {
       if (!edited) {
-        onNext()
+        onNext();
       } else {
-        setShowModal(true)
+        setShowModal(true);
       }
     },
   });
 
-  const handleOnChange = (event: any) => {
-    setEdited(true)
-    formik.handleChange(event);
-  }
+  const handleModalAction = useCallback(() => {
+    saveStage(formik.values.mode, getValueFromId(Number(formik.values.period)));
+    setIsVisible(false);
+  }, [saveStage, formik.values.mode, formik.values.period]);
+
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const handleCloseMainModal = useCallback(() => {
+    setIsVisible(false);
+  }, []);
+
+  const handleRadioChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEdited(true);
+      formik.handleChange(event);
+    },
+    [formik]
+  );
+
+  const handleSelectChange = useCallback(
+    (event: SelectChangeEvent<string | number>) => {
+      setEdited(true);
+      formik.handleChange(event);
+    },
+    [formik]
+  );
 
   return (
     <>
-      <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold' }}>
-        Etapa 1: Seminario de Grado<ModeEditIcon style={{ cursor: "not-allowed", opacity: 0.5 }}/>
+      <Typography variant="h6" gutterBottom style={{ fontWeight: "bold" }}>
+        Etapa 1: Seminario de Grado
+        <ModeEditIcon style={{ cursor: "not-allowed", opacity: 0.5 }} />
       </Typography>
-  
+
       <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12} md={7} lg={8}>
@@ -117,7 +141,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
                 name="mode"
                 row
                 value={formik.values.mode}
-                onChange={handleOnChange}
+                onChange={handleRadioChange}
               >
                 {modes.map((option) => (
                   <FormControlLabel
@@ -138,7 +162,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
                 id="period"
                 name="period"
                 value={formik.values.period}
-                onChange={handleOnChange}
+                onChange={handleSelectChange}
                 label="2. Seleccione periodo de inscripción"
                 disabled={readOnly}
                 error={formik.touched.period && Boolean(formik.errors.period)}
@@ -166,11 +190,11 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
           step={steps[0]}
           nextStep={steps[1]}
           isApproveButton={true}
-          setShowModal={setShowModal}
+          setShowModal={handleCloseModal}
           onNext={handleModalAction}
         />
       )}
-      <Modal isVisible={isVisible} setIsVisible={setIsVisible} />
+      <Modal isVisible={isVisible} setIsVisible={handleCloseMainModal} />
     </>
   );
 };

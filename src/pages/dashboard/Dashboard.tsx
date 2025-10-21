@@ -1,10 +1,9 @@
-/* eslint-disable no-console */
 import { Container, Grid } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import NumberCard from "../../components/common/NumberCard";
 import AreaChartCard from "../../components/common/AreaChart";
 import CalendarCard from "../../components/common/CalendarComponent";
-import { getStats } from "../../services/statsService";
+import getStats from "../../services/statsService";
 
 const DASHBOARD_MIN_WIDTH = 1200;
 
@@ -42,18 +41,18 @@ interface Stats {
 export const DashboardPage = () => {
   const [stats, setStats] = useState<Stats>();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const result = await getStats();
-        setStats(result.data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-    
-    fetchStats();
+  const fetchStats = useCallback(async () => {
+    try {
+      const result = await getStats();
+      setStats(result.data);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return (
     <Container
@@ -141,3 +140,5 @@ export const DashboardPage = () => {
     </Container>
   );
 };
+
+export default DashboardPage;

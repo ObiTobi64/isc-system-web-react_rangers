@@ -7,9 +7,8 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
     const response = await apiClient.post(`auth/login`, { email, password });
     if (response.status === 200) {
       return response.data.data;
-    } else {
-      throw new Error('Failed to authenticate');
     }
+    throw new Error('Failed to authenticate');
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data.message || 'Network error');
@@ -18,4 +17,4 @@ const authenticateUser = async (email: string, password: string): Promise<UserRe
     }
   }
 };
-export { authenticateUser };
+export default authenticateUser;

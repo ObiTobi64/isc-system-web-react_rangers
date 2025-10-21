@@ -10,12 +10,12 @@ import DateSelection from "./DateSelection";
 import DocumentCheckbox from "./DocumentCheckbox";
 import LoadingBackdrop from "../common/LoadingBackdrop";
 import ConfirmModal from "../common/ConfirmModal";
-import { steps } from "../../data/steps";
+import steps from "../../data/steps";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
 import { useCarrerStore } from "../../store/carrerStore";
 import useMentorFormik from "../../hooks/useMentorFormik";
-import { STAGE } from "../../constants/stages";
+import STAGE from "../../constants/stages";
 
 const CURRENT_STAGE = STAGE.MENTOR;
 
@@ -31,8 +31,8 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
 
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [editMode, setEditMode] = useState<boolean>(CURRENT_STAGE < (process?.stage_id || 0));
-  const isBlocked = process?.stage_id !== 2;
+  const [editMode, setEditMode] = useState<boolean>((process?.stage_id ?? 0) !== CURRENT_STAGE);
+  const isBlocked = (process?.stage_id ?? 0) !== CURRENT_STAGE; 
 
   const { formik, canApproveStage } = useMentorFormik(process, () => {
     if (canApproveStage) {
@@ -44,6 +44,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
 
   const saveStage = useCallback(async () => {
     if (!process) return;
+    if ((process?.stage_id ?? 0) !== CURRENT_STAGE) return;
 
     setLoading(true);
 
@@ -81,19 +82,27 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
     setShowModal(false);
   }, [saveStage]);
 
-  const renderFieldError = (fieldName: string) => {
-    const touched = formik.touched[fieldName as keyof typeof formik.touched];
-    const error = formik.errors[fieldName as keyof typeof formik.errors];
-    return touched && error ? (
-      <Typography color="error" variant="caption">
-        {String(error)}
-      </Typography>
-    ) : null;
-  };
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+  }, []);
 
-  const editForm = () => {
-    setEditMode(false);
-  };
+  const renderFieldError = useCallback(
+    (fieldName: string) => {
+      const touched = formik.touched[fieldName as keyof typeof formik.touched];
+      const error = formik.errors[fieldName as keyof typeof formik.errors];
+      return touched && error ? (
+        <Typography color="error" variant="caption">
+          {String(error)}
+        </Typography>
+      ) : null;
+    },
+    [formik.touched, formik.errors]
+  );
+
+  const editForm = useCallback(() => {
+    if (isBlocked) return;
+    setEditMode(true);
+  }, [isBlocked]);
 
   return (
     <>
@@ -125,7 +134,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
           <Button type="button" onClick={onPrevious} variant="contained" color="secondary">
             Anterior
           </Button>
-          <Button type="submit" variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary" disabled={isBlocked}>
             {canApproveStage ? "Aprobar Etapa" : "Guardar"}
           </Button>
         </Box>
@@ -135,7 +144,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
           step={steps[1]}
           nextStep={steps[2]}
           isApproveButton={canApproveStage}
-          setShowModal={setShowModal}
+          setShowModal={handleCloseModal}
           onNext={handleModalAction}
         />
       )}
