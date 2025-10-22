@@ -61,7 +61,6 @@ const EditStudentPage = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState<"success" | "error">("success");
-  const [student, setStudent] = useState<any>();
   const { id } = useParams();
 
   const fetchStudent = async () => {
