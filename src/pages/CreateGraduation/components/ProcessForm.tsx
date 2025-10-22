@@ -160,11 +160,11 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
     (params: any) => (
       <TextField
         {...params}
-        label = "Nombre Estudiante"
-        variant = "outlined"
-        margin = "normal"
-        error = {formik.touched.studentId && Boolean(formik.errors.studentId)}
-        helperText = {formik.touched.studentId && formik.errors.studentId}
+        label="Nombre Estudiante"
+        variant="outlined"
+        margin="normal"
+        error={formik.touched.studentId && Boolean(formik.errors.studentId)}
+        helperText={formik.touched.studentId && formik.errors.studentId}
       />
     ),
     [formik]
@@ -174,7 +174,7 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
   const renderPeriodMenuItem = useCallback((value: string) => {
     const desc = `${value.slice(0, value.length - 4)}-${value.slice(value.length - 4)}`;
     return (
-      <MenuItem key = {value} value = {value}>
+      <MenuItem key={value} value={value}>
         {desc}
       </MenuItem>
     );
@@ -183,9 +183,9 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
   const getStudentOptionLabel = useCallback((student: Student) => `${student.name}`, []);
 
   return (
-    <Modal open = {isVisible} onClose = {handleClose}>
+    <Modal open={isVisible} onClose={handleClose}>
       <Box
-        sx = {{
+        sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
@@ -200,122 +200,123 @@ function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
           borderRadius: 2,
         }}
       >
-        <form onSubmit = {formik.handleSubmit}>
-          <Grid container spacing = {2}>
-            <Grid item xs = {12}>
-              <Typography variant = "h4">{"Crear Proceso de Graduación"}</Typography>
-              <Typography variant = "body2" sx = {{ fontSize: 14, color: "gray" }}>
+        <form onSubmit={formik.handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h4">{"Crear Proceso de Graduación"}</Typography>
+              <Typography variant="body2" sx={{ fontSize: 14, color: "gray" }}>
                 {
                   "Completa los siguientes campos para definir los criterios y requisitos del proceso de\r"
                 }
                 {"graduación.\r"}
               </Typography>
-              <Divider flexItem sx = {{ my: 2 }} />
+              <Divider flexItem sx={{ my: 2 }} />
             </Grid>
 
-            <Grid item xs = {12}>
-              <Grid container spacing = {2}>
-                <Grid item xs = {3}>
-                  <Typography variant = "body2">{"Información Estudiante"}</Typography>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={3}>
+                  <Typography variant="body2">{"Información Estudiante"}</Typography>
                 </Grid>
-                <Grid item xs = {9}>
+                <Grid item xs={9}>
                   <Autocomplete
                     fullWidth
-                    options = {students}
-                    getOptionLabel = {getStudentOptionLabel}
-                    onChange = {handleStudentChange}
-                    onBlur = {formik.handleBlur}
-                    renderInput = {renderAutocompleteInput}
+                    options={students}
+                    getOptionLabel={getStudentOptionLabel}
+                    onChange={handleStudentChange}
+                    onBlur={formik.handleBlur}
+                    renderInput={renderAutocompleteInput}
                   />
                   <TextField
                     fullWidth
-                    name = "studentCode"
-                    value = {formik.values.studentCode}
-                    onChange = {formik.handleChange}
-                    onBlur = {formik.handleBlur}
-                    error = {formik.touched.studentCode && Boolean(formik.errors.studentCode)}
-                    helperText = {formik.touched.studentCode && formik.errors.studentCode}
-                    label = "Código Estudiante"
-                    variant = "outlined"
-                    margin = "normal"
+                    name="studentCode"
+                    value={formik.values.studentCode}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.studentCode && Boolean(formik.errors.studentCode)}
+                    helperText={formik.touched.studentCode && formik.errors.studentCode}
+                    label="Código Estudiante"
+                    variant="outlined"
+                    margin="normal"
+                    disabled
                   />
                 </Grid>
               </Grid>
-              <Divider flexItem sx = {{ my: 2 }} />
+              <Divider flexItem sx={{ my: 2 }} />
             </Grid>
 
-            <Grid item xs = {12}>
-              <Grid container spacing = {2}>
-                <Grid item xs = {3}>
-                  <Typography variant = "body2">{"Información Modalidad"}</Typography>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={3}>
+                  <Typography variant="body2">{"Información Modalidad"}</Typography>
                 </Grid>
-                <Grid item xs = {9}>
+                <Grid item xs={9}>
                   <TextField
                     fullWidth
                     select
-                    label = "Seleccionar Modalidad"
-                    variant = "outlined"
-                    margin = "normal"
-                    name = "modeId"
-                    value = {formik.values.modeId}
-                    onChange = {formik.handleChange}
-                    onBlur = {formik.handleBlur}
-                    error = {formik.touched.modeId && Boolean(formik.errors.modeId)}
-                    helperText = {formik.touched.modeId && formik.errors.modeId}
+                    label="Seleccionar Modalidad"
+                    variant="outlined"
+                    margin="normal"
+                    name="modeId"
+                    value={formik.values.modeId}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.modeId && Boolean(formik.errors.modeId)}
+                    helperText={formik.touched.modeId && formik.errors.modeId}
                   >
                     {modes.map((mode) => (
-                      <MenuItem key = {mode.id} value = {mode.id}>
+                      <MenuItem key={mode.id} value={mode.id}>
                         {mode.name}
                       </MenuItem>
                     ))}
                   </TextField>
                   <TextField
                     fullWidth
-                    label = "Título de Proyecto"
-                    name = "titleProject"
-                    value = {formik.values.titleProject}
-                    onChange = {handleTitleChange}
-                    onBlur = {formik.handleBlur}
-                    error = {
+                    label="Título de Proyecto"
+                    name="titleProject"
+                    value={formik.values.titleProject}
+                    onChange={handleTitleChange}
+                    onBlur={formik.handleBlur}
+                    error={
                       (formik.touched.titleProject && Boolean(formik.errors.titleProject)) ||
                       Boolean(titleError)
                     }
-                    helperText = {
+                    helperText={
                       titleError || (formik.touched.titleProject && formik.errors.titleProject)
                     }
-                    inputProps = {{ maxLength: 80 }}
-                    variant = "outlined"
-                    margin = "normal"
+                    inputProps={{ maxLength: 80 }}
+                    variant="outlined"
+                    margin="normal"
                   />
                   <TextField
                     fullWidth
                     select
-                    label = "Seleccionar Período"
-                    variant = "outlined"
-                    margin = "normal"
-                    name = "period"
-                    value = {formik.values.period}
-                    onChange = {formik.handleChange}
-                    onBlur = {formik.handleBlur}
-                    error = {formik.touched.period && Boolean(formik.errors.period)}
-                    helperText = {formik.touched.period && formik.errors.period}
+                    label="Seleccionar Período"
+                    variant="outlined"
+                    margin="normal"
+                    name="period"
+                    value={formik.values.period}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.period && Boolean(formik.errors.period)}
+                    helperText={formik.touched.period && formik.errors.period}
                   >
                     {setPeriods(numberPeriods).map(renderPeriodMenuItem)}
                   </TextField>
                 </Grid>
               </Grid>
-              <Divider flexItem sx = {{ my: 2 }} />
+              <Divider flexItem sx={{ my: 2 }} />
             </Grid>
 
-            <Grid item xs = {12}>
-              <Grid container spacing = {2} justifyContent = "flex-end">
+            <Grid item xs={12}>
+              <Grid container spacing={2} justifyContent="flex-end">
                 <Grid item>
                   <LoadingButton
-                    variant = "contained"
-                    color = "primary"
-                    type = "submit"
-                    loading = {loading}
-                    disabled = {isSubmitDisabled}
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    loading={loading}
+                    disabled={isSubmitDisabled}
                   >
                     {"GUARDAR\r"}
                   </LoadingButton>

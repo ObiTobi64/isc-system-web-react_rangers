@@ -8,8 +8,8 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Student } from "../../models/studentInterface";
 import { getPermissionById } from "../../services/permissionsService";
-import { Permission } from "../../models/permissionInterface";
-import { HasPermission } from "../../helper/permissions";
+import Permission from "../../models/permissionInterface";
+import HasPermission from "../../helper/permissions";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
 import ContainerPage from "../../components/common/ContainerPage";
 import ProcessForm from "../CreateGraduation/components/ProcessForm";
@@ -132,9 +132,9 @@ const GraduationProcessPage = () => {
 
   return (
     <ContainerPage
-      title = "Procesos de Graduación"
-      subtitle = "Lista de procesos de graduación de los estudiantes"
-      actions = {
+      title="Procesos de Graduación"
+      subtitle="Lista de procesos de graduación de los estudiantes"
+      actions={
         HasPermission(createProcess?.name || "") && (
           <Button
             variant="contained"
@@ -185,22 +185,22 @@ const GraduationProcessPage = () => {
         />
       </Box>
 
-      <Box sx = {{ mb: 2 }}>
+      <Box sx={{ mb: 2 }}>
         <Paper>
           <DataGrid
             autoHeight
-            disableColumnResize = {false}
-            rows = {filteredData}
-            columns = {tableHeaders}
-            localeText = {dataGridLocaleText}
-            initialState = {{
+            disableColumnResize={false}
+            rows={filteredData}
+            columns={tableHeaders}
+            localeText={dataGridLocaleText}
+            initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
               },
             }}
-            pageSizeOptions = {[5, 10, 25]}
+            pageSizeOptions={[5, 10, 25]}
             disableRowSelectionOnClick
-            sx = {{
+            sx={{
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#e5e7eb",
               },
@@ -227,14 +227,14 @@ const GraduationProcessPage = () => {
                 backgroundColor: "inherit !important",
               },
             }}
-            classes = {{
+            classes={{
               root: "bg-white dark:bg-gray-800",
               columnHeader: "bg-gray-200 dark:bg-gray-800",
               cell: "bg-white dark:bg-gray-800",
               row: "bg-white dark:bg-gray-800",
               columnHeaderTitle: "!font-bold text-center",
             }}
-            slotProps = {{
+            slotProps={{
               columnsManagement: {
                 autoFocusSearchField: false,
                 searchInputProps: {
@@ -258,7 +258,7 @@ const GraduationProcessPage = () => {
           />
         </Paper>
       </Box>
-      <ProcessForm isVisible = {open} isClosed = {handleClose}></ProcessForm>
+      <ProcessForm isVisible={open} isClosed={handleClose}></ProcessForm>
     </ContainerPage>
   );
 };
