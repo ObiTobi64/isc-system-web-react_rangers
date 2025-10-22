@@ -99,7 +99,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
       const response = await getModes();
       setModes(response.data);
     } catch (error) {
-      setError(error);
+      setError(error instanceof Error ? error : new Error('Failed to fetch modes'));
     }
   }, []);
 
@@ -132,7 +132,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
         onNext();
       } catch (error) {
         // Error al guardar los cambios
-        setError('No se pudieron guardar los cambios. Por favor, intente de nuevo.');
+        setError(new Error('No se pudieron guardar los cambios. Por favor, intente de nuevo.'));
       }
     },
     [studentProcess, setProcess, onNext, checkSeminarApproved]
@@ -147,12 +147,12 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
       Yup.object().shape({
         mode: Yup.string().test(
           'is-editable',
-          'No se puede modificar un seminario aprobado',
+          LOCKED_MESSAGE,
           () => !readOnly
         ),
         period: Yup.string().test(
           'is-editable',
-          'No se puede modificar un seminario aprobado',
+          LOCKED_MESSAGE,
           () => !readOnly
         ),
       })
