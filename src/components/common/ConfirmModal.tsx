@@ -23,7 +23,7 @@ const ConfirmModal: FC<ConfirmModalProps> = (props) => {
     } finally {
       setIsLoading(false);
     }
-  }, [onNext, isLoading]);
+  }, [onNext]);
 
   const handleCancel = useCallback(() => {
     if (!isLoading && setShowModal) {

@@ -44,6 +44,9 @@ const MAX_DATE = NOW.add(FUTURE_MONTHS, "month");
 
 const { TUTOR_APPROBAL, REVIEWER_ASSIGNMENT } = letters;
 
+const [showErrorSnackbar, setShowErrorSnackbar] = useState<boolean>(false);
+const [errorMessage, setErrorMessage] = useState<string>("");
+
 const validationSchema = Yup.object({
   reviewer: Yup.string()
     .required("* El revisor es obligatorio")
@@ -133,11 +136,9 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         return;
       }
 
-      // Si puede aprobar la etapa, mostrar modal
       if (canApproveStage()) {
         setShowModal(true);
       } else {
-        // Si solo está guardando, guardar directamente
         saveStage(false);
       }
     },
@@ -156,7 +157,6 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         reviewerApprovalLetterSubmitted: process.reviewer_approval || false,
         tutorId: process.tutor_id,
       });
-      // CORRECCIÓN: Pasar directamente el valor boolean
       setEditMode(isReadOnlyMode());
     }
   }, [process]);
@@ -172,7 +172,10 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
   const isApproveButton = canApproveStage();
   const hasReviewer = Boolean(formik.values.reviewer);
 
-  // Función simplificada de guardado
+  const handleErrorSnackbarClose = (): void => {
+    setShowErrorSnackbar(false);
+  };
+
   const saveStage = async (shouldAdvanceStage: boolean = false): Promise<void> => {
     if (!process || isSaving) return;
 
@@ -190,7 +193,6 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         date_reviewer_assignament: formik.values.date_reviewer_assignament,
       };
 
-      // Solo avanzar etapa si se indica y se cumplen las condiciones
       if (shouldAdvanceStage && isApproveButton) {
         updatedProcess.stage_id = 3;
         updatedProcess.reviewer_approval_date = dayjs();
@@ -199,20 +201,20 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
       await updateProcess(updatedProcess);
       setProcess(updatedProcess);
 
-      // Si avanzamos de etapa, llamar onNext
       if (shouldAdvanceStage && isApproveButton) {
         onNext();
       }
     } catch (error) {
       console.error("Error saving stage:", error);
+      setErrorMessage("Error al guardar los datos. Por favor, intente nuevamente.");
+      setShowErrorSnackbar(true);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Manejo directo del modal - SIN lógica compleja
   const handleModalAction = async (): Promise<void> => {
-    await saveStage(true); // Guardar y avanzar etapa
+    await saveStage(true);
     setShowModal(false);
   };
 
@@ -482,6 +484,16 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           <AlertTitle>{"Docente Duplicado"}</AlertTitle>
           {"No se puede asignar el mismo docente como tutor y revisor. \r"}
           {"Por favor, seleccione un docente diferente.\r"}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showErrorSnackbar}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleErrorSnackbarClose} severity="error" sx={{ width: "100%" }}>
+          {errorMessage}
         </Alert>
       </Snackbar>
     </>
