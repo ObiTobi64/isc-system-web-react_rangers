@@ -30,6 +30,18 @@ import DownloadButton from "../common/DownloadButton";
 import letters from "../../constants/letters";
 import { useCarrerStore } from "../../store/carrerStore";
 
+const parseEnvNumber = (v: unknown, d: number) => {
+  const n = Number(v as any);
+  return Number.isFinite(n) ? n : d;
+};
+
+const PAST_MONTHS = parseEnvNumber(import.meta?.env?.VITE_STAGE3_DATE_PAST_MONTHS, 12);
+const FUTURE_MONTHS = parseEnvNumber(import.meta?.env?.VITE_STAGE3_DATE_FUTURE_MONTHS, 6);
+
+const NOW = dayjs();
+const MIN_DATE = NOW.subtract(PAST_MONTHS, "month");
+const MAX_DATE = NOW.add(FUTURE_MONTHS, "month");
+
 const { TUTOR_APPROBAL, REVIEWER_ASSIGNMENT } = letters;
 
 const validationSchema = Yup.object({
@@ -40,13 +52,29 @@ const validationSchema = Yup.object({
       "* El revisor no puede ser el mismo docente que el tutor",
       function (value) {
         const { parent } = this;
-        const { tutorId } = parent;
+        const { tutorId } = parent as { tutorId?: number | string };
         return !value || !tutorId || value !== tutorId.toString();
+      }
+    ),
+  date_reviewer_assignament: Yup.mixed<Dayjs>()
+    .nullable()
+    .required("* La fecha de asignación es obligatoria")
+    .test(
+      "min-range",
+      () => `* La fecha no puede ser anterior a ${MIN_DATE.format("DD/MM/YYYY")}`,
+      (value) => {
+        return !!value && (value.isSame(MIN_DATE, "day") || value.isAfter(MIN_DATE));
+      }
+    )
+    .test(
+      "max-range",
+      () => `* La fecha no puede ser posterior a ${MAX_DATE.format("DD/MM/YYYY")}`,
+      (value) => {
+        return !!value && (value.isSame(MAX_DATE, "day") || value.isBefore(MAX_DATE));
       }
     ),
   reviewerDesignationLetterSubmitted: Yup.boolean(),
   reviewerApprovalLetterSubmitted: Yup.boolean(),
-  date_reviewer_assignament: Yup.mixed().required("Debe seleccionar una fecha"),
 });
 
 interface ReviewerStageProps {
@@ -141,7 +169,6 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         formik.values.date_reviewer_assignament &&
         !isDuplicateSelection(formik.values.reviewer)
     );
-
   const isApproveButton = canApproveStage();
   const hasReviewer = Boolean(formik.values.reviewer);
 
@@ -299,6 +326,8 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                 value={formik.values.date_reviewer_assignament}
                 onChange={handleDateChange}
                 format="DD/MM/YYYY"
+                minDate={MIN_DATE}
+                maxDate={MAX_DATE}
               />
             </LocalizationProvider>
           </Grid>
@@ -345,9 +374,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                   month: dayjs().format("MMMM"),
                   year: dayjs().format("YYYY"),
                 }}
-                filename={`${REVIEWER_ASSIGNMENT.filename}_${
-                  process?.reviewer_fullname || ""
-                }.${REVIEWER_ASSIGNMENT.extention}`}
+                filename={`${REVIEWER_ASSIGNMENT.filename}_${process?.reviewer_fullname || ""}.${REVIEWER_ASSIGNMENT.extention}`}
               />
             </span>
           </Tooltip>
