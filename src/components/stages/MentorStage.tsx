@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-import { Box, Button, Typography, Grid, Alert, AlertTitle } from "@mui/material";
+import { Box, Button, Typography, Grid, Alert, AlertTitle, Snackbar } from "@mui/material";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import WarningIcon from "@mui/icons-material/Warning";
 
@@ -33,6 +33,7 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<boolean>((process?.stage_id ?? 0) !== CURRENT_STAGE);
   const isBlocked = (process?.stage_id ?? 0) !== CURRENT_STAGE; 
+  const [showWarningSnackbar, setShowWarningSnackbar] = useState<boolean>(false);
 
   const { formik, canApproveStage } = useMentorFormik(process, () => {
     if (canApproveStage) {
@@ -82,9 +83,9 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
     setShowModal(false);
   }, [saveStage]);
 
-  const handleCloseModal = useCallback(() => {
-    setShowModal(false);
-  }, []);
+  const handleWarningSnackbarClose = () => {
+    setShowWarningSnackbar(false);
+  };
 
   const renderFieldError = useCallback(
     (fieldName: string) => {
@@ -100,7 +101,10 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
   );
 
   const editForm = useCallback(() => {
-    if (isBlocked) return;
+    if (isBlocked) {
+      setShowWarningSnackbar(true);
+      return;
+    }
     setEditMode(true);
   }, [isBlocked]);
 
@@ -108,7 +112,13 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
     <>
       <Typography variant="h6" gutterBottom style={{ fontWeight: "bold" }}>
         Etapa 2: Seleccionar Tutor
-        {!isBlocked && <ModeEditIcon onClick={editForm} style={{ cursor: "pointer" }} />}
+        <ModeEditIcon
+          onClick={editForm}
+          style={{
+            cursor: isBlocked ? "not-allowed" : "pointer",
+            color: isBlocked ? "#ccc" : "inherit",
+          }}
+        />
       </Typography>
 
       {isBlocked && (
@@ -144,11 +154,22 @@ export const MentorStage: FC<InternalDefenseStageProps> = ({ onPrevious, onNext 
           step={steps[1]}
           nextStep={steps[2]}
           isApproveButton={canApproveStage}
-          setShowModal={handleCloseModal}
+          setShowModal={setShowModal}
           onNext={handleModalAction}
         />
       )}
       <LoadingBackdrop loading={loading} canApproveStage={canApproveStage} />
+      <Snackbar
+        open={showWarningSnackbar}
+        autoHideDuration={6000}
+        onClose={handleWarningSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleWarningSnackbarClose} severity="warning" sx={{ width: "100%" }}>
+          {"No se puede editar la Etapa 2 porque ya fue aprobada. "}
+          {"La edición posterior solo puede realizarse a través de un administrador."}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
