@@ -29,23 +29,19 @@ import { periods, currentPeriod } from "../../data/periods";
 import { useProcessStore } from "../../store/store";
 import { updateProcess } from "../../services/processServicer";
 
-const LOCKED_MESSAGE = 'No se puede modificar un seminario aprobado';
+const LOCKED_MESSAGE = "No se puede modificar un seminario aprobado";
 
 const validationSchema = Yup.object({
   mode: Yup.string()
     .required("* La modalidad es obligatoria")
-    .test('is-locked', LOCKED_MESSAGE, 
-      function isNotLocked() {
-        return !this.options?.context?.isReadOnly;
-      }
-    ),
+    .test("is-locked", LOCKED_MESSAGE, function isNotLocked() {
+      return !this.options?.context?.isReadOnly;
+    }),
   period: Yup.date()
     .required("* El periodo es obligatorio")
-    .test('is-locked', LOCKED_MESSAGE, 
-      function isNotLocked() {
-        return !this.options?.context?.isReadOnly;
-      }
-    ),
+    .test("is-locked", LOCKED_MESSAGE, function isNotLocked() {
+      return !this.options?.context?.isReadOnly;
+    }),
 });
 
 interface RegistrationStageProps {
@@ -80,8 +76,8 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
 
     const isApproved = Boolean(
       studentProcess.seminar_enrollment === "true" &&
-      studentProcess.date_seminar_enrollment &&
-      studentProcess.stage_id > 0
+        studentProcess.date_seminar_enrollment &&
+        studentProcess.stage_id > 0
     );
 
     const isLaterStage = studentProcess.stage_id > 0;
@@ -99,7 +95,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
       const response = await getModes();
       setModes(response.data);
     } catch (error) {
-      setError(error instanceof Error ? error : new Error('Failed to fetch modes'));
+      setError(error instanceof Error ? error : new Error("Failed to fetch modes"));
     }
   }, []);
 
@@ -123,15 +119,15 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
         const updatedProcess = { ...studentProcess };
         updatedProcess.modality_id = mode;
         updatedProcess.period = period;
-        
+
         // Intentar actualizar en el backend primero
         await updateProcess(updatedProcess);
-        
+
         // Si la actualización fue exitosa, actualizar el estado local
         setProcess(updatedProcess);
         onNext();
       } catch (error) {
-        setError(new Error('No se pudieron guardar los cambios. Por favor, intente de nuevo.'));
+        setError(new Error("No se pudieron guardar los cambios. Por favor, intente de nuevo."));
       }
     },
     [studentProcess, setProcess, onNext, checkSeminarApproved]
@@ -144,16 +140,8 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
     },
     validationSchema: validationSchema.concat(
       Yup.object().shape({
-        mode: Yup.string().test(
-          'is-editable',
-          LOCKED_MESSAGE,
-          () => !readOnly
-        ),
-        period: Yup.string().test(
-          'is-editable',
-          LOCKED_MESSAGE,
-          () => !readOnly
-        ),
+        mode: Yup.string().test("is-editable", LOCKED_MESSAGE, () => !readOnly),
+        period: Yup.string().test("is-editable", LOCKED_MESSAGE, () => !readOnly),
       })
     ),
     onSubmit: () => {
@@ -221,32 +209,39 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
 
   return (
     <>
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-        {"Etapa 1: Seminario de Grado"}
-        {' '}
-        <ModeEditIcon 
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+        {"Etapa 1: Seminario de Grado"}{" "}
+        <ModeEditIcon
+          role="button"
+          tabIndex={0}
+          aria-label={readOnly ? "Edición deshabilitada" : "Editar seminario"}
           onClick={handleEditIconClick}
-          sx={{ 
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleEditIconClick();
+            }
+          }}
+          sx={{
             cursor: readOnly ? "not-allowed" : "pointer",
-            opacity: readOnly ? 0.5 : 1
-          }} 
+            opacity: readOnly ? 0.5 : 1,
+          }}
         />
       </Typography>
 
       {readOnly && (
         <Alert severity="warning" sx={{ mb: 2 }} icon={<WarningIcon />}>
           <AlertTitle>{"Fase de Seminario de Grado Registrada"}</AlertTitle>
-          {"Esta fase ya ha sido aprobada y registrada. No se pueden modificar los datos del seminario"}
+          {
+            "Esta fase ya ha sido aprobada y registrada. No se pueden modificar los datos del seminario"
+          }
           {"una vez que han sido aprobados. Si necesita realizar cambios excepcionales, por favor"}
           {"contacte al administrador del sistema."}
         </Alert>
       )}
-  
+
       <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">
         <Grid container spacing={3}>
-          <Grid
-            item xs={12} sm={12}
-            md={7} lg={8}>
+          <Grid item xs={12} sm={12} md={7} lg={8}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{"1. Seleccione la Modalidad"}</FormLabel>
               <RadioGroup
@@ -267,9 +262,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid
-            item xs={12} sm={12}
-            md={7} lg={8}>
+          <Grid item xs={12} sm={12} md={7} lg={8}>
             <FormControl fullWidth variant="outlined" margin="normal">
               <InputLabel id="period-label">{"2. Seleccione periodo de inscripción"}</InputLabel>
               <Select
@@ -295,12 +288,7 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
           </Grid>
         </Grid>
         <div className="flex justify-end pt-5">
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary"
-            disabled={readOnly && edited} 
-          >
+          <Button type="submit" variant="contained" color="primary" disabled={readOnly && edited}>
             {"Siguiente"}
           </Button>
         </div>
@@ -323,8 +311,9 @@ export const RegistrationStage: FC<RegistrationStageProps> = ({ onNext }) => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert onClose={handleWarningSnackbarClose} severity="warning" sx={{ width: "100%" }}>
-          {"No se puede modificar el seminario porque la fase ya ha sido registrada o aprobada.\r"}
-          {"Cualquier cambio requerirá reiniciar el proceso de aprobación.\r"}
+          {"No se puede modificar el seminario porque la fase ya ha sido registrada o aprobada."}
+          <br />
+          {"Cualquier cambio requerirá reiniciar el proceso de aprobación."}
         </Alert>
       </Snackbar>
     </>
