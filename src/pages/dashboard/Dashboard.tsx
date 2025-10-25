@@ -60,7 +60,7 @@ export const DashboardPage = () => {
   return (
     <Container
       fixed
-      sx={{
+      sx = {{
         ...(isMobile && {
           minWidth: "100%",
           overflowX: "auto",
@@ -93,62 +93,62 @@ export const DashboardPage = () => {
     >
       <Grid
         container
-        spacing={3}
-        sx={{
+        spacing = {3}
+        sx = {{
           ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
         }}
       >
-        <Grid item xs={12}>
+        <Grid item xs = {12}>
           <Grid
             container
-            spacing={3}
-            sx={{
+            spacing = {3}
+            sx = {{
               ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
             }}
           >
             <Grid
               item
-              xs={12}
-              md={4}
-              sx={{
+              xs = {12}
+              md = {4}
+              sx = {{
                 ...(isMobile && { minWidth: 400 }),
               }}
             >
-              <Grid container spacing={3} marginTop="15px">
-                <Grid item xs={12}>
+              <Grid container spacing = {3} marginTop = "15px">
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#FAAA1E"
-                    textColor="#ffffff"
-                    title="Procesos Finalizados"
-                    subtitle={`${
+                    backgroundColor = "#FAAA1E"
+                    textColor = "#ffffff"
+                    title = "Procesos Finalizados"
+                    subtitle = {`${
                       (stats?.total_procesos || 0) - (stats?.num_procesos_finalizados || 0)
                     } en curso`}
-                    count={stats?.num_procesos_finalizados || 0}
-                    percentage={
+                    count = {stats?.num_procesos_finalizados || 0}
+                    percentage = {
                       ((stats?.num_procesos_finalizados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#1450A3"
-                    textColor="#FFFFFF"
-                    title="Tutorias finalizadas"
-                    subtitle={`${stats?.num_tutorias_progreso || 0} en curso`}
-                    count={stats?.num_tutorias_aprobadas || 0}
-                    percentage={
+                    backgroundColor = "#1450A3"
+                    textColor = "#FFFFFF"
+                    title = "Tutorias finalizadas"
+                    subtitle = {`${stats?.num_tutorias_progreso || 0} en curso`}
+                    count = {stats?.num_tutorias_aprobadas || 0}
+                    percentage = {
                       ((stats?.num_tutorias_aprobadas || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs = {12}>
                   <NumberCard
-                    backgroundColor="#337CCF"
-                    textColor="#FFFFFF"
-                    title="Revisiones finalizadas"
-                    subtitle={`${stats?.num_reviewers_progreso || 0} en curso`}
-                    count={stats?.num_reviewers_aprobados || 0}
-                    percentage={
+                    backgroundColor = "#337CCF"
+                    textColor = "#FFFFFF"
+                    title = "Revisiones finalizadas"
+                    subtitle = {`${stats?.num_reviewers_progreso || 0} en curso`}
+                    count = {stats?.num_reviewers_aprobados || 0}
+                    percentage = {
                       ((stats?.num_reviewers_aprobados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
@@ -157,24 +157,24 @@ export const DashboardPage = () => {
             </Grid>
             <Grid
               item
-              xs={12}
-              md={8}
-              sx={{
+              xs = {12}
+              md = {8}
+              sx = {{
                 ...(isMobile && { minWidth: 800 }),
               }}
             >
-              <CalendarCard events={myEventsList} />
+              <CalendarCard events = {myEventsList} />
             </Grid>
           </Grid>
         </Grid>
         <Grid
           item
-          xs={12}
-          sx={{
+          xs = {12}
+          sx = {{
             ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
           }}
         >
-          <AreaChartCard title="Estudiantes Aprobados por Período" data={data} />
+          <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
         </Grid>
       </Grid>
     </Container>
