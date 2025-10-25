@@ -44,9 +44,6 @@ const MAX_DATE = NOW.add(FUTURE_MONTHS, "month");
 
 const { TUTOR_APPROBAL, REVIEWER_ASSIGNMENT } = letters;
 
-const [showErrorSnackbar, setShowErrorSnackbar] = useState<boolean>(false);
-const [errorMessage, setErrorMessage] = useState<string>("");
-
 const validationSchema = Yup.object({
   reviewer: Yup.string()
     .required("* El revisor es obligatorio")
@@ -91,6 +88,9 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
   const process = useProcessStore((state) => state.process);
   const carrer = useCarrerStore((state) => state.carrer);
   const setProcess = useProcessStore((state) => state.setProcess);
+
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showWarningSnackbar, setShowWarningSnackbar] = useState<boolean>(false);
@@ -188,7 +188,10 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
       const updatedProcess = {
         ...process,
         reviewer_letter: reviewerDesignationLetterSubmitted,
-        reviewer_approval: reviewerApprovalLetterSubmitted,
+        reviewer_approval:
+          Number(reviewer) !== process.reviewer_id
+            ? false
+            : reviewerApprovalLetterSubmitted,
         reviewer_id: Number(reviewer),
         date_reviewer_assignament: formik.values.date_reviewer_assignament,
       };
