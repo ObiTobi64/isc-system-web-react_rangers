@@ -89,37 +89,34 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
   const carrer = useCarrerStore((state) => state.carrer);
   const setProcess = useProcessStore((state) => state.setProcess);
 
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showWarningSnackbar, setShowWarningSnackbar] = useState<boolean>(false);
   const [showDuplicateWarning, setShowDuplicateWarning] = useState<boolean>(false);
-  const [originalReviewerId, setOriginalReviewerId] = useState<number | undefined>(undefined);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const isReadOnlyMode = () => {
+  const isReadOnlyMode = (): boolean => {
     if (!process) {
       return true;
     }
-
-    if (process.stage_id > CURRENT_STAGE && process.reviewer_approval) {
-      return true;
-    }
-
-    return false;
+    return process.stage_id > CURRENT_STAGE && !!process.reviewer_approval;
   };
 
   const [editMode, setEditMode] = useState<boolean>(isReadOnlyMode());
 
-  const wasReviewerApproved = () => {
-    return Boolean(process?.reviewer_approval && process?.stage_id > CURRENT_STAGE);
-  };
+  const wasReviewerApproved = (): boolean =>
+    Boolean(process?.reviewer_approval && process?.stage_id > CURRENT_STAGE);
 
   const [currentReviewerId, setCurrentReviewerId] = useState<string>(
     process?.reviewer_id?.toString() || ""
   );
 
-  const isDuplicateSelection = (reviewerId?: string) => {
+  const isDuplicateSelection = (reviewerId?: string): boolean => {
     const tutorId = process?.tutor_id;
     const selectedReviewer = reviewerId || currentReviewerId;
-    return !!tutorId && !!selectedReviewer && tutorId.toString() === selectedReviewer;
+    return Boolean(tutorId && selectedReviewer && tutorId.toString() === selectedReviewer);
   };
 
   const formik = useFormik({
@@ -139,19 +136,13 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         return;
       }
 
-      if (wasReviewerApproved() && originalReviewerId !== Number(formik.values.reviewer)) {
-        setShowWarningSnackbar(true);
-        return;
+      if (canApproveStage()) {
+        setShowModal(true);
+      } else {
+        saveStage(false);
       }
-      setShowModal(true);
     },
   });
-
-  useEffect(() => {
-    if (process?.reviewer_id) {
-      setOriginalReviewerId(process.reviewer_id);
-    }
-  }, [process?.reviewer_id]);
 
   useEffect(() => {
     if (process) {
@@ -170,83 +161,67 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
     }
   }, [process]);
 
-  const canApproveStage = () => {
-    return Boolean(
+  const canApproveStage = (): boolean =>
+    Boolean(
       formik.values.reviewer &&
         formik.values.reviewerDesignationLetterSubmitted &&
         formik.values.reviewerApprovalLetterSubmitted &&
         formik.values.date_reviewer_assignament &&
         !isDuplicateSelection(formik.values.reviewer)
     );
-  };
   const isApproveButton = canApproveStage();
   const hasReviewer = Boolean(formik.values.reviewer);
 
-  const saveStage = async () => {
-    if (!process) {
-      return;
-    }
+  const handleErrorSnackbarClose = (): void => {
+    setShowErrorSnackbar(false);
+  };
 
-    if (isDuplicateSelection(formik.values.reviewer)) {
-      setShowDuplicateWarning(true);
-      return;
-    }
+  const saveStage = async (shouldAdvanceStage: boolean = false): Promise<void> => {
+    if (!process || isSaving) return;
 
-    const { reviewer, reviewerDesignationLetterSubmitted, reviewerApprovalLetterSubmitted } =
-      formik.values;
-
-    const currentReviewerIdNumber = Number(reviewer);
-    const reviewerChanged = originalReviewerId !== currentReviewerIdNumber;
-    const wasApproved = process.reviewer_approval;
-    const shouldAdvanceToNextStage = isApproveButton && !reviewerChanged;
-
-    const updatedProcess = { ...process };
-
-    if (reviewerChanged && wasApproved) {
-      updatedProcess.reviewer_approval = false;
-      updatedProcess.reviewer_approval_date = null;
-      if (updatedProcess.stage_id > CURRENT_STAGE) {
-        updatedProcess.stage_id = CURRENT_STAGE;
-      }
-    } else {
-      updatedProcess.reviewer_approval = reviewerApprovalLetterSubmitted;
-      if (reviewerApprovalLetterSubmitted && isApproveButton) {
-        updatedProcess.reviewer_approval_date = dayjs();
-      }
-    }
-
-    updatedProcess.reviewer_letter = reviewerDesignationLetterSubmitted;
-    updatedProcess.reviewer_id = currentReviewerIdNumber;
-    updatedProcess.date_reviewer_assignament = formik.values.date_reviewer_assignament;
-
-    if (shouldAdvanceToNextStage) {
-      updatedProcess.stage_id = 3;
-    }
+    setIsSaving(true);
 
     try {
+      const { reviewer, reviewerDesignationLetterSubmitted, reviewerApprovalLetterSubmitted } =
+        formik.values;
+
+      const updatedProcess = {
+        ...process,
+        reviewer_letter: reviewerDesignationLetterSubmitted,
+        reviewer_approval:
+          Number(reviewer) !== process.reviewer_id
+            ? false
+            : reviewerApprovalLetterSubmitted,
+        reviewer_id: Number(reviewer),
+        date_reviewer_assignament: formik.values.date_reviewer_assignament,
+      };
+
+      if (shouldAdvanceStage && isApproveButton) {
+        updatedProcess.stage_id = 3;
+        updatedProcess.reviewer_approval_date = dayjs();
+      }
+
       await updateProcess(updatedProcess);
       setProcess(updatedProcess);
 
-      // Only proceed to next stage if approving and conditions are met
-      if (shouldAdvanceToNextStage) {
+      if (shouldAdvanceStage && isApproveButton) {
         onNext();
       }
     } catch (error) {
-      setProcess(process);
-    }
-  };
-
-  const handleModalAction = async () => {
-    try {
-      await saveStage();
-    } catch (error) {
-      // Handle error silently
+      console.error("Error saving stage:", error);
+      setErrorMessage("Error al guardar los datos. Por favor, intente nuevamente.");
+      setShowErrorSnackbar(true);
     } finally {
-      setShowModal(false);
+      setIsSaving(false);
     }
   };
 
-  const handleMentorChange = (_event: ChangeEvent<unknown>, value: Mentor | null) => {
+  const handleModalAction = async (): Promise<void> => {
+    await saveStage(true);
+    setShowModal(false);
+  };
+
+  const handleMentorChange = (_event: ChangeEvent<unknown>, value: Mentor | null): void => {
     const selectedId = value?.id?.toString() || "";
 
     if (selectedId && process?.tutor_id && selectedId === process.tutor_id.toString()) {
@@ -261,11 +236,11 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
     }
   };
 
-  const handleDateChange = (value: Dayjs | null) => {
+  const handleDateChange = (value: Dayjs | null): void => {
     formik.setFieldValue("date_reviewer_assignament", value);
   };
 
-  const editForm = () => {
+  const editForm = (): void => {
     if (wasReviewerApproved()) {
       setShowWarningSnackbar(true);
       return;
@@ -273,11 +248,11 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
     setEditMode(false);
   };
 
-  const handleWarningSnackbarClose = () => {
+  const handleWarningSnackbarClose = (): void => {
     setShowWarningSnackbar(false);
   };
 
-  const handleDuplicateWarningClose = () => {
+  const handleDuplicateWarningClose = (): void => {
     setShowDuplicateWarning(false);
   };
 
@@ -471,10 +446,11 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
               editMode ||
               !formik.values.reviewerDesignationLetterSubmitted ||
               !formik.values.reviewerApprovalLetterSubmitted ||
-              Boolean(isDuplicateSelection(formik.values.reviewer))
+              Boolean(isDuplicateSelection(formik.values.reviewer)) ||
+              isSaving
             }
           >
-            {isApproveButton ? "Aprobar Etapa" : "Guardar"}
+            {isSaving ? "Guardando..." : isApproveButton ? "Aprobar Etapa" : "Guardar"}
           </Button>
         </Box>
       </form>
@@ -483,7 +459,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
         <ConfirmModal
           step={steps[2]}
           nextStep={steps[3]}
-          setShowModal={setShowModal}
+          setShowModal={() => setShowModal(false)}
           isApproveButton={isApproveButton}
           onNext={handleModalAction}
         />
@@ -511,6 +487,16 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           <AlertTitle>{"Docente Duplicado"}</AlertTitle>
           {"No se puede asignar el mismo docente como tutor y revisor. \r"}
           {"Por favor, seleccione un docente diferente.\r"}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showErrorSnackbar}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleErrorSnackbarClose} severity="error" sx={{ width: "100%" }}>
+          {errorMessage}
         </Alert>
       </Snackbar>
     </>
