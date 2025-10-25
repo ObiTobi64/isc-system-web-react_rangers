@@ -1,4 +1,5 @@
-import { Container, Grid } from "@mui/material";
+/* eslint-disable no-console */
+import { Container, Grid, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
 import NumberCard from "../../components/common/NumberCard";
 import AreaChartCard from "../../components/common/AreaChart";
@@ -40,6 +41,8 @@ interface Stats {
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState<Stats>();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const fetchStats = useCallback(async () => {
     try {
@@ -57,84 +60,121 @@ export const DashboardPage = () => {
   return (
     <Container
       fixed
-      sx = {{
-        minWidth: DASHBOARD_MIN_WIDTH,
-        maxWidth: 1400,
-        overflowX: "auto",
-        scrollbarColor: "#c1c1c1 #f1f1f1",
-        scrollbarWidth: "thin",
-        "&::-webkit-scrollbar": {
-          height: 8,
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "#f1f1f1",
-          borderRadius: 4,
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#c1c1c1",
-          borderRadius: 4,
-          transition: "background 0.3s ease",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-          background: "#a8a8a8",
-        },
-        "&::-webkit-scrollbar-corner": {
-          background: "#f1f1f1",
-        },
+      sx={{
+        ...(isMobile && {
+          minWidth: "100%",
+          overflowX: "auto",
+          scrollbarColor: "#c1c1c1 #f1f1f1",
+          scrollbarWidth: "thin",
+          "&::-webkit-scrollbar": {
+            height: 8,
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#f1f1f1",
+            borderRadius: 4,
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#c1c1c1",
+            borderRadius: 4,
+            transition: "background 0.3s ease",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#a8a8a8",
+          },
+          "&::-webkit-scrollbar-corner": {
+            background: "#f1f1f1",
+          },
+        }),
+        ...(!isMobile && {
+          maxWidth: 1400,
+          overflowX: "hidden",
+        }),
       }}
     >
-      <Grid container spacing = {3} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
-        <Grid item xs = {12}>
-          <Grid container spacing = {3} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
-            <Grid item xs = {4} sx = {{ minWidth: 400 }}>
-              <Grid container spacing = {3} marginTop = "15px">
-                <Grid item xs = {12}>
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
+        }}
+      >
+        <Grid item xs={12}>
+          <Grid
+            container
+            spacing={3}
+            sx={{
+              ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
+            }}
+          >
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                ...(isMobile && { minWidth: 400 }),
+              }}
+            >
+              <Grid container spacing={3} marginTop="15px">
+                <Grid item xs={12}>
                   <NumberCard
-                    backgroundColor = "#FAAA1E"
-                    textColor = "#ffffff"
-                    title = "Procesos Finalizados"
-                    subtitle = {`${
+                    backgroundColor="#FAAA1E"
+                    textColor="#ffffff"
+                    title="Procesos Finalizados"
+                    subtitle={`${
                       (stats?.total_procesos || 0) - (stats?.num_procesos_finalizados || 0)
                     } en curso`}
-                    count = {stats?.num_procesos_finalizados || 0}
-                    percentage = {
+                    count={stats?.num_procesos_finalizados || 0}
+                    percentage={
                       ((stats?.num_procesos_finalizados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs = {12}>
+                <Grid item xs={12}>
                   <NumberCard
-                    backgroundColor = "#1450A3"
-                    textColor = "#FFFFFF"
-                    title = "Tutorias finalizadas"
-                    subtitle = {`${stats?.num_tutorias_progreso || 0} en curso`}
-                    count = {stats?.num_tutorias_aprobadas || 0}
-                    percentage = {
+                    backgroundColor="#1450A3"
+                    textColor="#FFFFFF"
+                    title="Tutorias finalizadas"
+                    subtitle={`${stats?.num_tutorias_progreso || 0} en curso`}
+                    count={stats?.num_tutorias_aprobadas || 0}
+                    percentage={
                       ((stats?.num_tutorias_aprobadas || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
-                <Grid item xs = {12}>
+                <Grid item xs={12}>
                   <NumberCard
-                    backgroundColor = "#337CCF"
-                    textColor = "#FFFFFF"
-                    title = "Revisiones finalizadas"
-                    subtitle = {`${stats?.num_reviewers_progreso || 0} en curso`}
-                    count = {stats?.num_reviewers_aprobados || 0}
-                    percentage = {
+                    backgroundColor="#337CCF"
+                    textColor="#FFFFFF"
+                    title="Revisiones finalizadas"
+                    subtitle={`${stats?.num_reviewers_progreso || 0} en curso`}
+                    count={stats?.num_reviewers_aprobados || 0}
+                    percentage={
                       ((stats?.num_reviewers_aprobados || 0) * 100) / (stats?.total_procesos || 1)
                     }
                   />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs = {8} sx = {{ minWidth: 800 }}>
-              <CalendarCard events = {myEventsList} />
+            <Grid
+              item
+              xs={12}
+              md={8}
+              sx={{
+                ...(isMobile && { minWidth: 800 }),
+              }}
+            >
+              <CalendarCard events={myEventsList} />
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs = {12} sx = {{ minWidth: DASHBOARD_MIN_WIDTH }}>
-          <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
+        <Grid
+          item
+          xs={12}
+          sx={{
+            ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
+          }}
+        >
+          <AreaChartCard title="Estudiantes Aprobados por Período" data={data} />
         </Grid>
       </Grid>
     </Container>
