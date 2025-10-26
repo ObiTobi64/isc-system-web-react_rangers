@@ -75,9 +75,13 @@ const Layout = () => {
   }, []);
 
   const handleProfileClick = useCallback(() => {
-    navigate("/profile");
+    if (user?.id) {
+      navigate(`/profile/${user.id}`);
+    } else {
+      navigate("/profile");
+    }
     handleCloseUserMenu();
-  }, [navigate, handleCloseUserMenu]);
+  }, [navigate, handleCloseUserMenu, user?.id]);
 
   const handleLogoutClick = useCallback(() => {
     localStorage.removeItem("token");
@@ -99,73 +103,73 @@ const Layout = () => {
   ];
 
   return (
-    <Box sx = {{ display: "flex" }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position = "fixed" open = {open} sx = {{ bgcolor: "#ffffff" }}>
+      <AppBar position="fixed" open={open} sx={{ bgcolor: "#ffffff" }}>
         <Toolbar>
           <IconButton
-            color = "primary"
-            aria-label = "open drawer"
-            onClick = {handleDrawerOpen}
-            edge = "start"
-            sx = {{
+            color="primary"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{
               marginRight: 5,
               ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
           </IconButton>
-          <Box sx = {{ flexGrow: 1 }} />
-          <Box mr = {2}>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box mr={2}>
             <Typography
-              variant = "subtitle1"
+              variant="subtitle1"
               noWrap
-              color = "primary"
-              textAlign = "right"
-              className = "font-bold"
+              color="primary"
+              textAlign="right"
+              className="font-bold"
             >
               {user?.name}
             </Typography>
-            <Typography variant = "subtitle2" color = "textSecondary" textAlign = "right">
+            <Typography variant="subtitle2" color="textSecondary" textAlign="right">
               {TranslateRole(user?.roles?.join(", ") || "")}
             </Typography>
           </Box>
 
-          <Tooltip data-test-id = "user_icon" title = "Abrir configuraciones">
-            <IconButton onClick = {handleOpenUserMenu} sx = {{ p: 0 }}>
-              <Avatar alt = {user?.name} src = "/static/images/avatar/2.jpg" />
+          <Tooltip data-test-id="user_icon" title="Abrir configuraciones">
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <Avatar alt={user?.name} src="/static/images/avatar/2.jpg" />
             </IconButton>
           </Tooltip>
           <Menu
-            sx = {{ mt: "45px" }}
-            id = "menu-appbar"
-            anchorEl = {anchorElUser}
-            anchorOrigin = {{
+            sx={{ mt: "45px" }}
+            id="menu-appbar"
+            anchorEl={anchorElUser}
+            anchorOrigin={{
               vertical: "top",
               horizontal: "right",
             }}
             keepMounted
-            transformOrigin = {{
+            transformOrigin={{
               vertical: "top",
               horizontal: "right",
             }}
-            open = {Boolean(anchorElUser)}
-            onClose = {handleCloseUserMenu}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
           >
             {settings.map((setting) => (
               <MenuItem
-                key = {setting.title}
-                data-test-id = {setting.title === "Logout" ? "logout_button" : undefined}
-                onClick = {setting.onClick}
+                key={setting.title}
+                data-test-id={setting.title === "Logout" ? "logout_button" : undefined}
+                onClick={setting.onClick}
               >
-                <Typography textAlign = "center">{setting.title}</Typography>
+                <Typography textAlign="center">{setting.title}</Typography>
               </MenuItem>
             ))}
           </Menu>
         </Toolbar>
       </AppBar>
-      <Sidebar open = {open} setOpen = {setOpen} />
-      <Box component = "main" sx = {{ flexGrow: 1, p: 3, overflowX: "auto", width: "100%" }}>
+      <Sidebar open={open} setOpen={setOpen} />
+      <Box component="main" sx={{ flexGrow: 1, p: 3, overflowX: "auto", width: "100%" }}>
         <DrawerHeader />
         <Outlet />
       </Box>
