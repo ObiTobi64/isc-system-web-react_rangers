@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { useCallback, useState, MouseEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -77,11 +78,12 @@ const Layout = () => {
   const handleProfileClick = useCallback(() => {
     if (user?.id) {
       navigate(`/profile/${user.id}`);
+      handleCloseUserMenu();
     } else {
-      navigate("/profile");
+      alert("Usuario no identificado.");
+      handleCloseUserMenu();
     }
-    handleCloseUserMenu();
-  }, [navigate, handleCloseUserMenu, user?.id]);
+  }, [user?.id, navigate, handleCloseUserMenu]);
 
   const handleLogoutClick = useCallback(() => {
     localStorage.removeItem("token");
