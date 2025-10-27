@@ -1,29 +1,35 @@
-import { useCallback, FC, Dispatch, SetStateAction } from "react";
+import { useCallback, FC, Dispatch, SetStateAction, useState } from "react";
 
 interface ConfirmModalProps {
   step: string;
   nextStep: string;
   isApproveButton: boolean;
-  setShowModal?: Dispatch<SetStateAction<boolean>> | (() => void);  
+  setShowModal?: Dispatch<SetStateAction<boolean>> | (() => void);
   onNext: () => void;
 }
 
 const ConfirmModal: FC<ConfirmModalProps> = (props) => {
   const { step, nextStep, setShowModal, onNext } = props;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleContinue = useCallback(() => {
-    onNext();
+  const handleContinue = useCallback(async () => {
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await onNext();
+    } finally {
+      setIsLoading(false);
+    }
   }, [onNext]);
 
   const handleCancel = useCallback(() => {
-    if (setShowModal) {
-      if (setShowModal.length > 0) {
-        (setShowModal as Dispatch<SetStateAction<boolean>>)(false);
-      } else {
-        (setShowModal as () => void)();
-      }
+    if (!isLoading && setShowModal) {
+      setShowModal(false);
     }
-  }, [setShowModal]);
+  }, [setShowModal, isLoading]);
 
   return (
     <div className = "flex absolute items-center justify-center inset-0 bg-gradient-to-tr from-[#39414E]/90 from-40% via-50% to-[#39414E]/95 to-55% via-[#272F3C]/90 z-50 bg-opacity-55">
@@ -39,10 +45,10 @@ const ConfirmModal: FC<ConfirmModalProps> = (props) => {
         </label>
         <label className = "txt3-modal">{"No podrá modificar los datos una vez que continue"}</label>
         <div className = "flex flex-row justify-between w-full px-5 md:px-2">
-          <button onClick = {handleContinue} className = "btn">
+          <button onClick = {handleContinue} className = "btn" disabled = {isLoading}>
             {"Continuar\r"}
           </button>
-          <button onClick = {handleCancel} className = "btn2-cancel">
+          <button onClick = {handleCancel} className = "btn2-cancel" disabled = {isLoading}>
             {"Cancelar\r"}
           </button>
         </div>
