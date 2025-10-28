@@ -1,12 +1,10 @@
 /* eslint-disable no-console */
-import { Container, Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
 import NumberCard from "../../components/common/NumberCard";
 import AreaChartCard from "../../components/common/AreaChart";
 import CalendarCard from "../../components/common/CalendarComponent";
 import getStats from "../../services/statsService";
-
-const DASHBOARD_MIN_WIDTH = 1200;
 
 const data = [
   { period: "2021 Q1", approved: 200 },
@@ -41,8 +39,6 @@ interface Stats {
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState<Stats>();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const fetchStats = useCallback(async () => {
     try {
@@ -61,59 +57,15 @@ export const DashboardPage = () => {
     <Container
       fixed
       sx = {{
-        ...(isMobile && {
-          minWidth: "100%",
-          overflowX: "auto",
-          scrollbarColor: "#c1c1c1 #f1f1f1",
-          scrollbarWidth: "thin",
-          "&::-webkit-scrollbar": {
-            height: 8,
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "#f1f1f1",
-            borderRadius: 4,
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#c1c1c1",
-            borderRadius: 4,
-            transition: "background 0.3s ease",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: "#a8a8a8",
-          },
-          "&::-webkit-scrollbar-corner": {
-            background: "#f1f1f1",
-          },
-        }),
-        ...(!isMobile && {
-          maxWidth: 1400,
-          overflowX: "hidden",
-        }),
+        maxWidth: 1400,
+        overflowX: "hidden",
+        px: { xs: 2, sm: 3 },
       }}
     >
-      <Grid
-        container
-        spacing = {3}
-        sx = {{
-          ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
-        }}
-      >
+      <Grid container spacing = {3}>
         <Grid item xs = {12}>
-          <Grid
-            container
-            spacing = {3}
-            sx = {{
-              ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
-            }}
-          >
-            <Grid
-              item
-              xs = {12}
-              md = {4}
-              sx = {{
-                ...(isMobile && { minWidth: 400 }),
-              }}
-            >
+          <Grid container spacing = {3}>
+            <Grid item xs = {12} md = {4}>
               <Grid container spacing = {3} marginTop = "15px">
                 <Grid item xs = {12}>
                   <NumberCard
@@ -155,25 +107,16 @@ export const DashboardPage = () => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid
-              item
-              xs = {12}
-              md = {8}
-              sx = {{
-                ...(isMobile && { minWidth: 800 }),
-              }}
-            >
+
+            {/* Calendar - En móvil va debajo de los NumberCards, en desktop a la derecha */}
+            <Grid item xs = {12} md = {8}>
               <CalendarCard events = {myEventsList} />
             </Grid>
           </Grid>
         </Grid>
-        <Grid
-          item
-          xs = {12}
-          sx = {{
-            ...(isMobile && { minWidth: DASHBOARD_MIN_WIDTH }),
-          }}
-        >
+
+        {/* Area Chart - Siempre abajo de todo */}
+        <Grid item xs = {12}>
           <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
         </Grid>
       </Grid>

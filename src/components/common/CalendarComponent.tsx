@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, Typography } from "@mui/material";
 import { Calendar, momentLocalizer, Event } from "react-big-calendar";
-// npm install --save-dev @types/react-big-calendar
 import moment from "moment";
 import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
