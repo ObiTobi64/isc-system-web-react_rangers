@@ -10,7 +10,7 @@ const getDefaultHomeRoute = (userRoles: string[]): string => {
   }
 
   if (userRoles.includes(INTERN) || userRoles.includes(SUPERVISOR)) {
-    return '/events';
+    return '/scholarshipHours';
   }
 
   return '/dashboard';
