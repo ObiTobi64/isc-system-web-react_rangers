@@ -108,14 +108,12 @@ export const DashboardPage = () => {
               </Grid>
             </Grid>
 
-            {/* Calendar - En móvil va debajo de los NumberCards, en desktop a la derecha */}
             <Grid item xs = {12} md = {8}>
               <CalendarCard events = {myEventsList} />
             </Grid>
           </Grid>
         </Grid>
 
-        {/* Area Chart - Siempre abajo de todo */}
         <Grid item xs = {12}>
           <AreaChartCard title = "Estudiantes Aprobados por Período" data = {data} />
         </Grid>
