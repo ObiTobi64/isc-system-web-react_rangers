@@ -311,7 +311,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
 
       <form onSubmit={formik.handleSubmit} className="mt-5 mx-16">
         <Grid container spacing={3}>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             <ProfessorAutocomplete
               disabled={editMode}
               value={formik.values.reviewer}
@@ -323,7 +323,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
               <div className="text-red-1 text-xs mt-1">{formik.errors.reviewer}</div>
             ) : null}
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 disabled={editMode}
@@ -342,7 +342,10 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           elevation={0}
           sx={{
             display: "flex",
-            alignItems: "center",
+            flexWrap: "wrap",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 1.5,
             backgroundColor: "#e6f4ff",
             p: 2,
             borderRadius: 2,
@@ -359,10 +362,20 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           <Typography variant="body2" sx={{ flexGrow: 1 }}>
             {"Carta de Designación de Revisor Presentada\r"}
           </Typography>
-          <Tooltip
-            title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
-          >
-            <span>
+          <Tooltip title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}>
+            <Box
+              sx={{
+                minWidth: 0,
+                width: { xs: "100%", sm: "auto" },
+                "& .MuiButton-root": {
+                  maxWidth: { xs: "100%", sm: 260 },
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  px: 1.5,
+                },
+              }}
+            >
               <DownloadButton
                 disabled={!hasReviewer}
                 url={REVIEWER_ASSIGNMENT.path}
@@ -381,7 +394,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                 }}
                 filename={`${REVIEWER_ASSIGNMENT.filename}_${process?.reviewer_fullname || ""}.${REVIEWER_ASSIGNMENT.extention}`}
               />
-            </span>
+            </Box>
           </Tooltip>
         </Paper>
 
@@ -389,7 +402,10 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           elevation={0}
           sx={{
             display: "flex",
-            alignItems: "center",
+            flexWrap: "wrap",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 1.5,
             backgroundColor: "#e6f4ff",
             p: 2,
             borderRadius: 2,
@@ -406,10 +422,20 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
           <Typography variant="body2" sx={{ flexGrow: 1 }}>
             {"Carta de Aprobación de Revisor Presentada\r"}
           </Typography>
-          <Tooltip
-            title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}
-          >
-            <span>
+          <Tooltip title={!hasReviewer ? "Debe seleccionar un revisor para habilitar esta descarga" : ""}>
+            <Box
+              sx={{
+                minWidth: 0,
+                width: { xs: "100%", sm: "auto" },
+                "& .MuiButton-root": {
+                  maxWidth: { xs: "100%", sm: 260 },
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  px: 1.5,
+                },
+              }}
+            >
               <DownloadButton
                 disabled={!hasReviewer}
                 url={TUTOR_APPROBAL.path}
@@ -430,7 +456,7 @@ const ReviewerStage: FC<ReviewerStageProps> = ({ onPrevious, onNext }) => {
                 }}
                 filename={`${TUTOR_APPROBAL.filename}_${process?.reviewer_fullname || formik.values.reviewer}.${TUTOR_APPROBAL.extention}`}
               />
-            </span>
+            </Box>
           </Tooltip>
         </Paper>
 
