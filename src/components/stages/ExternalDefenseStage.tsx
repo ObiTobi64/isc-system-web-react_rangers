@@ -51,12 +51,12 @@ const ExternalDefenseStage: FC<ExternalDefenseStageProps> = ({ onPrevious }) => 
 
   const [uniqueJurors, setUniqueJurors] = useState<boolean>(true);
 
-  const formik = useFormik({
+  const formik = useFormik<ExternalValues>({
     initialValues: {
-      president: defenseDetail?.president?.toString() || "",
-      firstJuror: defenseDetail?.first_juror?.toString() || "",
-      secondJuror: defenseDetail?.second_juror?.toString() || "",
-      date: defenseDetail?.date ? dayjs(defenseDetail.date) : null,
+      president: "",
+      firstJuror: "",
+      secondJuror: "",
+      date: null,
     },
     validationSchema,
     onSubmit: () => {
@@ -65,15 +65,26 @@ const ExternalDefenseStage: FC<ExternalDefenseStageProps> = ({ onPrevious }) => 
   });
 
   useEffect(() => {
-    if (defenseDetail) {
+    if (!defenseDetail) return;
+
+    const president = defenseDetail.president != null ? defenseDetail.president.toString() : "";
+    const firstJuror = defenseDetail.first_juror != null ? defenseDetail.first_juror.toString() : "";
+    const secondJuror =
+      defenseDetail.second_juror != null ? defenseDetail.second_juror.toString() : "";
+    const date: Dayjs | null = defenseDetail.date ? dayjs(defenseDetail.date) : null; 
+
+    const hasAny =
+      Boolean(president) || Boolean(firstJuror) || Boolean(secondJuror) || Boolean(date);
+
+    if (hasAny) {
       formik.setValues({
-        president: defenseDetail.president?.toString() || "",
-        firstJuror: defenseDetail.first_juror?.toString() || "",
-        secondJuror: defenseDetail.second_juror?.toString() || "",
-        date: defenseDetail.date ? dayjs(defenseDetail.date) : null,
+        president,
+        firstJuror,
+        secondJuror,
+        date,
       });
     }
-  }, [defenseDetail, formik]);
+  }, [defenseDetail]); 
 
   const saveStage = useCallback(
     async (values: ExternalValues) => {
@@ -164,8 +175,7 @@ const ExternalDefenseStage: FC<ExternalDefenseStageProps> = ({ onPrevious }) => 
   return (
     <>
       <div className="txt1">{"Etapa Final: Defensa Externa"}</div>
-
-      <form onSubmit={formik.handleSubmit} className="mx-16 ">
+      <form onSubmit={formik.handleSubmit} autoComplete="off" className="mx-16 ">
         <Box>
           <Grid container spacing={2}>
             <Grid item xs={6} marginTop={5}>
@@ -221,6 +231,7 @@ const ExternalDefenseStage: FC<ExternalDefenseStageProps> = ({ onPrevious }) => 
                   maxDate={currentDate.add(1, "year")}
                   slotProps={{
                     textField: {
+                      autoComplete: "off",
                       fullWidth: true,
                       onBlur: () => formik.setFieldTouched("date", true),
                       error: formik.touched.date && Boolean(formik.errors.date),
