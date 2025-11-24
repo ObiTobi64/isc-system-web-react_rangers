@@ -19,13 +19,14 @@ jobs:
         username: ${{ secrets.VM1_USER }}
         key: ${{ secrets.DEPLOY_KEY }}
         script: |
-          cd ~/isc-system-web-react_rangers/isc-system-web
-          git fetch --all
-          git reset --hard origin/main  # Fuerza al código más nuevo (evita drifts)
-          npm ci --only=production
+          cd ~/isc-system-web-react_rangers/
+          git pull origin qa
+          npm install --only=production
           npm run build
-          sudo rm -rf /var/www/html/*  # Limpia viejo (incluye Clash)
+          sudo rm -rf /var/www/html/*
           sudo cp -r dist/* /var/www/html/
           sudo chown -R www-data:www-data /var/www/html/
+          sudo chmod -R 755 /var/www/html/
+          sudo find /var/www/html/ -type f -exec chmod 644 {} \;
           sudo systemctl reload nginx
-          echo "Deploy UPB login completado"
+          echo "Deploy con permisos OK"
