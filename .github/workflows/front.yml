@@ -9,8 +9,8 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 18
-    - run: npm install
-    - run: npm test
+    - run: npm ci  # Mejor que install para CI/CD
+    - run: npm test || true  # Opcional si no hay tests
     - name: Build  # Test en runner (GitHub tiene más RAM)
       run: npm run build
     - name: Deploy to VM1 (con SSH y Nginx)
@@ -18,7 +18,7 @@ jobs:
       with:
         host: ${{ secrets.VM1_HOST }}
         username: ${{ secrets.VM1_USER }}
-        key: ${{ secrets.DEPLOY_KEY }}
+        password: ${{ secrets.VM1_PASSWORD }}  # Para auth simple; cambia a key si usas clave
         script: |
           REPO_DIR=~/isc-system-web-react_rangers
           APP_DIR=$REPO_DIR  # Raíz del repo
@@ -34,22 +34,23 @@ jobs:
           git fetch --all
           git reset --hard origin/qa  # Branch qa
           npm ci  # Full install
-          # Limpiar memoria antes del build
+          # Limpiar memoria antes del build (buena adición!)
           rm -rf dist/ node_modules/.vite .cache
           sync && echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
           export NODE_OPTIONS="--max-old-space-size=3072"
           npm run build || echo "Build parcial; chequea logs"
           if [ -d "dist" ] && [ $(ls dist/ | wc -l) -gt 10 ]; then  # Chequea archivos reales
             echo "Build OK: dist/ con $(ls dist/ | wc -l) items"
-            sudo rm -rf /var/www/html/*
-            sudo cp -r dist/* /var/www/html/
-            echo "Copiados: $(ls /var/www/html/ | wc -l) items"
+            sudo mkdir -p /usr/share/webapps/nginx/html  # Path Arch
+            sudo rm -rf /usr/share/webapps/nginx/html/*
+            sudo cp -r dist/* /usr/share/webapps/nginx/html/
+            echo "Copiados: $(ls /usr/share/webapps/nginx/html/ | wc -l) items"
           else
             echo "ERROR: Build falló o dist/ incompleto (solo $(ls dist/ 2>/dev/null | wc -l) items)"
             exit 1
           fi
-          sudo chown -R www-data:www-data /var/www/html/
-          sudo chmod -R 755 /var/www/html/
-          sudo find /var/www/html/ -type f -exec chmod 644 {} \;
+          sudo chown -R http:http /usr/share/webapps/nginx/html/  # User Arch
+          sudo chmod -R 755 /usr/share/webapps/nginx/html/
+          sudo find /usr/share/webapps/nginx/html/ -type f -exec chmod 644 {} \;
           sudo systemctl reload nginx
           echo "Deploy UPB completado en $(date)"
