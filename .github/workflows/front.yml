@@ -7,26 +7,25 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Node
       uses: actions/setup-node@v2
-      with:
-        node-version: 18
+      with: { node-version: 18 }
     - run: npm install
-    - run: npm test  # Tus tests existentes (agrega si no hay)
+    - run: npm test
     - name: Build
-      run: npm run build  # Crea dist/ para Vite (opcional: puedes remover este paso ya que build se hace en VM)
+      run: npm run build
     - name: Deploy to VM1 (con SSH y Nginx)
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VM1_HOST }}  # IP_VM1
+        host: ${{ secrets.VM1_HOST }}
         username: ${{ secrets.VM1_USER }}
         key: ${{ secrets.DEPLOY_KEY }}
         script: |
-          cd ~/isc-system-web-react_rangers/isc-system-web  # Asume que clonas en home; ajusta si es diferente
-          if [ ! -d ".git" ]; then
-            git clone https://github.com/ObiTobi64/isc-system-web-react_rangers.git .
-          fi
-          git pull origin main  # Asume rama main; cambia si es otra
-          npm ci --only=production  # Usa --only=production para prod
+          cd ~/isc-system-web-react_rangers/isc-system-web
+          git fetch --all
+          git reset --hard origin/main  # Fuerza al código más nuevo (evita drifts)
+          npm ci --only=production
           npm run build
+          sudo rm -rf /var/www/html/*  # Limpia viejo (incluye Clash)
           sudo cp -r dist/* /var/www/html/
+          sudo chown -R www-data:www-data /var/www/html/
           sudo systemctl reload nginx
-          echo "Deploy completado en $(date)"
+          echo "Deploy UPB login completado"
