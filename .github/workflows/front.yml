@@ -34,8 +34,10 @@ jobs:
           git fetch --all
           git reset --hard origin/qa  # Branch qa
           npm ci  # Full install
-          # Aumenta heap para build grande
-          export NODE_OPTIONS="--max-old-space-size=4096"
+          # Limpiar memoria antes del build
+          rm -rf dist/ node_modules/.vite .cache
+          sync && echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+          export NODE_OPTIONS="--max-old-space-size=3072"
           npm run build || echo "Build parcial; chequea logs"
           if [ -d "dist" ] && [ $(ls dist/ | wc -l) -gt 10 ]; then  # Chequea archivos reales
             echo "Build OK: dist/ con $(ls dist/ | wc -l) items"
