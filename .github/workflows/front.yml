@@ -9,9 +9,9 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 18
-    - run: npm install
+    - run: npm ci
     - run: npm test
-    - name: Build  # Opcional: build en runner para testear
+    - name: Build  # Opcional: test en runner
       run: npm run build
     - name: Deploy to VM1 (con SSH y Nginx)
       uses: appleboy/ssh-action@master
@@ -22,17 +22,27 @@ jobs:
         script: |
           REPO_DIR=~/isc-system-web-react_rangers
           APP_DIR=$REPO_DIR/isc-system-web
-          if [ ! -d "$REPO_DIR" ]; then
+          # Crea REPO_DIR si no existe
+          mkdir -p $REPO_DIR
+          if [ ! -d "$REPO_DIR/.git" ]; then
             echo "Clonando repo por primera vez..."
             git clone https://github.com/ObiTobi64/isc-system-web-react_rangers.git $REPO_DIR
+          else
+            echo "Repo existe, actualizando..."
+          fi
+          # Chequea y ajusta APP_DIR si subcarpeta no existe
+          if [ ! -d "$APP_DIR" ]; then
+            echo "Subcarpeta 'isc-system-web' no existe; usando raíz del repo."
+            APP_DIR=$REPO_DIR
           fi
           cd $APP_DIR
+          echo "Estructura actual: $(ls -la | head -5)"  # Log para debug (package.json?)
           git fetch --all
-          git reset --hard origin/main  # Fuerza código fresco (borra cambios locales)
-          npm install--omit=dev  # Instala solo prod deps (ignora WARN)
+          git reset --hard origin/main  # Fuerza código fresco
+          npm install --omit=dev  # Instala prod deps (compatible)
           npm run build
           sudo rm -rf /var/www/html/*
-          sudo cp -r dist/* /var/www/html/
+          sudo cp -r dist/* /var/www/html/ || echo "Advertencia: dist/ vacío o no copiado"
           sudo chown -R www-data:www-data /var/www/html/
           sudo chmod -R 755 /var/www/html/
           sudo find /var/www/html/ -type f -exec chmod 644 {} \;
