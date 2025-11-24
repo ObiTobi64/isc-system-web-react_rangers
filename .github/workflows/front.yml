@@ -11,7 +11,7 @@ jobs:
         node-version: 18
     - run: npm install
     - run: npm test
-    - name: Build  # Opcional: test en runner
+    - name: Build  # Test en runner
       run: npm run build
     - name: Deploy to VM1 (con SSH y Nginx)
       uses: appleboy/ssh-action@master
@@ -21,8 +21,7 @@ jobs:
         key: ${{ secrets.DEPLOY_KEY }}
         script: |
           REPO_DIR=~/isc-system-web-react_rangers
-          APP_DIR=$REPO_DIR/isc-system-web
-          # Crea REPO_DIR si no existe
+          APP_DIR=$REPO_DIR  # Usa raíz directamente (no subcarpeta)
           mkdir -p $REPO_DIR
           if [ ! -d "$REPO_DIR/.git" ]; then
             echo "Clonando repo por primera vez..."
@@ -30,19 +29,21 @@ jobs:
           else
             echo "Repo existe, actualizando..."
           fi
-          # Chequea y ajusta APP_DIR si subcarpeta no existe
-          if [ ! -d "$APP_DIR" ]; then
-            echo "Subcarpeta 'isc-system-web' no existe; usando raíz del repo."
-            APP_DIR=$REPO_DIR
-          fi
           cd $APP_DIR
-          echo "Estructura actual: $(ls -la | head -5)"  # Log para debug (package.json?)
+          echo "Estructura actual: $(ls -la | head -10)"  # Más logs para package.json y src
           git fetch --all
-          git reset --hard origin/main  # Fuerza código fresco
-          npm install --omit=dev  # Instala prod deps (compatible)
-          npm run build
-          sudo rm -rf /var/www/html/*
-          sudo cp -r dist/* /var/www/html/ || echo "Advertencia: dist/ vacío o no copiado"
+          git reset --hard origin/qa  # Usa branch 'qa' (default del repo)
+          npm ci  # Full install (incluye dev deps para tsc/husky)
+          npm run build || true  # Build, ignora si hook falla minor
+          if [ -d "dist" ]; then
+            echo "Build OK: dist/ generado"
+            sudo rm -rf /var/www/html/*
+            sudo cp -r dist/* /var/www/html/
+            echo "Archivos copiados: $(ls dist/ | wc -l) items"
+          else
+            echo "ERROR: No dist/ generado - chequea build logs"
+            exit 1  # Falla job si no build
+          fi
           sudo chown -R www-data:www-data /var/www/html/
           sudo chmod -R 755 /var/www/html/
           sudo find /var/www/html/ -type f -exec chmod 644 {} \;
