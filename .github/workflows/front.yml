@@ -9,19 +9,19 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 18
-    - run: npm ci  # Mejor que install para CI/CD
-    - run: npm test || true  # Opcional si no hay tests
-    - name: Build  # Test en runner (GitHub tiene más RAM)
+    - run: npm install  # Cambiado aquí
+    - run: npm test || true
+    - name: Build
       run: npm run build
     - name: Deploy to VM1 (con SSH y Nginx)
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM1_HOST }}
         username: ${{ secrets.VM1_USER }}
-        password: ${{ secrets.VM1_PASSWORD }}  # Para auth simple; cambia a key si usas clave
+        password: ${{ secrets.VM1_PASSWORD }}  # O key si usas clave
         script: |
           REPO_DIR=~/isc-system-web-react_rangers
-          APP_DIR=$REPO_DIR  # Raíz del repo
+          APP_DIR=$REPO_DIR
           mkdir -p $REPO_DIR
           if [ ! -d "$REPO_DIR/.git" ]; then
             echo "Clonando repo por primera vez..."
@@ -32,16 +32,15 @@ jobs:
           cd $APP_DIR
           echo "Estructura actual: $(ls -la | head -10)"
           git fetch --all
-          git reset --hard origin/qa  # Branch qa
-          npm ci  # Full install
-          # Limpiar memoria antes del build (buena adición!)
+          git reset --hard origin/qa
+          npm install  # Cambiado aquí
           rm -rf dist/ node_modules/.vite .cache
           sync && echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
           export NODE_OPTIONS="--max-old-space-size=3072"
           npm run build || echo "Build parcial; chequea logs"
-          if [ -d "dist" ] && [ $(ls dist/ | wc -l) -gt 10 ]; then  # Chequea archivos reales
+          if [ -d "dist" ] && [ $(ls dist/ | wc -l) -gt 10 ]; then
             echo "Build OK: dist/ con $(ls dist/ | wc -l) items"
-            sudo mkdir -p /usr/share/webapps/nginx/html  # Path Arch
+            sudo mkdir -p /usr/share/webapps/nginx/html
             sudo rm -rf /usr/share/webapps/nginx/html/*
             sudo cp -r dist/* /usr/share/webapps/nginx/html/
             echo "Copiados: $(ls /usr/share/webapps/nginx/html/ | wc -l) items"
@@ -49,7 +48,7 @@ jobs:
             echo "ERROR: Build falló o dist/ incompleto (solo $(ls dist/ 2>/dev/null | wc -l) items)"
             exit 1
           fi
-          sudo chown -R http:http /usr/share/webapps/nginx/html/  # User Arch
+          sudo chown -R http:http /usr/share/webapps/nginx/html/
           sudo chmod -R 755 /usr/share/webapps/nginx/html/
           sudo find /usr/share/webapps/nginx/html/ -type f -exec chmod 644 {} \;
           sudo systemctl reload nginx
