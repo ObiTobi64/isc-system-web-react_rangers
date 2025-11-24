@@ -9,7 +9,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 18
-    - run: npm ci
+    - run: npm install
     - run: npm test
     - name: Build  # Opcional: test en runner
       run: npm run build
