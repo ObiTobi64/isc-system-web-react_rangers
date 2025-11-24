@@ -9,7 +9,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 18
-    - run: npm ci
+    - run: npm install
     - run: npm test  # Tus tests existentes (agrega si no hay)
     - name: Build
       run: npm run build  # Crea dist/ para Vite (opcional: puedes remover este paso ya que build se hace en VM)
