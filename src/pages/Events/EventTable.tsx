@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { Alert, Button, IconButton, Snackbar, Tooltip } from "@mui/material";
@@ -46,13 +47,13 @@ const EventTable = () => {
               name_supervisor: res.data ? `${res.data.name} ${res.data.lastname}` : "Ninguno",
             };
             return eventNew;
-          } else {
-            const eventNew: EventNameSupervisor = {
-              ...event,
-              name_supervisor: "Ninguno",
-            };
-            return eventNew;
-          }
+          } 
+          const eventNew: EventNameSupervisor = {
+            ...event,
+            name_supervisor: "Ninguno",
+          };
+          return eventNew;
+          
         });
 
         const updatedEventsSupervisor = await Promise.all(promises);
@@ -81,8 +82,8 @@ const EventTable = () => {
       align: "center",
       flex: 1,
       renderHeader: (params) => (
-        <Tooltip title="Fecha Inicio" placement="bottom">
-          <span style={{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
+        <Tooltip title = "Fecha Inicio" placement = "bottom">
+          <span style = {{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
         </Tooltip>
       ),
     },
@@ -93,8 +94,8 @@ const EventTable = () => {
       align: "center",
       flex: 1,
       renderHeader: (params) => (
-        <Tooltip title="Nombre del evento" placement="bottom">
-          <span style={{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
+        <Tooltip title = "Nombre del evento" placement = "bottom">
+          <span style = {{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
         </Tooltip>
       ),
     },
@@ -105,8 +106,8 @@ const EventTable = () => {
       align: "center",
       flex: 1,
       renderHeader: (params) => (
-        <Tooltip title="Supervisor del Evento" placement="bottom">
-          <span style={{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
+        <Tooltip title = "Supervisor del Evento" placement = "bottom">
+          <span style = {{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
         </Tooltip>
       ),
     },
@@ -117,8 +118,8 @@ const EventTable = () => {
       align: "center",
       flex: 1,
       renderHeader: (params) => (
-        <Tooltip title="Solicitudes de Becarios" placement="bottom">
-          <span style={{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
+        <Tooltip title = "Solicitudes de Becarios" placement = "bottom">
+          <span style = {{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
         </Tooltip>
       ),
     },
@@ -129,8 +130,8 @@ const EventTable = () => {
       align: "center",
       flex: 1,
       renderHeader: (params) => (
-        <Tooltip title="Becarios Seleccionados" placement="bottom">
-          <span style={{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
+        <Tooltip title = "Becarios Seleccionados" placement = "bottom">
+          <span style = {{ fontWeight: "bold" }}>{params.colDef.headerName}</span>
         </Tooltip>
       ),
     },
@@ -142,25 +143,25 @@ const EventTable = () => {
       flex: 1,
       renderCell: (params) => (
         <div>
-          <Tooltip title="Ver detalles">
-            <IconButton color="primary" onClick={() => handleView(params.row.id)}>
+          <Tooltip title = "Ver detalles">
+            <IconButton color = "primary" onClick = {() => handleView(params.row.id)}>
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Editar evento" placement="bottom">
+          <Tooltip title = "Editar evento" placement = "bottom">
             <IconButton
-              color="primary"
-              aria-label="editar"
-              onClick={() => handleEdit(params.row.id)}
+              color = "primary"
+              aria-label = "editar"
+              onClick = {() => handleEdit(params.row.id)}
             >
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Eliminar evento" placement="bottom">
+          <Tooltip title = "Eliminar evento" placement = "bottom">
             <IconButton
-              color="secondary"
-              aria-label="eliminar"
-              onClick={() => handleClickOpen(params.row.id)}
+              color = "secondary"
+              aria-label = "eliminar"
+              onClick = {() => handleClickOpen(params.row.id)}
             >
               <DeleteIcon />
             </IconButton>
@@ -233,51 +234,51 @@ const EventTable = () => {
 
   return (
     <ContainerPage
-      title="Lista de Eventos"
-      subtitle="Resumen de los eventos programados y sus detalles"
-      actions={
+      title = "Lista de Eventos"
+      subtitle = "Resumen de los eventos programados y sus detalles"
+      actions = {
         <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleCreateEvent}
-          startIcon={<AddIcon />}
+          variant = "contained"
+          color = "secondary"
+          onClick = {handleCreateEvent}
+          startIcon = {<AddIcon />}
         >
-          Agregar evento
+          {"Agregar evento\r"}
         </Button>
       }
     >
-      <div style={{ width: "100%", overflowX: "auto" }}>
-        <div style={{ minWidth: "800px" }}>
+      <div style = {{ width: "100%", overflowX: "auto" }}>
+        <div style = {{ minWidth: "800px" }}>
           <DataGrid
-            rows={eventsSupervisor || []}
-            columns={columns}
-            localeText={dataGridLocaleText}
-            getRowId={(row) => row.id}
+            rows = {eventsSupervisor || []}
+            columns = {columns}
+            localeText = {dataGridLocaleText}
+            getRowId = {(row) => row.id}
             autoHeight
-            initialState={{
+            initialState = {{
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
               },
             }}
-            classes={{
+            classes = {{
               root: "bg-white dark:bg-gray-800",
               columnHeader: "bg-gray-200 dark:bg-gray-800 ",
               cell: "bg-white dark:bg-gray-800",
               row: "bg-white dark:bg-gray-800",
               columnHeaderTitle: "!font-bold text-center",
             }}
-            pageSizeOptions={[5, 10]}
+            pageSizeOptions = {[5, 10]}
           />
           <ConfirmDialog
-            open={open}
-            onClose={handleClose}
-            onConfirm={handleDelete}
-            title="Confirmar eliminación"
-            description="¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer."
+            open = {open}
+            onClose = {handleClose}
+            onConfirm = {handleDelete}
+            title = "Confirmar eliminación"
+            description = "¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer."
           />
           {alert && (
-            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-              <Alert onClose={handleSnackbarClose} severity={alert.severity} sx={{ width: "100%" }}>
+            <Snackbar open = {snackbarOpen} autoHideDuration = {6000} onClose = {handleSnackbarClose}>
+              <Alert onClose = {handleSnackbarClose} severity = {alert.severity} sx = {{ width: "100%" }}>
                 {alert.message}
               </Alert>
             </Snackbar>

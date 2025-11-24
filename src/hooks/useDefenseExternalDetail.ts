@@ -4,7 +4,7 @@ import { DefenseDetail } from '../services/models/DefenseDetail';
 
 const DEFENSE_INTERNAL = 'external';
 
-export const useDefenseExternalDetail = (processId: number | null) => {
+const useDefenseExternalDetail = (processId: number | null) => {
   const [defenseDetail, setDefenseDetail] = useState<DefenseDetail | null>(null);
 
   useEffect(() => {
@@ -20,3 +20,5 @@ export const useDefenseExternalDetail = (processId: number | null) => {
 
   return defenseDetail;
 };
+
+export default useDefenseExternalDetail;

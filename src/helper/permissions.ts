@@ -1,7 +1,8 @@
-import { Permission } from '../models/permissionInterface';
+/* eslint-disable camelcase */
+import Permission from '../models/permissionInterface';
 import { useUserStore } from '../store/store';
 
-export function HasPermission(permissionName: string): boolean {
+function HasPermission(permissionName: string): boolean {
   const user = useUserStore((state) => state.user);
   let hasThePermission = false;
   if (user) {
@@ -16,3 +17,5 @@ export function HasPermission(permissionName: string): boolean {
   }
   return hasThePermission;
 }
+
+export default HasPermission;

@@ -20,3 +20,5 @@ const degree = [
     abbreviation: 'PhD.',
   },
 ];
+
+export default degree;

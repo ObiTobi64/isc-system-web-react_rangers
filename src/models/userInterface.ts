@@ -1,4 +1,4 @@
-import { Role } from './roleInterface';
+import Role from './roleInterface';
 
 export interface User {
   id: number;
@@ -11,7 +11,7 @@ export interface User {
   code: string;
   phone: string;
   degree: string;
-  roles: number[];
+  roles: string[];
   rolesAndPermissions?: { [id: number]: Role };
 }
 

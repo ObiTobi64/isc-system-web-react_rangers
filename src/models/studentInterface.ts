@@ -19,5 +19,6 @@ export interface StudentForm {
   mothername: string;
   email: string;
   phone: string;
-  code?: string;
+  code: string;
+  is_scholarship?: boolean;
 }

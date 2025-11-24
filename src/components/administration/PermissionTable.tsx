@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,16 +13,16 @@ import {
   Collapse,
 } from "@mui/material";
 import { getPermissions } from "../../services/permissionsService";
-import { Section } from "../../models/sectionInterface";
-import { Permission } from "../../models/permissionInterface";
+import Section from "../../models/sectionInterface";
+import Permission from "../../models/permissionInterface";
 import SavePermissionsModal from "../common/SavePermissionsModal";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { PermissionsCategory } from "../../models/permissionsCategoryInterface";
-import { PermissionTableProps } from "../../models/permissionTablePropsInterface";
+import PermissionsCategory from "../../models/permissionsCategoryInterface";
+import PermissionTableProps from "../../models/permissionTablePropsInterface";
 import { addPermisionToRole, removePermisionToRole } from "../../services/roleService";
 import AlertSnackbar from "../common/AlertSnackbar";
 
-const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
+const PermissionTable: FC<PermissionTableProps> = ({ currentRol }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [listOfChanges, setListOfChanges] = useState<Permission[]>([]);
   const [buttonVisible, setButtonVisible] = useState(false);
@@ -30,6 +30,10 @@ const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
   const [openSections, setOpenSections] = useState<boolean[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+
+  const hasPermission = (permissionName: string) => {
+    return Array.isArray(currentRol.permissions) && currentRol.permissions.includes(permissionName);
+  };
 
   const fetchPermissions = async () => {
     const response = await getPermissions();
@@ -95,7 +99,7 @@ const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
   const handleSaveComplete = async () => {
     try {
       for (const permission of listOfChanges) {
-        if (!currentRol.permissions.includes(permission.name)) {
+        if (!hasPermission(permission.name)) {
           await addPermisionToRole(currentRol.id, permission.id);
         } else {
           await removePermisionToRole(currentRol.id, permission.id);
@@ -172,11 +176,10 @@ const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
                         <TableCell>
                           <Switch
                             checked={
-                              (currentRol.permissions.includes(permission.name) ||
+                              (hasPermission(permission.name) ||
                                 listOfChanges.includes(permission)) &&
                               !(
-                                currentRol.permissions.includes(permission.name) &&
-                                listOfChanges.includes(permission)
+                                hasPermission(permission.name) && listOfChanges.includes(permission)
                               )
                             }
                             onChange={handleSwitchChange(sectionIndex, permissionIndex)}
@@ -226,11 +229,7 @@ const PermissionTable: React.FC<PermissionTableProps> = ({ currentRol }) => {
       )}
 
       {openSnackbar && (
-        <AlertSnackbar
-          open={openSnackbar}
-          message={snackbarMessage}
-          onClose={closeSnackbar}
-        ></AlertSnackbar>
+        <AlertSnackbar open={openSnackbar} message={snackbarMessage} onClose={closeSnackbar} />
       )}
     </>
   );

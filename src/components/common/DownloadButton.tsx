@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable no-console */
+import { useState, useCallback, FC } from "react";
 import { Button, ButtonProps } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { generateDocument } from "../../utils/files";
@@ -14,7 +15,7 @@ interface DownloadButtonProps extends ButtonProps {
   onClick?: () => void; 
 }
 
-const DownloadButton: React.FC<DownloadButtonProps> = ({
+const DownloadButton: FC<DownloadButtonProps> = ({
   url,
   data,
   filename,
@@ -24,13 +25,15 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
   ...buttonProps
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const handleDownload = async () => {
 
+  const handleDownload = useCallback(async () => {
     if (onClick) {
       onClick();
     }
 
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
 
     setIsDownloading(true);
     try {
@@ -40,14 +43,14 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     } finally {
       setIsDownloading(false);
     }
-  };
+  }, [onClick, disabled, url, data, filename]);
 
   return (
     <Button
-      onClick={handleDownload}
-      variant="contained"
-      startIcon={<DownloadIcon />}
-      disabled={disabled || isDownloading}
+      onClick = {handleDownload}
+      variant = "contained"
+      startIcon = {<DownloadIcon />}
+      disabled = {disabled || isDownloading}
       {...buttonProps}
     >
       {isDownloading ? "Descargando..." : buttonText}

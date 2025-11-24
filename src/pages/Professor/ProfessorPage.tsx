@@ -1,9 +1,7 @@
+/* eslint-disable no-console */
 import { DataGrid, GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-import ContainerPage from "../../components/common/ContainerPage";
-import SpinModal from "../../components/common/SpinModal";
 import { useEffect, useState } from "react";
-import { deleteProfessor, getMentors } from "../../services/mentorsService";
 import {
   Button,
   Dialog,
@@ -17,13 +15,16 @@ import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Permission } from "../../models/permissionInterface";
-import { getPermissionById } from "../../services/permissionsService";
-import { HasPermission } from "../../helper/permissions";
-import dataGridLocaleText from "../../locales/datagridLocaleEs";
-import { SnackbarProps } from "../../models/SnackBarProps";
-import SnackBar from "../../components/common/SnackBar";
 import axios from "axios";
+import ContainerPage from "../../components/common/ContainerPage";
+import SpinModal from "../../components/common/SpinModal";
+import { deleteProfessor, getMentors } from "../../services/mentorsService";
+import Permission from "../../models/permissionInterface";
+import { getPermissionById } from "../../services/permissionsService";
+import HasPermission from "../../helper/permissions";
+import dataGridLocaleText from "../../locales/datagridLocaleEs";
+import SnackbarProps from "../../models/SnackBarProps";
+import SnackBar from "../../components/common/SnackBar";
 import ProfessorModal from "../../components/common/ProfessorModal";
 
 const ProfessorPage = () => {
@@ -134,7 +135,7 @@ const ProfessorPage = () => {
       resizable: true,
       renderCell: (params) => (
         <div
-          style={{
+          style = {{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -156,7 +157,7 @@ const ProfessorPage = () => {
       maxWidth: 200,
       renderCell: (params) => (
         <div
-          style={{
+          style = {{
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
             maxWidth: 200,
@@ -172,10 +173,10 @@ const ProfessorPage = () => {
           {params.value ? (
             params.value
           ) : (
-            <span style={{ textAlign: "center" }}>
-              No existen
+            <span style = {{ textAlign: "center" }}>
+              {"No existen\r"}
               <br />
-              tutorías registradas
+              {"tutorías registradas\r"}
             </span>
           )}
         </div>
@@ -191,7 +192,7 @@ const ProfessorPage = () => {
       maxWidth: 200,
       renderCell: (params) => (
         <div
-          style={{
+          style = {{
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
             maxWidth: 200,
@@ -207,10 +208,10 @@ const ProfessorPage = () => {
           {params.value ? (
             params.value
           ) : (
-            <span style={{ textAlign: "center" }}>
-              No existen
+            <span style = {{ textAlign: "center" }}>
+              {"No existen\r"}
               <br />
-              revisiones disponibles
+              {"revisiones disponibles\r"}
             </span>
           )}
         </div>
@@ -228,24 +229,24 @@ const ProfessorPage = () => {
       sortable: false,
       renderCell: (params) => {
         if (!permissionsReady) {
-          return <span>Cargando acciones...</span>;
+          return <span>{"Cargando acciones..."}</span>;
         }
         const hasActions = hasViewPermission || hasEditPermission || hasDeletePermission;
 
         return hasActions ? (
           <div>
             {hasViewPermission && (
-              <IconButton color="primary" onClick={() => handleView(params.row.id)}>
+              <IconButton color = "primary" onClick = {() => handleView(params.row.id)}>
                 <VisibilityIcon />
               </IconButton>
             )}
             {hasEditPermission && (
-              <IconButton color="primary" onClick={() => handleEdit(params.row.id)}>
+              <IconButton color = "primary" onClick = {() => handleEdit(params.row.id)}>
                 <EditIcon />
               </IconButton>
             )}
             {hasDeletePermission && (
-              <IconButton color="secondary" onClick={() => handleClickOpen(params.row.id)}>
+              <IconButton color = "secondary" onClick = {() => handleClickOpen(params.row.id)}>
                 <DeleteIcon />
               </IconButton>
             )}
@@ -264,7 +265,9 @@ const ProfessorPage = () => {
     const dynamicFlex = visibleColumns.length > 0 ? Math.floor(12 / visibleColumns.length) : 1;
 
     return columns.map((col) => {
-      if (col.field === "actions" || columnVisibilityModel[col.field] === false) return col;
+      if (col.field === "actions" || columnVisibilityModel[col.field] === false) {
+        return col;
+      }
       return {
         ...col,
         flex: dynamicFlex,
@@ -281,7 +284,9 @@ const ProfessorPage = () => {
   const fetchProfessors = async () => {
     const professors = await getMentors();
     setProfessors(professors.data);
-    if (import.meta.env.DEV) console.log(professors);
+    if (import.meta.env.DEV) {
+      console.log(professors);
+    }
     setIsLoading(false);
   };
 
@@ -291,7 +296,9 @@ const ProfessorPage = () => {
 
   const handleView = (id: number) => {
     navigate(`/profile/${id}`);
-    if (import.meta.env.DEV) console.log(`Ver docente con id: ${id}`);
+    if (import.meta.env.DEV) {
+      console.log(`Ver docente con id: ${id}`);
+    }
   };
 
   const handleEdit = (id: number) => {
@@ -356,25 +363,25 @@ const ProfessorPage = () => {
 
   return (
     <ContainerPage
-      title={"Docentes"}
-      subtitle={"Lista de docentes"}
-      actions={
+      title = "Docentes"
+      subtitle = "Lista de docentes"
+      actions = {
         HasPermission(addProfessorPermission?.name || "") && (
           <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleCreateTeacher}
-            startIcon={<AddIcon />}
-            style={{ display: "inline-flex" }}
+            variant = "contained"
+            color = "secondary"
+            onClick = {handleCreateTeacher}
+            startIcon = {<AddIcon />}
+            style = {{ display: "inline-flex" }}
           >
-            Agregar docente
+            {"Agregar docente\r"}
           </Button>
         )
       }
     >
       {isLoading ? (
         <div
-          style={{
+          style = {{
             position: "absolute",
             top: "50%",
             left: "55%",
@@ -383,29 +390,29 @@ const ProfessorPage = () => {
           <SpinModal />
         </div>
       ) : (
-        <div style={{ width: "100%", paddingBottom: 0 }}>
+        <div style = {{ width: "100%", paddingBottom: 0 }}>
           <DataGrid
-            rows={professors}
-            columns={getResponsiveColumns()}
-            localeText={dataGridLocaleText}
-            initialState={{
+            rows = {professors}
+            columns = {getResponsiveColumns()}
+            localeText = {dataGridLocaleText}
+            initialState = {{
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
               },
             }}
-            pageSizeOptions={[5, 10]}
-            checkboxSelection={false}
+            pageSizeOptions = {[5, 10]}
+            checkboxSelection = {false}
             disableRowSelectionOnClick
             autoHeight
-            columnVisibilityModel={columnVisibilityModel}
-            onColumnVisibilityModelChange={(newModel) => {
+            columnVisibilityModel = {columnVisibilityModel}
+            onColumnVisibilityModelChange = {(newModel) => {
               const updatedModel = {
                 ...newModel,
                 code: true,
               };
               setColumnVisibilityModel(updatedModel);
             }}
-            slotProps={{
+            slotProps = {{
               columnsManagement: {
                 autoFocusSearchField: false,
                 searchInputProps: {
@@ -426,7 +433,7 @@ const ProfessorPage = () => {
                 },
               },
             }}
-            classes={{
+            classes = {{
               root: "bg-white dark:bg-gray-800",
               columnHeader: "bg-gray-200 dark:bg-gray-800",
               cell: "bg-white dark:bg-gray-800",
@@ -434,7 +441,7 @@ const ProfessorPage = () => {
               columnHeaderTitle: "!font-bold text-center",
               sortIcon: "bg-gray-200 dark:bg-gray-800",
             }}
-            sx={{
+            sx = {{
               "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
                 outline: "none !important",
                 border: "none !important",
@@ -461,37 +468,37 @@ const ProfessorPage = () => {
           />
 
           <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            open = {open}
+            onClose = {handleClose}
+            aria-labelledby = "alert-dialog-title"
+            aria-describedby = "alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">{"Confirmar eliminación"}</DialogTitle>
+            <DialogTitle id = "alert-dialog-title">{"Confirmar eliminación"}</DialogTitle>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                ¿Estás seguro de que quieres eliminar este docente?
+              <DialogContentText id = "alert-dialog-description">
+                {"¿Estás seguro de que quieres eliminar este docente?\r"}
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose} color="primary">
-                Cancelar
+              <Button onClick = {handleClose} color = "primary">
+                {"Cancelar\r"}
               </Button>
-              <Button onClick={handleDelete} color="secondary">
-                Eliminar
+              <Button onClick = {handleDelete} color = "secondary">
+                {"Eliminar\r"}
               </Button>
             </DialogActions>
           </Dialog>
           <SnackBar
-            open={snackbar.open}
-            message={snackbar.message}
-            severity={snackbar.severity}
-            onClose={handleCloseSnackbar}
+            open = {snackbar.open}
+            message = {snackbar.message}
+            severity = {snackbar.severity}
+            onClose = {handleCloseSnackbar}
           />
           <ProfessorModal
-            open={professorModalOpen}
-            onClose={handleProfessorModalClose}
-            func={professorModalFunc}
-            id={selectedId}
+            open = {professorModalOpen}
+            onClose = {handleProfessorModalClose}
+            func = {professorModalFunc}
+            id = {selectedId}
           />
         </div>
       )}

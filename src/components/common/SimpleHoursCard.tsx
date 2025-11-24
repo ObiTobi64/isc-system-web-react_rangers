@@ -16,22 +16,22 @@ function SimpleHoursCard({
 }: SimpleHoursCardProps) {
   return (
     <Card
-      sx={{
+      sx = {{
         maxWidth: 345,
         background: backgroundColor,
         borderRadius: 3,
       }}
     >
       <CardContent>
-        <Grid container justifyContent="center" alignItems="center">
-          <Grid item xs={12}>
-            <Typography variant="h5" component="div" sx={{ color: textColor, fontWeight: "bold" }}>
-              {count} Horas
+        <Grid container justifyContent = "center" alignItems = "center">
+          <Grid item xs = {12}>
+            <Typography variant = "h5" component = "div" sx = {{ color: textColor, fontWeight: "bold" }}>
+              {count} {"Horas\r"}
             </Typography>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx = {{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography
-                sx={{
+                sx = {{
                   fontSize: 16,
                   color: textColor,
                   fontWeight: "bold",
@@ -40,7 +40,7 @@ function SimpleHoursCard({
                 {title}
               </Typography>
               <Typography
-                sx={{
+                sx = {{
                   fontSize: 18,
                   color: textColor,
                   fontWeight: "bold",

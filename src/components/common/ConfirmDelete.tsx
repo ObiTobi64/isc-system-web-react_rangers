@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { Modal as MuiModal, Box, Button, Typography, IconButton } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -12,57 +12,62 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({
   setIsVisible,
   onDelete,
 }) => {
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     onDelete();
     setIsVisible(false);
-  };
+  }, [onDelete, setIsVisible]);
 
-  const toggleModal = () => {
+  const toggleModal = useCallback(() => {
     setIsVisible(!isVisible);
-  };
+  }, [isVisible, setIsVisible]);
 
   return (
     <MuiModal
-      open={isVisible}
-      onClose={toggleModal}
-      aria-labelledby="delete-modal-title"
-      aria-describedby="delete-modal-description"
+      open = {isVisible}
+      onClose = {toggleModal}
+      aria-labelledby = "delete-modal-title"
+      aria-describedby = "delete-modal-description"
     >
-      <Box className="modal-box">
-        <IconButton sx={{ position: "absolute", top: 6, right: 6 }} onClick={toggleModal}>
-          <CancelIcon color="primary" />
+      <Box className = "modal-box">
+        <IconButton sx = {{ position: "absolute", top: 6, right: 6 }} onClick = {toggleModal}>
+          <CancelIcon color = "primary" />
         </IconButton>
-        <Typography id="delete-modal-title" variant="h5" align="center">
-          Eliminar rol
+        <Typography id = "delete-modal-title" variant = "h5" align = "center">
+          {"Eliminar rol\r"}
         </Typography>
         <Typography
-          id="delete-modal-description"
-          variant="body1"
-          sx={{ marginTop: "20px" }}
-          align="center"
+          id = "delete-modal-description"
+          variant = "body1"
+          sx = {{ marginTop: "20px" }}
+          align = "center"
         >
-          ¿Estás seguro de que deseas eliminar el rol <strong>{roleName}</strong>?
+          {"¿Estás seguro de que deseas eliminar el rol "}<strong>{roleName}</strong>{"?\r"}
         </Typography>
         <Typography
-          id="delete-modal-description"
-          variant="body2"
-          sx={{ marginTop: "20px" }}
-          align="center"
-          color="gray"
+          id = "delete-modal-description"
+          variant = "body2"
+          sx = {{ marginTop: "20px" }}
+          align = "center"
+          color = "gray"
         >
-          Si eliminas el rol no podrás recuperarlo
+          {"Si eliminas el rol no podrás recuperarlo\r"}
         </Typography>
-        <Box display="flex" justifyContent="center" mt={2} sx={{ marginTop: "20px" }}>
-          <Button variant="outlined" color="secondary" onClick={toggleModal}>
-            Cancelar
+        <Box
+          display = "flex"
+          justifyContent = "center"
+          mt = {2}
+          sx = {{ marginTop: "20px" }}
+        >
+          <Button variant = "outlined" color = "secondary" onClick = {toggleModal}>
+            {"Cancelar\r"}
           </Button>
           <Button
-            variant="contained"
-            color="error"
-            onClick={handleDelete}
-            sx={{ marginLeft: "15px" }}
+            variant = "contained"
+            color = "error"
+            onClick = {handleDelete}
+            sx = {{ marginLeft: "15px" }}
           >
-            Eliminar
+            {"Eliminar\r"}
           </Button>
         </Box>
       </Box>

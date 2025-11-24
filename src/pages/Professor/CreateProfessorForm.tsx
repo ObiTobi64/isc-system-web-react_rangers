@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button, Divider, Grid, MenuItem, TextField, Typography } from "@mui/material";
@@ -8,11 +8,14 @@ import ErrorDialog from "../../components/common/ErrorDialog";
 import SuccessDialog from "../../components/common/SucessDialog";
 import {
   PHONE_ERROR_MESSAGE,
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
   PHONE_DIGITS,
   LETTERS_REGEX,
   PHONE_REGEX,
+  CODE_REGEX,
 } from "../../constants/validation";
-
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -31,12 +34,10 @@ const validationSchema = Yup.object({
     .matches(PHONE_REGEX, PHONE_ERROR_MESSAGE)
     .required("El número de teléfono es requerido"),
   degree: Yup.string().required("El título académico es obligatorio"),
-  code: Yup.number()
-    .typeError("El código debe ser numérico")
+  code: Yup.string()
+    .matches(CODE_REGEX, CODE_ERROR_MESSAGE)
     .required("El código de docente es obligatorio"),
-
 });
-
 
 const CreateProfessorForm = () => {
   const [message, setMessage] = useState("");
@@ -65,7 +66,11 @@ const CreateProfessorForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        await createProfessor(values);
+        const professorData = {
+          ...values,
+          code: values.code,
+        };
+        await createProfessor(professorData as any);
         setMessage("Profesor creado con éxito");
         setSuccessDialog(true);
       } catch (error) {
@@ -75,21 +80,19 @@ const CreateProfessorForm = () => {
     },
   });
 
-  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("phone", value);
     }
   };
 
-
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("code", value);
     }
   };
-
 
   return (
     <>
@@ -102,7 +105,6 @@ const CreateProfessorForm = () => {
             </Typography>
             <Divider flexItem sx={{ mt: 2, mb: 2 }} />
           </Grid>
-
 
           <Grid item xs={12}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
@@ -150,8 +152,7 @@ const CreateProfessorForm = () => {
                       fullWidth
                       value={formik.values.mothername}
                       onChange={formik.handleChange}
-                      error={formik.touched.mothername &&
-                        Boolean(formik.errors.mothername)}
+                      error={formik.touched.mothername && Boolean(formik.errors.mothername)}
                       helperText={formik.touched.mothername && formik.errors.mothername}
                       margin="normal"
                     />
@@ -168,7 +169,10 @@ const CreateProfessorForm = () => {
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ maxLength: 10 }}
+                      inputProps={{
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS,
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -195,7 +199,6 @@ const CreateProfessorForm = () => {
             </Grid>
             <Divider flexItem sx={{ my: 2 }} />
           </Grid>
-
 
           <Grid item xs={12}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
@@ -258,6 +261,5 @@ const CreateProfessorForm = () => {
     </>
   );
 };
-
 
 export default CreateProfessorForm;

@@ -1,16 +1,15 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { useLoaderData } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { ChangeEvent, useEffect, useState, useCallback } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
 
 import { FaSearch } from "react-icons/fa";
-import { Student } from "../../models/studentInterface";
-import { getPermissionById } from "../../services/permissionsService";
-import { Permission } from "../../models/permissionInterface";
-import { HasPermission } from "../../helper/permissions";
-import { Box, Button, IconButton, Paper, TextField } from "@mui/material";
+import { Box, Button, IconButton, Paper, TextField, useTheme, useMediaQuery } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Student } from "../../models/studentInterface";
+import { getPermissionById } from "../../services/permissionsService";
+import Permission from "../../models/permissionInterface";
+import HasPermission from "../../helper/permissions";
 import dataGridLocaleText from "../../locales/datagridLocaleEs";
 import ContainerPage from "../../components/common/ContainerPage";
 import ProcessForm from "../CreateGraduation/components/ProcessForm";
@@ -29,6 +28,9 @@ const GraduationProcessPage = () => {
   const navigate = useNavigate();
   const [createProcess, setCreateProcess] = useState<Permission>();
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   useEffect(() => {
     const fetchCreateProcess = async () => {
       const response = await getPermissionById(3);
@@ -44,16 +46,23 @@ const GraduationProcessPage = () => {
     setFilteredData(results);
   }, [search, students]);
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-  const value = e.target.value;
-  const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, '');
-  const limitedValue = sanitizedValue.slice(0, 50);
-  setSearch(limitedValue);
-};
+  const handleSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    const limitedValue = sanitizedValue.slice(0, 50);
+    setSearch(limitedValue);
+  }, []);
 
-  const goToCreateProcessPage = () => {
+  const goToCreateProcessPage = useCallback(() => {
     handleOpen();
-  };
+  }, [handleOpen]);
+
+  const handleViewStudent = useCallback(
+    (studentId: string) => {
+      navigate(`/studentProfile/${studentId}`);
+    },
+    [navigate]
+  );
 
   const tableHeaders: GridColDef[] = [
     {
@@ -112,7 +121,7 @@ const GraduationProcessPage = () => {
           <IconButton
             color="primary"
             aria-label="ver"
-            onClick={() => navigate(`/studentProfile/${params.row.id}`)}
+            onClick={() => handleViewStudent(params.row.id)}
           >
             <VisibilityIcon />
           </IconButton>
@@ -132,51 +141,49 @@ const GraduationProcessPage = () => {
             color="secondary"
             onClick={goToCreateProcessPage}
             startIcon={<AddIcon />}
+            size={isSmallScreen ? "small" : "medium"}
           >
             {"Nuevo Proceso\r"}
           </Button>
         )
       }
     >
-    <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between mb-4">
-  <label htmlFor="table-search" className="sr-only">
-    {"Buscar\r"}
-  </label>
-  <div className="relative">
-    <TextField
-      type="text"
-      id="table-search"
-      className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-      placeholder="Buscar por nombre de estudiante"
-      value={search}
-      onChange={handleSearchChange}
-      InputProps={{
-        startAdornment: (
-          <div className="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
-            <FaSearch className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </div>
-        ),
-        sx: {
-      paddingLeft: '40px', 
-    },
-      }}
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          '&:hover fieldset': {
-            borderColor: 'secondary.main',
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: 'secondary.main',
-          },
-        },
-        '& input': {
-          outline: 'none !important',
-          boxShadow: 'none !important',
-        },
-      }}
-    />
-  </div>
-</div>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          flexWrap: "wrap",
+          mb: 3,
+          width: "100%",
+        }}
+      >
+        <TextField
+          type="text"
+          placeholder="Buscar por nombre de estudiante"
+          value={search}
+          onChange={handleSearchChange}
+          size={isSmallScreen ? "small" : "medium"}
+          multiline
+          maxRows={3}
+          sx={{
+            width: isSmallScreen ? "100%" : "600px",
+            "& .MuiOutlinedInput-root": {
+              pr: 1,
+              "&:hover fieldset": { borderColor: "secondary.main" },
+              "&.Mui-focused fieldset": { borderColor: "secondary.main" },
+            },
+            "& input": { outline: "none !important", boxShadow: "none !important" },
+          }}
+          InputProps={{
+            startAdornment: (
+              <Box sx={{ display: "flex", alignItems: "center", mr: 1, color: "text.secondary" }}>
+                <FaSearch />
+              </Box>
+            ),
+          }}
+        />
+      </Box>
 
       <Box sx={{ mb: 2 }}>
         <Paper>

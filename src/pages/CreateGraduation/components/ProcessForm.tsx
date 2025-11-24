@@ -1,27 +1,34 @@
-import { useState, useCallback, useEffect } from "react";
+/* eslint-disable no-console */
+import { useState, ChangeEvent, useCallback, useEffect } from "react";
+
 import { TextField, Grid, Typography, MenuItem, Autocomplete, Modal, Box } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import { useFormik } from "formik";
 
-import { Student } from "../../../models/studentInterface";
-import { getStudentsForGraduation } from "../../../services/studentService";
-import { getModes } from "../../../services/modesService";
-import { Modes } from "../../../models/modeInterface";
-import { createGraduationProcess } from "../../../services/processServicer";
 import { useNavigate } from "react-router-dom";
-import { useProcessStore } from "../../../store/store";
 import { LoadingButton } from "@mui/lab";
 import * as yup from "yup";
+import { Student } from "../../../models/studentInterface";
+import { getStudentsForGraduation } from "../../../services/studentService";
+import getModes from "../../../services/modesService";
+import Modes from "../../../models/modeInterface";
+import { createGraduationProcess } from "../../../services/processServicer";
+import { useProcessStore } from "../../../store/store";
+
 interface ProcessFormProps {
   isVisible: boolean;
   isClosed: () => void;
 }
 
-function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
+// Constantes para evitar duplicación
+const FIELD_REQUIRED_MESSAGE = "Campo requerido";
+
+function ProcessForm({ isVisible, isClosed }: ProcessFormProps) {
   const [, setError] = useState<string | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [modes, setModes] = useState<Modes[]>([]);
   const [loading, setLoading] = useState(false);
+  const [titleError, setTitleError] = useState<string | null>(null);
   const updateProcess = useProcessStore((state) => state.setProcess);
   const navigate = useNavigate();
   const actualDate = new Date();
@@ -31,30 +38,35 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
     studentId: yup
       .number()
       .typeError("El ID del estudiante debe ser un número")
-      .required("Campo requerido"),
+      .required(FIELD_REQUIRED_MESSAGE),
 
     studentCode: yup
       .number()
-      .transform((value, originalValue) => {
-        return originalValue.trim() === "" ? null : value;
-      })
+      .transform((value, originalValue) => (originalValue.trim() === "" ? null : value))
       .typeError("El código del estudiante debe ser un número")
       .integer("El código debe ser un número entero")
       .positive("El código debe ser positivo")
-      .required("Campo requerido"),
+      .required(FIELD_REQUIRED_MESSAGE),
 
-    modeId: yup.mixed().test("is-valid-mode", "Seleccionar Modalidad", (value) => {
-      return typeof value === "number" && !isNaN(value);
-    }),
+    modeId: yup
+      .mixed()
+      .test(
+        "is-valid-mode",
+        "Seleccionar Modalidad",
+        (value) => typeof value === "number" && !Number.isNaN(value)
+      ),
 
-    period: yup.string().required("Campo requerido"),
+    period: yup.string().required(FIELD_REQUIRED_MESSAGE),
 
     titleProject: yup
       .string()
       .min(5, "El título debe tener al menos 5 caracteres")
       .max(80, "El título no debe superar los 80 caracteres")
       .matches(/^[a-zA-Z0-9\s]+$/, "El título solo debe contener letras y números")
-      .required("Campo requerido"),
+      .matches(/[a-zA-Z]/, "El título debe contener texto descriptivo.")
+      .matches(/^[^\s].*[^\s]$/, "El título no debe tener espacios al inicio o final")
+      .matches(/^(?!.*\s{2}).*$/, "El título no debe tener espacios consecutivos")
+      .required(FIELD_REQUIRED_MESSAGE),
   });
 
   const fetchData = useCallback(async () => {
@@ -64,8 +76,7 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
       setModes(responseModes.data);
       setStudents([...responseStudents.data]);
     } catch (error) {
-      console.error("Failed to fetch data: ", error);
-      setError("Failed to load data, please try again.");
+      setError("Error al cargar los datos. Por favor, intente de nuevo.");
     }
   }, []);
 
@@ -77,10 +88,12 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
     let firstSemester = actualDate.getMonth() <= 5;
     let currentYear = actualDate.getFullYear();
     const listPeriods = [];
-    for (let i = 0; i < option; i++) {
+    for (let i = 0; i < option; i += 1) {
       const strPeriod = firstSemester ? "Primero" : "Segundo";
       listPeriods.push(strPeriod + currentYear);
-      if (!firstSemester) currentYear++;
+      if (!firstSemester) {
+        currentYear += 1;
+      }
       firstSemester = !firstSemester;
     }
     return listPeriods;
@@ -95,9 +108,10 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
       titleProject: "",
       stageId: 1,
     },
-    validationSchema: validationSchema,
+    validationSchema,
     onSubmit: async (values) => {
       setLoading(true);
+      setTitleError(null);
       try {
         const response = await createGraduationProcess(values);
         if (response.success) {
@@ -105,31 +119,83 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
           navigate(`/studentProfile/${response.data.id}`);
         }
       } catch (error) {
-        console.error("Error al crear proceso:", error);
+        setTitleError(
+          "Este título ya ha sido registrado por otro estudiante. Por favor, ingrese un título diferente."
+        );
       } finally {
         setLoading(false);
       }
     },
   });
 
-  const handleStudentChange = (_event: React.ChangeEvent<object | null>, value: Student | null) => {
-    formik.setFieldValue("studentId", value ? value.id : "");
-    formik.setFieldValue("studentCode", value ? value.code : "");
-  };
+  const handleClose = useCallback(() => {
+    formik.resetForm();
+    setTitleError(null);
+    setError(null);
+    isClosed();
+  }, [formik, isClosed]);
+
+  const handleStudentChange = useCallback(
+    (_event: ChangeEvent<object | null>, value: Student | null) => {
+      formik.setFieldValue("studentId", value ? value.id : "");
+      formik.setFieldValue("studentCode", value ? value.code : "");
+    },
+    [formik]
+  );
+
+  const handleTitleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      formik.handleChange(event);
+      if (titleError) {
+        setTitleError(null);
+      }
+    },
+    [formik, titleError]
+  );
+
+  const isSubmitDisabled = loading || !!titleError || !formik.isValid;
+
+  const renderAutocompleteInput = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (params: any) => (
+      <TextField
+        {...params}
+        label="Nombre Estudiante"
+        variant="outlined"
+        margin="normal"
+        error={formik.touched.studentId && Boolean(formik.errors.studentId)}
+        helperText={formik.touched.studentId && formik.errors.studentId}
+      />
+    ),
+    [formik]
+  );
+
+  // Handler para renderizar items del período
+  const renderPeriodMenuItem = useCallback((value: string) => {
+    const desc = `${value.slice(0, value.length - 4)}-${value.slice(value.length - 4)}`;
+    return (
+      <MenuItem key={value} value={value}>
+        {desc}
+      </MenuItem>
+    );
+  }, []);
+
+  const getStudentOptionLabel = useCallback((student: Student) => `${student.name}`, []);
+
   return (
-    <Modal open={isVisible} onClose={isClosed}>
+    <Modal open={isVisible} onClose={handleClose}>
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
-          boxShadow: 24, 
-          p: 4, 
-          width: '80%', 
-          maxWidth: '100vh', 
-          maxHeight: "80vh", 
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+          width: "80%",
+          maxWidth: "100vh",
+          maxHeight: "80vh",
           overflowY: "auto",
           borderRadius: 2,
         }}
@@ -137,10 +203,12 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
         <form onSubmit={formik.handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h4">Crear Proceso de Graduación</Typography>
-              <Typography variant="body2" sx={{ fontSize: 14, color: 'gray' }}>
-                Completa los siguientes campos para definir los criterios y requisitos del proceso de
-                graduación.
+              <Typography variant="h4">{"Crear Proceso de Graduación"}</Typography>
+              <Typography variant="body2" sx={{ fontSize: 14, color: "gray" }}>
+                {
+                  "Completa los siguientes campos para definir los criterios y requisitos del proceso de\r"
+                }
+                {"graduación.\r"}
               </Typography>
               <Divider flexItem sx={{ my: 2 }} />
             </Grid>
@@ -148,25 +216,16 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={3}>
-                  <Typography variant="body2">Información Estudiante</Typography>
+                  <Typography variant="body2">{"Información Estudiante"}</Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <Autocomplete
                     fullWidth
                     options={students}
-                    getOptionLabel={(student) => `${student.name}`}
+                    getOptionLabel={getStudentOptionLabel}
                     onChange={handleStudentChange}
                     onBlur={formik.handleBlur}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Nombre Estudiante"
-                        variant="outlined"
-                        margin="normal"
-                        error={formik.touched.studentId && Boolean(formik.errors.studentId)}
-                        helperText={formik.touched.studentId && formik.errors.studentId}
-                      />
-                    )}
+                    renderInput={renderAutocompleteInput}
                   />
                   <TextField
                     fullWidth
@@ -179,6 +238,7 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
                     label="Código Estudiante"
                     variant="outlined"
                     margin="normal"
+                    disabled
                   />
                 </Grid>
               </Grid>
@@ -188,7 +248,7 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={3}>
-                  <Typography variant="body2">Información Modalidad</Typography>
+                  <Typography variant="body2">{"Información Modalidad"}</Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <TextField
@@ -215,10 +275,15 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
                     label="Título de Proyecto"
                     name="titleProject"
                     value={formik.values.titleProject}
-                    onChange={formik.handleChange}
+                    onChange={handleTitleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.titleProject && Boolean(formik.errors.titleProject)}
-                    helperText={formik.touched.titleProject && formik.errors.titleProject}
+                    error={
+                      (formik.touched.titleProject && Boolean(formik.errors.titleProject)) ||
+                      Boolean(titleError)
+                    }
+                    helperText={
+                      titleError || (formik.touched.titleProject && formik.errors.titleProject)
+                    }
                     inputProps={{ maxLength: 80 }}
                     variant="outlined"
                     margin="normal"
@@ -236,10 +301,7 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
                     error={formik.touched.period && Boolean(formik.errors.period)}
                     helperText={formik.touched.period && formik.errors.period}
                   >
-                    {setPeriods(numberPeriods).map((value) => {
-                      const desc = value.slice(0, value.length - 4) + '-' + value.slice(value.length - 4);
-                      return <MenuItem value={value}>{desc}</MenuItem>;
-                    })}
+                    {setPeriods(numberPeriods).map(renderPeriodMenuItem)}
                   </TextField>
                 </Grid>
               </Grid>
@@ -249,8 +311,14 @@ function ProcessForm({isVisible, isClosed}: ProcessFormProps) {
             <Grid item xs={12}>
               <Grid container spacing={2} justifyContent="flex-end">
                 <Grid item>
-                  <LoadingButton variant="contained" color="primary" type="submit" loading={loading}>
-                    GUARDAR
+                  <LoadingButton
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    loading={loading}
+                    disabled={isSubmitDisabled}
+                  >
+                    {"GUARDAR\r"}
                   </LoadingButton>
                 </Grid>
               </Grid>

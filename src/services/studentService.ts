@@ -38,6 +38,9 @@ export const getUserById = async (id: number) => {
 };
 
 export const updateStudent = async (student: StudentForm) => {
-  const response = await apiClient.put(`/student/${student.id}`, student);
+  
+  const { id, ...studentData } = student;
+  
+  const response = await apiClient.put(`/student/${id}`, studentData);
   return response.data;
 };

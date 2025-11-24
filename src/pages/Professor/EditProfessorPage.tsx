@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button, Divider, Grid, TextField, Typography, Snackbar, Alert, MenuItem } from "@mui/material";
-import { useEffect, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { updateProfessor, getProfessorById } from "../../services/mentorsService";
 import {
   PHONE_ERROR_MESSAGE,
@@ -9,7 +9,12 @@ import {
   LETTERS_REGEX,
   EMAIL_REGEX,
   PHONE_REGEX,
+  CODE_ERROR_MESSAGE,
+  CODE_DIGITS,
+  CODE_MIN_DIGITS,
+  CODE_REGEX,
 } from "../../constants/validation";
+
 const validationSchema = Yup.object({
   name: Yup.string()
     .matches(LETTERS_REGEX, "El nombre solo debe contener letras")
@@ -27,8 +32,8 @@ const validationSchema = Yup.object({
     .matches(PHONE_REGEX, PHONE_ERROR_MESSAGE)
     .required("El número de teléfono es obligatorio"),
   degree: Yup.string().required("El título académico es obligatorio"),
-  code: Yup.number()
-    .typeError("El código debe ser numérico")
+  code: Yup.string()
+    .matches(CODE_REGEX, CODE_ERROR_MESSAGE)
     .required("El código de docente es obligatorio"),
   
 });
@@ -82,15 +87,24 @@ const EditProfessorPage = ({ id }:EditProfessorProps) => {
     onSubmit: async (values) => {
       try {
         const updatedValues = {
-          ...values,
-          id: Number(id),
+          name: values.name,
+          lastname: values.lastname,
+          mothername: values.mothername,
+          email: values.email,
+          phone: values.phone,
+          code: values.code, // Como string
+          degree: values.degree,
           role_id: 2,
           roles: [2],
           isStudent: false,
           is_scholarship: false
         };
+        
         // @ts-ignore
-        await updateProfessor(updatedValues);
+        await updateProfessor({
+          id: Number(id),
+          ...updatedValues
+        });
         setMessage("Docente actualizado con éxito");
         setSeverity("success");
       } catch (error) {
@@ -101,24 +115,25 @@ const EditProfessorPage = ({ id }:EditProfessorProps) => {
       }
     },
   });
-  const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_event: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") {
       return;
     }
     setOpen(false);
   };
 
-  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("phone", value);
     }
   };
 
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^[0-9]*$/.test(value)) {
       formik.setFieldValue("code", value);
+      formik.setFieldTouched("code", true);
     }
   };
   return (
@@ -196,7 +211,10 @@ const EditProfessorPage = ({ id }:EditProfessorProps) => {
                       error={formik.touched.code && Boolean(formik.errors.code)}
                       helperText={formik.touched.code && formik.errors.code}
                       margin="normal"
-                      inputProps={{ maxLength: 10 }}
+                      inputProps={{ 
+                        maxLength: CODE_DIGITS,
+                        minLength: CODE_MIN_DIGITS
+                      }}
                     />
                   </Grid>
                 </Grid>

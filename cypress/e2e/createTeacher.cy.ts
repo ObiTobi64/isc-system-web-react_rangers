@@ -1,122 +1,83 @@
-/// <reference types="cypress" />
+describe("Creación de Docente", () => {
+  beforeEach(() => {
+    cy.loginAsHeadOfDepartment();
+  });
 
-const email = 'paulwilkerlf@gmail.com';
-const password = '123456';
+  it("Se debe crear un docente correctamente", () => {
+    cy.fixture("teachers").then(({ validTeacher }) => {
+      cy.createTeacher(validTeacher);
+      
+      cy.contains('Docente Creado!', { timeout: 15000 }).should('be.visible');
+      
+      // cerrar mensaje de exito y formulario
+      cy.get('body').type('{esc}');
+      cy.get('body').type('{esc}');
+      cy.get('body').type('{esc}');
 
-Cypress.Commands.add('login', (email, password) => {
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    throw new Error('Email and password must be strings');
-  }
+      cy.wait(3000); //esperar para actualizacion de tabla
 
-  cy.visit('http://localhost:5173/login');
-  cy.get('input[name=email]').type(email);
-  cy.get('input[name=password]').type(password);
-  cy.contains('Login').click();
+      cy.searchTeacher(validTeacher.code);
+    });
+  });
 });
 
-describe('Create new graduation process', () => {
-  const code = Math.floor(Math.random() * 100000);
-  const name = `Teacher${code}`;
-  const lastname = `Teacher${code}`;
-  const testEmail = `testEmail${code}@gmail.com`;
-
+describe("Validaciones", () => {
   beforeEach(() => {
-    cy.login(email, password);
+    cy.loginAsHeadOfDepartment();
+    cy.get('[data-testid="SupervisorAccountIcon"]').should('be.visible').click();
+
+    cy.contains('Agregar docente').should('be.visible').click();
   });
 
-  it('Should create a new teacher with the position of a licensed successfully', () => {
-    cy.get('[data-testid="MenuIcon"]').should('be.visible').click();
-    cy.get('[data-testid="SupervisorAccountIcon"]').should('be.visible').click();
-    cy.get('.MuiButton-containedSecondary.css-kcsbbo-MuiButtonBase-root-MuiButton-root')
-      .should('be.visible')
-      .click();
-    // insert data
-    cy.get('#name')
-      .should('be.visible')
-      .type(name + 'licensed');
-    cy.get('#lastname')
-      .should('be.visible')
-      .type(lastname + 'licensed');
-    cy.get('#code')
-      .should('be.visible')
-      .type(code + '1');
-    cy.get('#degree').should('be.visible').click();
-    cy.get('[data-value="licenciado"]').should('be.visible').click();
-    cy.get('#email')
-      .should('be.visible')
-      .type('licensed' + testEmail);
-    cy.get('#phone')
-      .should('be.visible')
-      .type(code + '1');
-    cy.get('.MuiButtonBase-root.MuiButton-root.MuiButton-containedPrimary')
-      .should('be.visible')
-      .click();
-    cy.get('.MuiAlert-message.css-1pxa9xg-MuiAlert-message')
-      .should('be.visible')
-      .and('contain', 'Profesor creado con éxito');
+  it("Debe mostrar errores para todos los campos requeridos al guardar sin llenar nada", () => {
+    cy.fixture("teachers").then(({ validationMessages }) => {
+      cy.contains('button', 'GUARDAR').click();
+
+      // Verificar todos los mensajes de campos requeridos
+      const requiredFields = [
+        { label: 'Nombres', message: validationMessages.requiredName },
+        { label: 'Apellido Paterno', message: validationMessages.requiredPaternalSurname },
+        { label: 'Apellido Materno', message: validationMessages.requiredMaternalSurname },
+        { label: 'Codigo de Docente', message: validationMessages.requiredCode },
+        { label: 'Título Académico', message: validationMessages.requiredTitle },
+        { label: 'Correo Electrónico', message: validationMessages.requiredEmail },
+        { label: 'Número de Teléfono', message: validationMessages.requiredPhone }
+      ];
+
+      requiredFields.forEach(field => {
+        cy.contains('label', field.label)
+          .siblings('.MuiFormHelperText-root')
+          .should('contain', field.message);
+      });
+    });
   });
 
-  it('Should create a new teacher with the position of a maestrer successfully', () => {
-    cy.get('[data-testid="MenuIcon"]').should('be.visible').click();
-    cy.get('[data-testid="SupervisorAccountIcon"]').should('be.visible').click();
-    cy.get('.MuiButton-containedSecondary.css-kcsbbo-MuiButtonBase-root-MuiButton-root')
-      .should('be.visible')
-      .click();
-    // insert data
-    cy.get('#name')
-      .should('be.visible')
-      .type(name + 'master');
-    cy.get('#lastname')
-      .should('be.visible')
-      .type(lastname + 'master');
-    cy.get('#code')
-      .should('be.visible')
-      .type(code + '2');
-    cy.get('#degree').should('be.visible').click();
-    cy.get('[data-value="maestro"]').should('be.visible').click();
-    cy.get('#email')
-      .should('be.visible')
-      .type('master' + testEmail);
-    cy.get('#phone')
-      .should('be.visible')
-      .type(code + '2');
-    cy.get('.MuiButtonBase-root.MuiButton-root.MuiButton-containedPrimary')
-      .should('be.visible')
-      .click();
-    cy.get('.MuiAlert-message.css-1pxa9xg-MuiAlert-message')
-      .should('be.visible')
-      .and('contain', 'Profesor creado con éxito');
-  });
+  it("Debe mostrar errores para todos los campos con datos inválidos", () => {
+    cy.fixture("teachers").then(({ invalidTeacher, validationMessages }) => {
+      // Llenar todos los campos con datos inválidos
+      cy.get('input[name="name"]').type(invalidTeacher.invalidName);
+      cy.get('input[name="lastname"]').type(invalidTeacher.invalidPaternalSurname);
+      cy.get('input[name="mothername"]').type(invalidTeacher.invalidMaternalSurname);
+      cy.get('input[name="code"]').type(invalidTeacher.invalidCode);
+      cy.get('input[name="email"]').type(invalidTeacher.invalidEmail);
+      cy.get('input[name="phone"]').type(invalidTeacher.invalidPhone);
 
-  it('Should create a new teacher with the position of a PhD successfully', () => {
-    cy.get('[data-testid="MenuIcon"]').should('be.visible').click();
-    cy.get('[data-testid="SupervisorAccountIcon"]').should('be.visible').click();
-    cy.get('.MuiButton-containedSecondary.css-kcsbbo-MuiButtonBase-root-MuiButton-root')
-      .should('be.visible')
-      .click();
-    // insert data
-    cy.get('#name')
-      .should('be.visible')
-      .type(name + 'PhD');
-    cy.get('#lastname')
-      .should('be.visible')
-      .type(lastname + 'PhD');
-    cy.get('#code')
-      .should('be.visible')
-      .type(code + '3');
-    cy.get('#degree').should('be.visible').click();
-    cy.get('[data-value="maestro"]').should('be.visible').click();
-    cy.get('#email')
-      .should('be.visible')
-      .type('PhD' + testEmail);
-    cy.get('#phone')
-      .should('be.visible')
-      .type(code + '3');
-    cy.get('.MuiButtonBase-root.MuiButton-root.MuiButton-containedPrimary')
-      .should('be.visible')
-      .click();
-    cy.get('.MuiAlert-message.css-1pxa9xg-MuiAlert-message')
-      .should('be.visible')
-      .and('contain', 'Profesor creado con éxito');
+      cy.contains('button', 'GUARDAR').click();
+
+      // Verificar todos los mensajes de formato inválido
+      const invalidFields = [
+        { label: 'Nombres', message: validationMessages.onlyLettersName },
+        { label: 'Apellido Paterno', message: validationMessages.onlyLettersPaternal },
+        { label: 'Apellido Materno', message: validationMessages.onlyLettersMaternal },
+        { label: 'Correo Electrónico', message: validationMessages.invalidEmailFormat },
+        { label: 'Número de Teléfono', message: validationMessages.invalidPhoneLength }
+      ];
+
+      invalidFields.forEach(field => {
+        cy.contains('label', field.label)
+          .siblings('.MuiFormHelperText-root')
+          .should('contain', field.message);
+      });
+    });
   });
 });

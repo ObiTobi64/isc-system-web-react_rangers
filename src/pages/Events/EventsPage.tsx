@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { FC, SyntheticEvent, useEffect, useState } from "react";
 import { Grid, Tabs, Tab, Box } from "@mui/material";
 import EventCard from "../../components/cards/EventCard";
 import dayjs from "dayjs";
 import { getEventsService } from "../../services/eventsService";
 import { Event } from "../../models/eventInterface";
 
-const EventsPage: React.FC = () => {
+const EventsPage: FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [events, setEvents] = useState<Event[]>();
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

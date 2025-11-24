@@ -3,10 +3,11 @@ import { Checkbox, Paper, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 import dayjs from "dayjs";
 import DownloadButton from "../common/DownloadButton";
-import { letters } from "../../constants/letters";
+import letters from "../../constants/letters";
 import { Seminar } from "../../models/studentProcess";
 import { MentorFormValues } from "../../hooks/useMentorFormik";
 import { Carrer } from "../../store/carrerStore";
+import { Box } from "@mui/material";
 
 const { TUTOR_APPROBAL, TUTOR_ASSIGNMENT } = letters;
 
@@ -36,7 +37,10 @@ const DocumentCheckbox: FC<DocumentCheckboxProps> = ({ disabled, formik, carrer,
         elevation={0}
         sx={{
           display: "flex",
-          alignItems: "center",
+          flexWrap: "wrap",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 1.5,
           backgroundColor: "#e6f4ff",
           p: 2,
           borderRadius: 2,
@@ -73,7 +77,10 @@ const DocumentCheckbox: FC<DocumentCheckboxProps> = ({ disabled, formik, carrer,
         elevation={0}
         sx={{
           display: "flex",
-          alignItems: "center",
+          flexWrap: "wrap",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 1.5,
           backgroundColor: "#e6f4ff",
           p: 2,
           borderRadius: 2,
@@ -90,27 +97,41 @@ const DocumentCheckbox: FC<DocumentCheckboxProps> = ({ disabled, formik, carrer,
         <Typography variant="body2" sx={{ flexGrow: 1 }}>
           {"Carta de Aprobación de Tutor Presentada"}
         </Typography>
-        <DownloadButton
-          url={TUTOR_APPROBAL.path}
-          disabled={!isMentorSelected}
-          onClick={handleBlockedDownload}
-          data={{
-            student: process?.student_fullname || "",
-            tutor: process?.tutor_fullname || "",
-            jefe_carrera: carrer?.headOfDepartment || "",
-            degree: process?.tutor_degree || "",
-            carrera: carrer?.fullName || "",
-            dia: dayjs().format("DD"),
-            mes: dayjs().format("MMMM"),
-            ano: dayjs().format("YYYY"),
-            title_project: process?.project_name || "",
-            date: dayjs(formik.values.date_tutor_assignament).format("DD/MM/YYYY"),
-            isTesis: process?.modality_id.toString() === "3" ? "  X" : "",
-            isProject: process?.modality_id.toString() === "1" ? "  X" : "",
-            isJob: process?.modality_id.toString() === "2" ? "  X" : "",
+        <Box
+          sx={{
+            minWidth: 0,
+            width: { xs: "100%", sm: "auto" },
+            "& .MuiButton-root": {
+              maxWidth: { xs: "100%", sm: 260 },
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              px: 1.5,
+            },
           }}
-          filename={`${TUTOR_APPROBAL.filename}_${formik.values.mentorName}.${TUTOR_APPROBAL.extention}`}
-        />
+        >
+          <DownloadButton
+            url={TUTOR_APPROBAL.path}
+            disabled={!isMentorSelected}
+            onClick={handleBlockedDownload}
+            data={{
+              student: process?.student_fullname || "",
+              tutor: process?.tutor_fullname || "",
+              jefe_carrera: carrer?.headOfDepartment || "",
+              degree: process?.tutor_degree || "",
+              carrera: carrer?.fullName || "",
+              dia: dayjs().format("DD"),
+              mes: dayjs().format("MMMM"),
+              ano: dayjs().format("YYYY"),
+              title_project: process?.project_name || "",
+              date: dayjs(formik.values.date_tutor_assignament).format("DD/MM/YYYY"),
+              isTesis: process?.modality_id.toString() === "3" ? "  X" : "",
+              isProject: process?.modality_id.toString() === "1" ? "  X" : "",
+              isJob: process?.modality_id.toString() === "2" ? "  X" : "",
+            }}
+            filename={`${TUTOR_APPROBAL.filename}_${formik.values.mentorName}.${TUTOR_APPROBAL.extention}`}
+          />
+        </Box>
       </Paper>
     </>
   );

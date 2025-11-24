@@ -14,12 +14,14 @@ export const getCurrentSemester = () => {
     today.isSame(semester1End)
   ) {
     return `SEMESTRE I - ${year}`;
-  } else if (
+  }
+  if (
     (today.isAfter(semester2Start) && today.isBefore(semester2End)) ||
     today.isSame(semester2End)
   ) {
     return `SEMESTRE II - ${year}`;
-  } else {
-    return `${year}`;
   }
+  return `${year}`;
 };
+
+export default getCurrentSemester;
