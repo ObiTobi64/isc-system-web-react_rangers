@@ -59,11 +59,19 @@ jobs:
 
           rm private_key.pem
 
-      - name: Reload Apache on VM
+      - name: Install and Reload Apache
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo systemctl restart apache2
+            # Instalar Apache2 si no existe
+            if ! systemctl is-active --quiet apache2; then
+              sudo apt-get update
+              sudo apt-get install -y apache2
+              sudo systemctl enable apache2
+              sudo systemctl start apache2
+            else
+              sudo systemctl restart apache2
+            fi
