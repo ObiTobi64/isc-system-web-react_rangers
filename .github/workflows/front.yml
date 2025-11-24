@@ -38,12 +38,19 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-          # Copiar a home primero (sin permisos)
+          # Limpiar espacio PRIMERO
+          ssh -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "Limpiando espacio en disco..."
+            rm -rf ~/dist
+            sudo rm -rf /var/www/html/*
+            df -h /
+          EOF
+
+          # Copiar a home
           scp -i private_key.pem -r dist ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
 
           # Mover con sudo al destino final
           ssh -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            sudo rm -rf /var/www/html/*
             sudo cp -r ~/dist/* /var/www/html/
             echo '${{ secrets.FRONTEND_ENV }}' | sudo tee /var/www/html/.env > /dev/null
             sudo chmod 600 /var/www/html/.env
